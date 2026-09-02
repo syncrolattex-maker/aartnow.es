@@ -16,7 +16,7 @@ interface HalftoneCursorTrailProps {
 export default function HalftoneCursorTrail({
   src,
   type = 'image',
-  gridSize = 12, // Optimized grid size
+  gridSize = 12,
   influenceRadius = 90,
   dotRadius = 3.5,
   decay = 0.93,
@@ -30,16 +30,23 @@ export default function HalftoneCursorTrail({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isTouch, setIsTouch] = useState(false);
 
-  // Detect touch pointer
+  // Detect touch pointer / mobile screen
   useEffect(() => {
     const mq = window.matchMedia('(pointer: coarse)');
-    const update = () => setIsTouch(mq.matches);
+    const update = () => setIsTouch(mq.matches || window.innerWidth < 768);
     update();
     mq.addEventListener?.('change', update);
-    return () => mq.removeEventListener?.('change', update);
+    window.addEventListener('resize', update);
+
+    return () => {
+      mq.removeEventListener?.('change', update);
+      window.removeEventListener('resize', update);
+    };
   }, []);
 
   useEffect(() => {
+    if (isTouch) return;
+
     const stage = stageRef.current;
     const source = sourceRef.current;
     const canvas = canvasRef.current;
@@ -52,7 +59,6 @@ export default function HalftoneCursorTrail({
     const sctx = sample.getContext('2d', { willReadFrequently: true });
     if (!sctx) return;
 
-    // Optimized DPR cap (max 1.5x) for ultra-fast rendering on high-DPI Retina screens
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     let W = 0, H = 0, cols = 0, rows = 0;
     let activation: Float32Array | null = null;
@@ -130,18 +136,15 @@ export default function HalftoneCursorTrail({
       return activation[iy * cols + ix];
     }
 
-    function pointerPos(e: MouseEvent | TouchEvent) {
+    function pointerPos(e: MouseEvent) {
       if (!stage) return { x: 0, y: 0 };
       const rect = stage.getBoundingClientRect();
-      const touch = (e as TouchEvent).touches ? (e as TouchEvent).touches[0] : null;
-      const clientX = touch ? touch.clientX : (e as MouseEvent).clientX;
-      const clientY = touch ? touch.clientY : (e as MouseEvent).clientY;
-      return { x: clientX - rect.left, y: clientY - rect.top };
+      return { x: e.clientX - rect.left, y: e.clientY - rect.top };
     }
 
     let last: { x: number; y: number } | null = null;
 
-    function onMove(e: MouseEvent | TouchEvent) {
+    function onMove(e: MouseEvent) {
       const p = pointerPos(e);
       if (last) {
         const dist = Math.hypot(p.x - last.x, p.y - last.y);
@@ -173,10 +176,8 @@ export default function HalftoneCursorTrail({
       }
 
       if (ctx && activation) {
-        // 1) Base full frame render
         drawBase();
 
-        // 2) Displaced grid tiles (Bulge) + Ink dots
         if (active.size > 0) {
           ctx.fillStyle = `rgb(${dotColor})`;
           
@@ -215,7 +216,6 @@ export default function HalftoneCursorTrail({
           }
           ctx.globalAlpha = 1;
         } else if (type === 'image') {
-          // Pause animation loop when no active cells remain for static images
           isLooping = false;
           return;
         }
@@ -228,8 +228,6 @@ export default function HalftoneCursorTrail({
     window.addEventListener('resize', resize);
     stage.addEventListener('mousemove', onMove);
     stage.addEventListener('mouseleave', onEnd);
-    stage.addEventListener('touchmove', onMove, { passive: true });
-    stage.addEventListener('touchend', onEnd);
 
     const onLoaded = () => {
       updateSampleFrame();
@@ -251,15 +249,13 @@ export default function HalftoneCursorTrail({
       window.removeEventListener('resize', resize);
       stage.removeEventListener('mousemove', onMove);
       stage.removeEventListener('mouseleave', onEnd);
-      stage.removeEventListener('touchmove', onMove);
-      stage.removeEventListener('touchend', onEnd);
       if (type === 'image') {
         (source as HTMLImageElement).removeEventListener('load', onLoaded);
       } else {
         (source as HTMLVideoElement).removeEventListener('loadeddata', onLoaded);
       }
     };
-  }, [src, type, gridSize, influenceRadius, dotRadius, decay, warpStrength, dotColor]);
+  }, [src, type, gridSize, influenceRadius, dotRadius, decay, warpStrength, dotColor, isTouch]);
 
   return (
     <div
@@ -279,7 +275,7 @@ export default function HalftoneCursorTrail({
           loop
           playsInline
           crossOrigin="anonymous"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', visibility: 'hidden' }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', visibility: isTouch ? 'visible' : 'hidden' }}
         />
       ) : (
         <img
@@ -287,13 +283,15 @@ export default function HalftoneCursorTrail({
           src={src}
           alt=""
           crossOrigin="anonymous"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', visibility: 'hidden' }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', visibility: isTouch ? 'visible' : 'hidden' }}
         />
       )}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full"
-      />
+      {!isTouch && (
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full"
+        />
+      )}
     </div>
   );
 }

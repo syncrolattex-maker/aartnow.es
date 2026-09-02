@@ -6,13 +6,23 @@ export default function GlobalAdaptiveHalftoneTrail() {
 
   useEffect(() => {
     const mq = window.matchMedia('(pointer: coarse)');
-    const update = () => setIsTouch(mq.matches);
+    const update = () => {
+      setIsTouch(mq.matches || window.innerWidth < 768);
+    };
     update();
     mq.addEventListener?.('change', update);
-    return () => mq.removeEventListener?.('change', update);
+    window.addEventListener('resize', update);
+
+    return () => {
+      mq.removeEventListener?.('change', update);
+      window.removeEventListener('resize', update);
+    };
   }, []);
 
   useEffect(() => {
+    // Completely disable trail execution on mobile / touch devices
+    if (isTouch) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -59,7 +69,6 @@ export default function GlobalAdaptiveHalftoneTrail() {
       try {
         const elem = document.elementFromPoint(px, py);
         if (elem) {
-          // Check closest section ID or computed background color
           if (elem.closest('#work')) {
             return '10, 10, 10'; // Black dots on light cream background (#FFFDF3)
           }
@@ -117,16 +126,13 @@ export default function GlobalAdaptiveHalftoneTrail() {
       startLoop();
     }
 
-    function pointerPos(e: MouseEvent | TouchEvent) {
-      const touch = (e as TouchEvent).touches ? (e as TouchEvent).touches[0] : null;
-      const clientX = touch ? touch.clientX : (e as MouseEvent).clientX;
-      const clientY = touch ? touch.clientY : (e as MouseEvent).clientY;
-      return { x: clientX, y: clientY };
+    function pointerPos(e: MouseEvent) {
+      return { x: e.clientX, y: e.clientY };
     }
 
     let last: { x: number; y: number } | null = null;
 
-    function onMove(e: MouseEvent | TouchEvent) {
+    function onMove(e: MouseEvent) {
       const p = pointerPos(e);
       if (last) {
         const dist = Math.hypot(p.x - last.x, p.y - last.y);
@@ -191,26 +197,22 @@ export default function GlobalAdaptiveHalftoneTrail() {
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseleave', onEnd);
-    window.addEventListener('touchmove', onMove, { passive: true });
-    window.addEventListener('touchend', onEnd);
 
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseleave', onEnd);
-      window.removeEventListener('touchmove', onMove);
-      window.removeEventListener('touchend', onEnd);
     };
-  }, []);
+  }, [isTouch]);
+
+  // Don't render canvas on mobile / touch devices
+  if (isTouch) return null;
 
   return (
     <canvas
       ref={canvasRef}
       className="fixed inset-0 w-full h-full pointer-events-none z-[9995]"
-      style={{
-        cursor: isTouch ? 'auto' : 'none',
-      }}
     />
   );
 }
