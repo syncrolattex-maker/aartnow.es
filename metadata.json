@@ -1,0 +1,6 @@
+{
+  "name": "aartnow.es",
+  "description": "Portfolio of aartnow.es — A cutting-edge digital experience at the intersection of art and technology.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
