@@ -32,26 +32,26 @@ export default function StickyBar() {
       <div className="flex items-center gap-6">
         <span className="hidden md:inline-block text-white/50">{t.stickyFreaks}</span>
         <span className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#FF1300] animate-pulse"></span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#A3FF12] animate-pulse"></span>
           <span>{t.stickyBased}</span>
         </span>
       </div>
 
       {/* Center Live Clock */}
       <div className="hidden lg:flex items-center gap-2 text-white">
-        <span className="text-[#FF1300] font-bold">[</span>
+        <span className="text-[#A3FF12] font-bold">[</span>
         <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
         <span className="font-bold tracking-widest">{time || '14:22:00'}</span>
-        <span className="text-[#FF1300] font-bold">]</span>
+        <span className="text-[#A3FF12] font-bold">]</span>
       </div>
 
       {/* Right Social & Trilingual Switcher */}
       <div className="flex items-center gap-6">
         <div className="hidden sm:flex items-center gap-4 text-white/60">
-          <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-[#FF1300] transition-colors">
+          <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-[#A3FF12] transition-colors">
             instagram ↗
           </a>
-          <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-[#FF1300] transition-colors">
+          <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-[#A3FF12] transition-colors">
             linkedin ↗
           </a>
         </div>
@@ -64,7 +64,7 @@ export default function StickyBar() {
                 data-magnetic="true"
                 onClick={() => setLang(item.code)}
                 className={`px-1 rounded transition-colors font-bold ${
-                  lang === item.code ? 'text-[#FF1300]' : 'text-white/40 hover:text-white'
+                  lang === item.code ? 'text-[#A3FF12]' : 'text-white/40 hover:text-white'
                 }`}
               >
                 {item.label}

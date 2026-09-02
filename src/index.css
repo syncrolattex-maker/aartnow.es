@@ -1,131 +1,81 @@
 @import "tailwindcss";
 
-/* SuisseIntl & SuisseBPIntl Font Definitions */
-@font-face {
-  font-family: 'SuisseIntl';
-  src: url('https://lamalama.com/wp-content/themes/lamalama2025/dist/fonts/SuisseBPIntl-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SuisseIntl';
-  src: url('https://lamalama.com/wp-content/themes/lamalama2025/dist/fonts/SuisseBPIntl-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SuisseIntl';
-  src: url('https://lamalama.com/wp-content/themes/lamalama2025/dist/fonts/SuisseBPIntl-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SuisseIntl';
-  src: url('https://lamalama.com/wp-content/themes/lamalama2025/dist/fonts/SuisseBPIntl-Light.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-:root {
-  --ll-bg-primary: #000000;
-  --ll-bg-secondary: #0D0D0D;
-  --ll-bg-card: #121212;
-  --ll-text-primary: #FFFDF3;
-  --ll-accent-green: #FF1300;
-  --ll-accent-red: #FF1300;
-  --ll-accent-lime: #FF1300;
-  --ll-border-subtle: rgba(255, 253, 243, 0.12);
-  --ll-grid-gap: 1.5rem;
-}
-
 @layer base {
-  html, body {
-    background-color: var(--ll-bg-primary);
-    color: var(--ll-text-primary);
-    font-family: 'SuisseIntl', 'SuisseBPIntl', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    overflow-x: hidden;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    selection-background-color: var(--ll-accent-green);
-    selection-color: #000000;
+  :root {
+    /* Lama Lama Official Brand Color Palette */
+    --ll-bg-black: #000000;
+    --ll-bg-surface: #0D0D0D;
+    --ll-bg-cream: #FFFDF3;
+    --ll-accent-green: #A3FF12; /* Lama Lama Signature Acid Electric Lime Green */
+    --ll-accent-red: #A3FF12;
+    --ll-text-light: #FFFDF3;
+    --ll-text-dark: #000000;
+    --ll-border-subtle: rgba(255, 255, 255, 0.12);
   }
 
-  h1, h2, h3, h4, h5, h6, .font-sans {
-    font-family: 'SuisseIntl', 'SuisseBPIntl', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--ll-bg-black);
+    color: var(--ll-text-light);
+    font-family: 'SuisseBPIntl', system-ui, -apple-system, sans-serif;
   }
 
-  .font-mono {
-    font-family: 'Sometype', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  }
-
-  @media (pointer: fine) {
-    *, html, body, a, button, input, textarea, select, [role="button"] {
-      cursor: none !important;
-    }
+  ::selection {
+    background-color: #A3FF12;
+    color: #000000;
   }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: #000000;
-}
-::-webkit-scrollbar-thumb {
-  background: #222222;
-  border-radius: 2px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--ll-accent-green);
+/* Custom Utilities for Lama Lama Aesthetic */
+.dot-matrix {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-/* Grain Overlay */
 .grain-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: transparent url('https://grainy-gradients.vercel.app/noise.svg') repeat;
-  opacity: 0.04;
   pointer-events: none;
-  z-index: 9990;
-  filter: contrast(150%) brightness(100%);
+  z-index: 999;
+  opacity: 0.035;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* Base GSAP Custom Cursor Styles */
-.ll-cursor-main {
-  position: fixed;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 9999;
-  mix-blend-mode: difference;
-  will-change: transform;
+/* SVG Marching Dashed Line Animation for Project Cards */
+@keyframes strokeMarch {
+  to {
+    stroke-dashoffset: -28;
+  }
 }
 
-.ll-cursor-ball {
-  background-color: #FFFFFF;
-  border-radius: 9999px;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-              height 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-              border-radius 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              background-color 0.3s ease;
+.animate-marching-dashes {
+  stroke-dasharray: 8 6;
+  animation: strokeMarch 1s linear infinite;
 }
 
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #A3FF12;
+  border-radius: 0px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8AE600;
+}
+
+/* Lama Lama Preloader Screen */
 .ll-loader {
   position: fixed;
   inset: 0;
@@ -137,28 +87,4 @@
   z-index: 9999;
   background-color: #000000;
   color: #FFFFFF;
-  font-family: ui-monospace, monospace;
-  text-transform: uppercase;
-  font-weight: 500;
-}
-
-/* Dot Matrix Glow */
-.dot-matrix {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-/* Marching Dashed Border Animation along Rectangular Perimeter */
-@keyframes strokeMarch {
-  0% {
-    stroke-dashoffset: 0;
-  }
-  100% {
-    stroke-dashoffset: -28;
-  }
-}
-
-.animate-marching-dashes {
-  stroke-dasharray: 8 6;
-  animation: strokeMarch 0.7s linear infinite;
 }

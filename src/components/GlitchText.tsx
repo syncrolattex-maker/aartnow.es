@@ -48,7 +48,7 @@ export default function GlitchText({ text, className = '', as = 'span' }: Glitch
     <Component 
       onMouseEnter={triggerGlitch}
       className={`relative inline-block transition-colors duration-200 cursor-pointer ${
-        isGlitching ? 'text-[#FF1300] font-mono' : ''
+        isGlitching ? 'text-[#A3FF12] font-mono' : ''
       } ${className}`}
     >
       {displayText}
