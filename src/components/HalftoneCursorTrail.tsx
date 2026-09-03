@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
 /**
- * DitherCursorTrail (Deformación Fluida de Imagen + Borde Físico Deformable)
- * Deforma la imagen Y el propio marco/borde exterior del contenedor al pasar el cursor,
- * curvando el borde como una goma líquida fusionada con el tramado Dithering Bayer 4x4.
+ * DitherCursorTrail (Fusión Total Fondo + Imagen con Bleed Extendido)
+ * Deforma la imagen Y el fondo exterior de la web como una sola masa líquida unificada,
+ * permitiendo que la foto se desborde y fusione con el fondo de la página.
  */
 
 interface HalftoneCursorTrailProps {
@@ -27,13 +27,16 @@ const BAYER_4X4 = [
   [15/16,  7/16, 13/16,  5/16]
 ];
 
+// Margen de sangrado para permitir que la deformación se fusione con el fondo fuera de la caja
+const BLEED_MARGIN = 50;
+
 export default function HalftoneCursorTrail({
   src,
   type = "image",
   gridSize = 10,
-  influenceRadius = 130,
-  decay = 0.92,
-  warpStrength = 28,
+  influenceRadius = 150,
+  decay = 0.93,
+  warpStrength = 35,
   invert = true,
   dotColor = "255,255,255",
   className = "",
@@ -80,7 +83,7 @@ export default function HalftoneCursorTrail({
     if (!sctx) return;
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    let W = 0, H = 0, cols = 0, rows = 0;
+    let stageW = 0, stageH = 0, W = 0, H = 0, cols = 0, rows = 0;
     let activation: Float32Array | null = null;
     let active = new Set<number>();
     let raf: number;
@@ -97,24 +100,30 @@ export default function HalftoneCursorTrail({
     function resize() {
       if (!stage || !canvas || !ctx) return;
       const rect = stage.getBoundingClientRect();
-      W = rect.width; 
-      H = rect.height;
-      if (W <= 0 || H <= 0) return;
+      stageW = rect.width; 
+      stageH = rect.height;
+      if (stageW <= 0 || stageH <= 0) return;
+
+      // El área del Canvas incluye un margen de sangrado (Bleed) exterior para que se fusione con el fondo
+      W = stageW + BLEED_MARGIN * 2;
+      H = stageH + BLEED_MARGIN * 2;
 
       canvas.width = W * dpr;
       canvas.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      sample.width = W;
-      sample.height = H;
+
+      sample.width = stageW;
+      sample.height = stageH;
+
       buildGrid();
       updateSampleFrame();
       drawBase();
     }
 
     function updateSampleFrame() {
-      if (!sctx || !source || W <= 0 || H <= 0) return;
+      if (!sctx || !source || stageW <= 0 || stageH <= 0) return;
       try {
-        sctx.drawImage(source, 0, 0, W, H);
+        sctx.drawImage(source, 0, 0, stageW, stageH);
         sampleReady = true;
       } catch (e) {
         /* Fuente no lista */
@@ -122,27 +131,32 @@ export default function HalftoneCursorTrail({
     }
 
     function drawBase() {
-      if (ctx && sampleReady && W > 0 && H > 0) {
+      if (ctx && sampleReady && stageW > 0 && stageH > 0) {
         ctx.clearRect(0, 0, W, H);
-        ctx.drawImage(sample, 0, 0, W, H);
+        // Dibujar la imagen centrada dentro del canvas sangrado
+        ctx.drawImage(sample, BLEED_MARGIN, BLEED_MARGIN, stageW, stageH);
       }
     }
 
     function excite(px: number, py: number) {
       if (!activation) return;
-      const ix0 = Math.max(0, Math.floor((px - influenceRadius) / gridSize));
-      const ix1 = Math.min(cols - 1, Math.ceil((px + influenceRadius) / gridSize));
-      const iy0 = Math.max(0, Math.floor((py - influenceRadius) / gridSize));
-      const iy1 = Math.min(rows - 1, Math.ceil((py + influenceRadius) / gridSize));
+      // Posición del ratón ajustada con el offset de sangrado
+      const cx = px + BLEED_MARGIN;
+      const cy = py + BLEED_MARGIN;
+
+      const ix0 = Math.max(0, Math.floor((cx - influenceRadius) / gridSize));
+      const ix1 = Math.min(cols - 1, Math.ceil((cx + influenceRadius) / gridSize));
+      const iy0 = Math.max(0, Math.floor((cy - influenceRadius) / gridSize));
+      const iy1 = Math.min(rows - 1, Math.ceil((cy + influenceRadius) / gridSize));
 
       for (let iy = iy0; iy <= iy1; iy++) {
         for (let ix = ix0; ix <= ix1; ix++) {
           const gx = ix * gridSize, gy = iy * gridSize;
-          const d = Math.hypot(gx - px, gy - py);
+          const d = Math.hypot(gx - cx, gy - cy);
           if (d > influenceRadius) continue;
           const falloff = 1 - d / influenceRadius;
           const idx = iy * cols + ix;
-          const val = Math.pow(falloff, 1.2);
+          const val = Math.pow(falloff, 1.1);
           if (val > activation[idx]) activation[idx] = val;
           active.add(idx);
         }
@@ -198,11 +212,11 @@ export default function HalftoneCursorTrail({
       }
 
       if (ctx && activation) {
-        // Base limpia de la imagen
+        // Base de la imagen centrada
         drawBase();
 
         if (active.size > 0) {
-          // Fase 1: Deformación Warp en una sola pasada ligera
+          // Fase 1: Deformación Warp extendida que desborda la foto sobre el fondo
           if (warpStrength > 0 && sampleReady) {
             for (const idx of Array.from(active)) {
               const a = activation[idx];
@@ -215,21 +229,23 @@ export default function HalftoneCursorTrail({
               const dx = activationAt(ix + 1, iy) - activationAt(ix - 1, iy);
               const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
 
-              const tile = gridSize * 2.5;
-              const shiftX = dx * warpStrength * (1 + a * 0.6);
-              const shiftY = dy * warpStrength * (1 + a * 0.6);
+              const tile = gridSize * 2.8;
+              const shiftX = dx * warpStrength * (1 + a * 0.8);
+              const shiftY = dy * warpStrength * (1 + a * 0.8);
 
-              const sx = Math.min(W - tile, Math.max(0, gx - shiftX - tile / 2));
-              const sy = Math.min(H - tile, Math.max(0, gy - shiftY - tile / 2));
-              const dxDest = gx - tile / 2;
-              const dyDest = gy - tile / 2;
+              // Coordenadas relativas a la imagen original
+              const imgGx = gx - BLEED_MARGIN;
+              const imgGy = gy - BLEED_MARGIN;
 
-              ctx.globalAlpha = Math.min(1, a * 1.3);
-              ctx.drawImage(sample, sx, sy, tile, tile, dxDest, dyDest, tile, tile);
+              const sx = Math.min(stageW - tile, Math.max(0, imgGx - shiftX - tile / 2));
+              const sy = Math.min(stageH - tile, Math.max(0, imgGy - shiftY - tile / 2));
+
+              ctx.globalAlpha = Math.min(1, a * 1.4);
+              ctx.drawImage(sample, sx, sy, tile, tile, gx - tile / 2, gy - tile / 2, tile, tile);
             }
           }
 
-          // Fase 2: Cuantización Dithering Bayer 4x4 fusionada
+          // Fase 2: Cuantización Dithering Bayer 4x4 fusionada que abarca foto y fondo
           if (invert) {
             ctx.globalCompositeOperation = "difference";
             ctx.fillStyle = "rgb(255,255,255)";
@@ -252,9 +268,9 @@ export default function HalftoneCursorTrail({
             const gx = ix * gridSize, gy = iy * gridSize;
 
             const threshold = BAYER_4X4[iy % 4][ix % 4];
-            if (a > threshold * 0.6) {
-              const pixelSize = Math.max(2.0, Math.min(gridSize, (a - threshold * 0.25) * 4));
-              ctx.globalAlpha = Math.min(1, a * 1.5);
+            if (a > threshold * 0.55) {
+              const pixelSize = Math.max(2.0, Math.min(gridSize, (a - threshold * 0.25) * 4.5));
+              ctx.globalAlpha = Math.min(1, a * 1.6);
               ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
             }
           }
@@ -262,8 +278,8 @@ export default function HalftoneCursorTrail({
           ctx.globalCompositeOperation = "source-over";
           ctx.globalAlpha = 1;
 
-          // Fase 3: Deformación del Marco/Borde Exterior de la Imagen
-          drawDeformedBorder(ctx, W, H);
+          // Fase 3: Deformación fluida del marco exterior de la foto fusionado con el fondo
+          drawFusedLiquidBorder(ctx, stageW, stageH);
 
         } else if (type === "image") {
           isLooping = false;
@@ -274,44 +290,54 @@ export default function HalftoneCursorTrail({
       raf = requestAnimationFrame(frame);
     }
 
-    // Dibuja el marco de borde deformado reactivo a lo largo de las 4 aristas
-    function drawDeformedBorder(c: CanvasRenderingContext2D, width: number, height: number) {
+    // Dibuja el marco de la foto deformándose fluidamente hacia el fondo exterior
+    function drawFusedLiquidBorder(c: CanvasRenderingContext2D, sW: number, sH: number) {
       const step = 8;
+      const b = BLEED_MARGIN;
+
       c.beginPath();
-      c.strokeStyle = "rgba(255, 255, 255, 0.6)";
+      c.strokeStyle = "rgba(255, 255, 255, 0.7)";
       c.lineWidth = 2;
 
-      // 1. Arista Superior (0,0 -> W,0)
-      for (let x = 0; x <= width; x += step) {
-        const ix = Math.floor(x / gridSize);
-        const dy = activationAt(ix, 1) - activationAt(ix, 0);
-        const yOffset = dy * warpStrength * 0.8;
-        if (x === 0) c.moveTo(x, Math.max(0, yOffset));
-        else c.lineTo(x, Math.max(0, yOffset));
+      // 1. Borde Superior
+      for (let x = 0; x <= sW; x += step) {
+        const gx = x + b;
+        const ix = Math.floor(gx / gridSize);
+        const iy = Math.floor(b / gridSize);
+        const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
+        const yOffset = b + dy * warpStrength * 0.9;
+        if (x === 0) c.moveTo(gx, yOffset);
+        else c.lineTo(gx, yOffset);
       }
 
-      // 2. Arista Derecha (W,0 -> W,H)
-      for (let y = 0; y <= height; y += step) {
-        const iy = Math.floor(y / gridSize);
-        const dx = activationAt(cols - 1, iy) - activationAt(cols - 2, iy);
-        const xOffset = width + dx * warpStrength * 0.8;
-        c.lineTo(Math.min(width, xOffset), y);
+      // 2. Borde Derecho
+      for (let y = 0; y <= sH; y += step) {
+        const gy = y + b;
+        const iy = Math.floor(gy / gridSize);
+        const ix = Math.floor((sW + b) / gridSize);
+        const dx = activationAt(ix + 1, iy) - activationAt(ix - 1, iy);
+        const xOffset = sW + b + dx * warpStrength * 0.9;
+        c.lineTo(xOffset, gy);
       }
 
-      // 3. Arista Inferior (W,H -> 0,H)
-      for (let x = width; x >= 0; x -= step) {
-        const ix = Math.floor(x / gridSize);
-        const dy = activationAt(ix, rows - 1) - activationAt(ix, rows - 2);
-        const yOffset = height + dy * warpStrength * 0.8;
-        c.lineTo(x, Math.min(height, yOffset));
+      // 3. Borde Inferior
+      for (let x = sW; x >= 0; x -= step) {
+        const gx = x + b;
+        const ix = Math.floor(gx / gridSize);
+        const iy = Math.floor((sH + b) / gridSize);
+        const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
+        const yOffset = sH + b + dy * warpStrength * 0.9;
+        c.lineTo(gx, yOffset);
       }
 
-      // 4. Arista Izquierda (0,H -> 0,0)
-      for (let y = height; y >= 0; y -= step) {
-        const iy = Math.floor(y / gridSize);
-        const dx = activationAt(1, iy) - activationAt(0, iy);
-        const xOffset = dx * warpStrength * 0.8;
-        c.lineTo(Math.max(0, xOffset), y);
+      // 4. Borde Izquierdo
+      for (let y = sH; y >= 0; y -= step) {
+        const gy = y + b;
+        const iy = Math.floor(gy / gridSize);
+        const ix = Math.floor(b / gridSize);
+        const dx = activationAt(ix + 1, iy) - activationAt(ix - 1, iy);
+        const xOffset = b + dx * warpStrength * 0.9;
+        c.lineTo(xOffset, gy);
       }
 
       c.closePath();
@@ -354,7 +380,7 @@ export default function HalftoneCursorTrail({
   return (
     <div
       ref={stageRef}
-      className={`relative w-full h-full overflow-hidden ${className}`}
+      className={`relative w-full h-full overflow-visible ${className}`}
       style={{
         cursor: isTouch ? "auto" : "none",
         ...style,
@@ -385,9 +411,11 @@ export default function HalftoneCursorTrail({
           ref={canvasRef}
           style={{
             position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
+            top: -BLEED_MARGIN,
+            left: -BLEED_MARGIN,
+            width: `calc(100% + ${BLEED_MARGIN * 2}px)`,
+            height: `calc(100% + ${BLEED_MARGIN * 2}px)`,
+            pointerEvents: "none",
           }}
         />
       )}
