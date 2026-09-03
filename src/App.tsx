@@ -5,6 +5,7 @@ import Hero from './components/Hero';
 import ProjectList from './components/ProjectList';
 import About from './components/About';
 import AdminLeads from './components/AdminLeads';
+import BudgetEstimator from './components/BudgetEstimator';
 import SmoothScroll from './components/SmoothScroll';
 import Cursor from './components/Cursor';
 import GlobalAdaptiveHalftoneTrail from './components/GlobalAdaptiveHalftoneTrail';
@@ -12,16 +13,59 @@ import Scene from './components/WebGL/Scene';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { motion, AnimatePresence } from 'motion/react';
 
+function StandaloneEstimatorPage() {
+  return (
+    <div className="min-h-screen bg-[#000000] text-[#FFFDF3] font-mono py-16 px-4 md:px-12 flex flex-col items-center justify-center relative selection:bg-white selection:text-black">
+      <Scene />
+      <div className="grain-overlay" />
+      <Cursor />
+      <GlobalAdaptiveHalftoneTrail />
+      <Header />
+
+      <div className="w-full max-w-3xl mx-auto space-y-8 pt-16 z-10">
+        <div className="text-center space-y-3 border-b border-white/15 pb-8">
+          <span className="text-xs uppercase tracking-widest text-white/50 block font-bold">
+            [ ESTIMADOR DE PRESUPUESTO ONLINE · AARTNOW.ES ]
+          </span>
+          <h1 className="text-3xl md:text-5xl font-black uppercase text-white font-sans tracking-tight">
+            Calcula Tu Proyecto
+          </h1>
+          <p className="text-xs text-white/60 max-w-md mx-auto leading-relaxed">
+            Responde a unas breves preguntas sobre tus necesidades para obtener una estimación orientativa al instante.
+          </p>
+        </div>
+
+        <BudgetEstimator />
+
+        <div className="text-center pt-6">
+          <a
+            href="/"
+            className="text-xs text-white/50 hover:text-white uppercase font-bold tracking-widest underline transition-colors"
+          >
+            ← Volver a la web principal (aartnow.es)
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AppContent() {
   const { t } = useLanguage();
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [isAdminRoute, setIsAdminRoute] = useState(false);
+  const [currentRoute, setCurrentRoute] = useState<'home' | 'admin' | 'presupuesto'>('home');
 
   useEffect(() => {
-    // Comprobar si la ruta es /admin o /admin/leads
     const checkPath = () => {
-      setIsAdminRoute(window.location.pathname.startsWith('/admin'));
+      const path = window.location.pathname.toLowerCase();
+      if (path.startsWith('/admin')) {
+        setCurrentRoute('admin');
+      } else if (path.startsWith('/presupuesto') || path.startsWith('/estimador')) {
+        setCurrentRoute('presupuesto');
+      } else {
+        setCurrentRoute('home');
+      }
     };
     checkPath();
     window.addEventListener('popstate', checkPath);
@@ -43,8 +87,12 @@ function AppContent() {
     return () => clearInterval(timer);
   }, []);
 
-  if (isAdminRoute) {
+  if (currentRoute === 'admin') {
     return <AdminLeads />;
+  }
+
+  if (currentRoute === 'presupuesto') {
+    return <StandaloneEstimatorPage />;
   }
 
   return (
