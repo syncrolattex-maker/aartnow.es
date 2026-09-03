@@ -19,7 +19,7 @@ interface ProjectAccordionProps {
 
 /**
  * ProjectAccordion
- * Lista de proyectos tipo lamalama.com/work: transición fina y gradual al expandir/colapsar.
+ * Lista de proyectos tipo lamalama.com/work: expansión gradual de tamaño en miniaturas con Framer Motion layoutId.
  */
 export default function ProjectAccordion({ projects = [] }: ProjectAccordionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -54,7 +54,7 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
   const current = useRef({ x: 0, y: 0 });
   const raf = useRef<number | null>(null);
 
-  // La etiqueta "( VIEW + )" sigue al cursor con movimiento lerp magnético suave
+  // La etiqueta "( VIEW + )" sigue al cursor con lerp magnético suave
   useEffect(() => {
     function tick() {
       current.current.x += (target.current.x - current.current.x) * 0.18;
@@ -74,9 +74,17 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
     target.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
   }
 
+  // Lista de imágenes a mostrar (usando gallery o thumbnails como base compartida)
+  const displayImages = gallery.length > 0 ? gallery : thumbnails;
+
   return (
-    <div style={{ borderBottom: "1px solid rgba(255,255,255,0.15)" }} className="overflow-hidden">
-      {/* Fila principal: título / tags / campo de hover con toggle / miniaturas */}
+    <motion.div 
+      layout
+      transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+      style={{ borderBottom: "1px solid rgba(255,255,255,0.15)" }} 
+      className="overflow-hidden"
+    >
+      {/* Fila principal: título / tags / campo de hover con toggle / miniaturas colapsadas */}
       <div
         ref={headerRef}
         onMouseEnter={() => setHovering(true)}
@@ -116,11 +124,11 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
         </div>
 
         {/* Zona central: campo de puntos + indicador (+ / -) */}
-        <div style={{ position: "relative", flex: 1, height: 60, minWidth: 40, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 12px" }}>
+        <div style={{ position: "relative", flex: 1, height: 60, minWidth: 40, display: "flex", itemsCenter: "center", justifyContent: "space-between", padding: "0 12px" }}>
           <HalftoneHoverField />
           <motion.span 
             animate={{ rotate: isOpen ? 180 : 0 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             style={{ fontSize: 12, opacity: 0.7, position: "relative", zIndex: 10 }}
           >
             {isOpen ? '( − )' : '( + )'}
@@ -149,30 +157,27 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
           )}
         </div>
 
-        {/* Colapsado: tira de miniaturas con animación suave de desvanecimiento */}
-        <AnimatePresence>
-          {!isOpen && thumbnails.length > 0 && (
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              style={{ display: "flex", gap: 4, flexShrink: 0, height: 100, overflow: "hidden" }}
-            >
-              {thumbnails.slice(0, 5).map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt=""
-                  style={{ width: 90, height: 100, objectFit: "cover" }}
-                />
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Colapsado: miniaturas pequeñas (90x100px) que escalarán progresivamente al abrir */}
+        {!isOpen && (
+          <motion.div 
+            layout
+            style={{ display: "flex", gap: 4, flexShrink: 0, height: 100, overflow: "hidden" }}
+          >
+            {displayImages.slice(0, 5).map((src, i) => (
+              <motion.img
+                key={i}
+                layoutId={`project-img-${title}-${i}`}
+                src={src}
+                alt=""
+                style={{ width: 90, height: 100, objectFit: "cover" }}
+                transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              />
+            ))}
+          </motion.div>
+        )}
       </div>
 
-      {/* Contenido expandido con animación suave de desplegado gradual */}
+      {/* Contenido expandido con aumento gradual de tamaño de imágenes de miniaturas a formato gigante */}
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div 
@@ -183,10 +188,10 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
             className="overflow-hidden"
           >
             <motion.div 
-              initial={{ y: 20, opacity: 0 }}
+              initial={{ y: 15, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -10, opacity: 0 }}
-              transition={{ duration: 0.45, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.45, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
               style={{ paddingBottom: 32 }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", gap: 40, marginBottom: 24, flexWrap: "wrap" }}>
@@ -235,22 +240,19 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
                 </p>
               </div>
 
-              {/* Galería grande desplegada de forma gradual */}
+              {/* Galería desplegada: Las miniaturas aumentan de 90x100px a 420px de alto de forma continua */}
               <motion.div 
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                layout
                 style={{ display: "flex", gap: 4, overflowX: "auto", paddingBottom: 12 }}
               >
-                {gallery.map((src, i) => (
+                {displayImages.map((src, i) => (
                   <motion.img
-                    initial={{ opacity: 0, scale: 0.96 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4, delay: 0.15 + i * 0.05, ease: [0.16, 1, 0.3, 1] }}
                     key={i}
+                    layoutId={`project-img-${title}-${i}`}
                     src={src}
                     alt=""
                     style={{ height: 420, flex: "0 0 auto", objectFit: "cover" }}
+                    transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
                   />
                 ))}
               </motion.div>
@@ -258,6 +260,6 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
