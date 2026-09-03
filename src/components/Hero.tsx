@@ -56,14 +56,14 @@ export default function Hero() {
         <div className="lg:col-span-8 space-y-6">
           
           {/* Badge Label */}
-          <div className="hero-reveal inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded text-[11px] font-mono uppercase tracking-widest text-[#A3FF12]">
+          <div className="hero-reveal inline-flex items-center gap-2 px-3.5 py-1 bg-white/5 backdrop-blur-md border border-white/20 rounded text-[11px] font-mono uppercase tracking-widest text-white/80">
             <span>{t.heroBadge}</span>
           </div>
 
           {/* Main H1 Display Headline with GlitchText */}
           <h1 className="hero-reveal text-5xl md:text-7xl lg:text-[5.2vw] font-black uppercase leading-[0.92] tracking-tight text-white font-sans drop-shadow-2xl">
             <GlitchText text={t.heroH1Word1} />{' '}
-            <span className="text-[#A3FF12]"><GlitchText text={t.heroH1Word2} /></span>{' '}
+            <span className="text-white/40"><GlitchText text={t.heroH1Word2} /></span>{' '}
             <GlitchText text={t.heroH1Word3} />{' '}
             <GlitchText text={t.heroH1Word4} />
           </h1>
@@ -79,10 +79,10 @@ export default function Hero() {
           <div 
             data-magnetic="true"
             data-cursor-text="PLAY SHOWREEL"
-            className="hero-reveal bg-[#0D0D0D]/90 backdrop-blur-md border border-white/20 rounded-lg p-4 flex items-center justify-between group hover:border-[#A3FF12] transition-all cursor-pointer shadow-2xl"
+            className="hero-reveal bg-[#0D0D0D]/90 backdrop-blur-md border border-white/20 rounded-lg p-4 flex items-center justify-between group hover:border-white/60 transition-all cursor-pointer shadow-2xl"
           >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#A3FF12] text-black flex items-center justify-center font-bold text-xs">
+              <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-bold text-xs">
                 ▶
               </div>
               <div className="flex flex-col font-mono text-xs">
@@ -91,7 +91,7 @@ export default function Hero() {
               </div>
             </div>
 
-            <span className="text-xs font-mono text-[#A3FF12] group-hover:translate-x-1 transition-transform">
+            <span className="text-xs font-mono text-white/60 group-hover:translate-x-1 transition-transform">
               [ 1:03 ]
             </span>
           </div>
@@ -104,8 +104,8 @@ export default function Hero() {
         <div ref={marqueeRef} className="flex whitespace-nowrap gap-8 font-mono text-xs uppercase tracking-widest text-white/70 w-max">
           {[...marqueeItems, ...marqueeItems].map((item, idx) => (
             <div key={idx} className="flex items-center gap-8">
-              <span className="hover:text-[#A3FF12] transition-colors">{item}</span>
-              <span className="text-[#A3FF12] font-bold">✦</span>
+              <span className="hover:text-white transition-colors">{item}</span>
+              <span className="text-white/40 font-bold">✦</span>
             </div>
           ))}
         </div>

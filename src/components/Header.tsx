@@ -122,8 +122,8 @@ export default function Header() {
           <div className="flex justify-between items-center h-12 px-3 relative cursor-pointer border-b border-white/10">
             {/* Logo with 10x10 Matrix SVG */}
             <a href="/" data-magnetic="true" data-cursor-text={t.homeTag} className="flex items-center gap-2 relative z-10 group">
-              <div className="w-6 h-6 rounded bg-neutral-900/80 border border-white/20 flex items-center justify-center p-1 group-hover:border-[#A3FF12]">
-                <svg viewBox="0 0 10 10" fill="none" className="w-full h-full text-white group-hover:text-[#A3FF12] transition-colors">
+              <div className="w-6 h-6 rounded bg-neutral-900/80 border border-white/20 flex items-center justify-center p-1 group-hover:border-[#FFFFFF]">
+                <svg viewBox="0 0 10 10" fill="none" className="w-full h-full text-white group-hover:text-[#FFFFFF] transition-colors">
                   <rect x="0" y="0" width="2" height="2" fill="currentColor" />
                   <rect x="4" y="0" width="2" height="2" fill="currentColor" />
                   <rect x="8" y="0" width="2" height="2" fill="currentColor" />
@@ -134,12 +134,12 @@ export default function Header() {
                 </svg>
               </div>
               <span className="text-xs font-bold uppercase tracking-wider text-white">
-                aartnow<span className="text-[#A3FF12]">.es</span>
+                aartnow<span className="text-[#FFFFFF]">.es</span>
               </span>
             </a>
 
             {/* Center Dynamic Label with GlitchText Effect on Section Scroll */}
-            <div className="text-[10px] uppercase text-[#A3FF12] font-bold tracking-widest hidden sm:block">
+            <div className="text-[10px] uppercase text-[#FFFFFF] font-bold tracking-widest hidden sm:block">
               [ <GlitchText key={activeSectionLabel} text={activeSectionLabel} /> ]
             </div>
 
@@ -166,9 +166,9 @@ export default function Header() {
               <a 
                 href="#work" 
                 onClick={closeMenu} 
-                className="gsap-menu-item h-12 flex items-center px-4 border-b border-white/10 hover:bg-white/5 hover:text-[#A3FF12] transition-colors relative group"
+                className="gsap-menu-item h-12 flex items-center px-4 border-b border-white/10 hover:bg-white/5 hover:text-[#FFFFFF] transition-colors relative group"
               >
-                <span className="text-[#A3FF12] mr-3">▪</span>
+                <span className="text-[#FFFFFF] mr-3">▪</span>
                 <span className="text-white font-bold">
                   <GlitchText text={t.navWork} />
                 </span>
@@ -178,10 +178,10 @@ export default function Header() {
               <div className="gsap-menu-item">
                 <button 
                   onClick={() => setShowWhatWeDo(!showWhatWeDo)}
-                  className="w-full h-12 flex items-center justify-between px-4 border-b border-white/10 hover:bg-white/5 hover:text-[#A3FF12] transition-colors text-left"
+                  className="w-full h-12 flex items-center justify-between px-4 border-b border-white/10 hover:bg-white/5 hover:text-[#FFFFFF] transition-colors text-left"
                 >
                   <div className="flex items-center">
-                    <span className="text-[#A3FF12] mr-3">▪</span>
+                    <span className="text-[#FFFFFF] mr-3">▪</span>
                     <span className="text-white font-bold">
                       <GlitchText text={t.navWhatWeDo} />
                     </span>
@@ -196,9 +196,9 @@ export default function Header() {
                         key={idx} 
                         href="#about" 
                         onClick={closeMenu}
-                        className="h-10 flex items-center text-[11px] text-white/70 hover:text-[#A3FF12] border-b border-white/5 last:border-0"
+                        className="h-10 flex items-center text-[11px] text-white/70 hover:text-[#FFFFFF] border-b border-white/5 last:border-0"
                       >
-                        <span className="text-[9px] text-[#A3FF12] mr-2">›</span>
+                        <span className="text-[9px] text-[#FFFFFF] mr-2">›</span>
                         <GlitchText text={sub} />
                       </a>
                     ))}
@@ -210,9 +210,9 @@ export default function Header() {
               <a 
                 href="#about" 
                 onClick={closeMenu} 
-                className="gsap-menu-item h-12 flex items-center px-4 border-b border-white/10 hover:bg-white/5 hover:text-[#A3FF12] transition-colors"
+                className="gsap-menu-item h-12 flex items-center px-4 border-b border-white/10 hover:bg-white/5 hover:text-[#FFFFFF] transition-colors"
               >
-                <span className="text-[#A3FF12] mr-3">▪</span>
+                <span className="text-[#FFFFFF] mr-3">▪</span>
                 <span className="text-white font-bold">
                   <GlitchText text={t.navAbout} />
                 </span>
@@ -221,15 +221,15 @@ export default function Header() {
               {/* Nav Item: Contact & Form Toggle */}
               <button 
                 onClick={() => setShowForm(!showForm)} 
-                className="gsap-menu-item h-12 flex items-center justify-between px-4 border-b border-white/10 hover:bg-white/5 hover:text-[#A3FF12] transition-colors text-left"
+                className="gsap-menu-item h-12 flex items-center justify-between px-4 border-b border-white/10 hover:bg-white/5 hover:text-[#FFFFFF] transition-colors text-left"
               >
                 <div className="flex items-center">
-                  <span className="text-[#A3FF12] mr-3">▪</span>
+                  <span className="text-[#FFFFFF] mr-3">▪</span>
                   <span className="text-white font-bold">
                     <GlitchText text={t.navContact} />
                   </span>
                 </div>
-                <span className="text-[10px] bg-[#A3FF12] text-black px-2 py-0.5 rounded font-bold">
+                <span className="text-[10px] bg-[#FFFFFF] text-black px-2 py-0.5 rounded font-bold">
                   {showForm ? t.closeFormBtn : t.startProjectBtn}
                 </span>
               </button>
@@ -239,8 +239,8 @@ export default function Header() {
                 {showForm ? (
                   <div className="p-4 bg-[#000000] border-b border-white/10 space-y-4">
                     {formSubmitted ? (
-                      <div className="p-4 bg-white/5 border border-[#A3FF12] rounded text-center">
-                        <p className="text-[#A3FF12] font-bold text-xs mb-1">{t.successTitle}</p>
+                      <div className="p-4 bg-white/5 border border-[#FFFFFF] rounded text-center">
+                        <p className="text-[#FFFFFF] font-bold text-xs mb-1">{t.successTitle}</p>
                         <p className="text-[10px] text-white/60">{t.successDesc}</p>
                       </div>
                     ) : (
@@ -256,7 +256,7 @@ export default function Header() {
                                 onClick={() => toggleProjectType(type)}
                                 className={`px-2.5 py-1 rounded text-[10px] transition-all ${
                                   isSelected 
-                                    ? 'bg-[#A3FF12] text-black font-bold' 
+                                    ? 'bg-[#FFFFFF] text-black font-bold' 
                                     : 'bg-white/5 text-white/60 border border-white/10'
                                 }`}
                               >
@@ -270,23 +270,23 @@ export default function Header() {
                           type="text" 
                           required 
                           placeholder={t.nameLabel}
-                          className="w-full bg-[#111111] border border-white/10 rounded px-3 py-2 text-[11px] text-white outline-none focus:border-[#A3FF12]"
+                          className="w-full bg-[#111111] border border-white/10 rounded px-3 py-2 text-[11px] text-white outline-none focus:border-[#FFFFFF]"
                         />
                         <input 
                           type="email" 
                           required 
                           placeholder={t.emailLabel} 
-                          className="w-full bg-[#111111] border border-white/10 rounded px-3 py-2 text-[11px] text-white outline-none focus:border-[#A3FF12]"
+                          className="w-full bg-[#111111] border border-white/10 rounded px-3 py-2 text-[11px] text-white outline-none focus:border-[#FFFFFF]"
                         />
                         <textarea 
                           rows={2} 
                           placeholder={t.messageLabel} 
-                          className="w-full bg-[#111111] border border-white/10 rounded px-3 py-2 text-[11px] text-white outline-none focus:border-[#A3FF12]"
+                          className="w-full bg-[#111111] border border-white/10 rounded px-3 py-2 text-[11px] text-white outline-none focus:border-[#FFFFFF]"
                         />
 
                         <button 
                           type="submit" 
-                          className="w-full py-2.5 bg-[#A3FF12] text-black font-bold uppercase text-xs rounded hover:bg-white transition-colors"
+                          className="w-full py-2.5 bg-[#FFFFFF] text-black font-bold uppercase text-xs rounded hover:bg-white transition-colors"
                         >
                           {t.submitBtn} →
                         </button>
@@ -297,7 +297,7 @@ export default function Header() {
                   <div className="p-3">
                     <button 
                       onClick={() => setShowForm(true)}
-                      className="w-full h-11 bg-white/10 hover:bg-[#A3FF12] hover:text-black border border-white/15 rounded flex items-center justify-center font-bold text-xs uppercase transition-all duration-300"
+                      className="w-full h-11 bg-white/10 hover:bg-[#FFFFFF] hover:text-black border border-white/15 rounded flex items-center justify-center font-bold text-xs uppercase transition-all duration-300"
                     >
                       <GlitchText text={t.pitchdeckBtn} />
                     </button>
@@ -316,13 +316,13 @@ export default function Header() {
         href="#contact" 
         data-magnetic="true"
         data-cursor-text={t.getInTouchBtn}
-        className="fixed right-4 top-4 z-40 hidden md:flex items-center gap-3 px-3.5 py-2.5 bg-black/50 backdrop-blur-2xl backdrop-saturate-150 border border-white/20 rounded-lg text-xs font-mono uppercase text-white hover:border-[#A3FF12] transition-all group shadow-[0_8px_32px_rgba(0,0,0,0.5)] pointer-events-auto"
+        className="fixed right-4 top-4 z-40 hidden md:flex items-center gap-3 px-3.5 py-2.5 bg-black/50 backdrop-blur-2xl backdrop-saturate-150 border border-white/20 rounded-lg text-xs font-mono uppercase text-white hover:border-[#FFFFFF] transition-all group shadow-[0_8px_32px_rgba(0,0,0,0.5)] pointer-events-auto"
       >
-        <div className="w-6 h-6 rounded-full overflow-hidden bg-[#A3FF12] flex items-center justify-center font-bold text-black text-[10px]">
+        <div className="w-6 h-6 rounded-full overflow-hidden bg-[#FFFFFF] flex items-center justify-center font-bold text-black text-[10px]">
           VL
         </div>
-        <span className="group-hover:text-[#A3FF12] transition-colors">{t.getInTouchBtn}</span>
-        <span className="text-[#A3FF12]">→</span>
+        <span className="group-hover:text-[#FFFFFF] transition-colors">{t.getInTouchBtn}</span>
+        <span className="text-[#FFFFFF]">→</span>
       </a>
     </>
   );

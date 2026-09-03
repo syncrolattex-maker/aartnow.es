@@ -96,7 +96,7 @@ export default function ProjectList() {
         {/* Section Header & Drag Instructions */}
         <div className="px-6 md:px-16 max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-black/15 pb-8">
           <div>
-            <span className="px-3 py-1 bg-[#A3FF12] text-[#000000] border border-black/10 rounded-none text-xs font-bold uppercase tracking-widest block w-max mb-3 shadow-md">
+            <span className="px-3 py-1 bg-[#000000] text-[#FFFDF3] border border-black/10 rounded-none text-xs font-bold uppercase tracking-widest block w-max mb-3 shadow-md">
               {t.casesTag}
             </span>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-black uppercase text-[#000000] font-sans tracking-tight">
@@ -105,7 +105,7 @@ export default function ProjectList() {
           </div>
 
           <div className="flex items-center gap-3 text-xs text-[#000000] font-mono font-bold uppercase bg-black/5 border border-black/10 px-4 py-2 rounded-none flex-shrink-0">
-            <span className="w-2.5 h-2.5 bg-[#A3FF12] border border-black/30 rounded-full animate-pulse"></span>
+            <span className="w-2.5 h-2.5 bg-[#000000] rounded-full animate-pulse"></span>
             <span>[ ARRASTRA HORIZONTALMENTE CON EL CURSOR ]</span>
           </div>
         </div>
@@ -142,13 +142,13 @@ export default function ProjectList() {
                         width="calc(100% - 4px)"
                         height="calc(100% - 4px)"
                         fill="none"
-                        stroke="#A3FF12"
+                        stroke="#000000"
                         strokeWidth="3"
                         className="animate-marching-dashes"
                       />
                     </svg>
 
-                    {/* Official Lama Lama Halftone Grid Canvas Container */}
+                    {/* Studio Halftone Grid Canvas Container */}
                     <div className={`${c.aspect} w-full rounded-none overflow-hidden bg-neutral-950 border border-black/15 relative shadow-2xl`}>
                       <HalftoneCursorTrail 
                         src={c.image} 
@@ -158,7 +158,7 @@ export default function ProjectList() {
                         dotRadius={3.5}
                         decay={0.93}
                         warpStrength={16}
-                        dotColor="163,255,18"
+                        dotColor="10,10,10"
                       />
 
                       {/* Centered Main Title Overlay on top of the image */}
@@ -175,7 +175,7 @@ export default function ProjectList() {
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-t border-black/15 pt-4 px-2">
                     <div className="space-y-1">
                       <div className="flex items-center gap-3">
-                        <span className="text-xs font-bold text-[#000000] bg-[#A3FF12] px-2 py-0.5 font-mono">[{c.num} / 05]</span>
+                        <span className="text-xs font-bold text-[#FFFDF3] bg-[#000000] px-2 py-0.5 font-mono">[{c.num} / 05]</span>
                         <span className="text-xs text-black/50 font-bold">[{c.year}]</span>
                       </div>
                       <p className="text-xs text-black/80 max-w-md font-bold">{c.headline}</p>
@@ -186,7 +186,7 @@ export default function ProjectList() {
                       target={c.url !== '#' ? '_blank' : '_self'}
                       rel="noreferrer"
                       data-magnetic="true"
-                      className="px-6 py-3 bg-[#A3FF12] text-[#000000] font-black uppercase text-xs rounded-none hover:bg-[#000000] hover:text-[#A3FF12] transition-colors flex items-center gap-2 flex-shrink-0 shadow-lg border border-black/20"
+                      className="px-6 py-3 bg-[#000000] text-[#FFFDF3] font-black uppercase text-xs rounded-none hover:bg-neutral-800 transition-colors flex items-center gap-2 flex-shrink-0 shadow-lg border border-black/20"
                     >
                       <span>{t.viewCase}</span>
                       <span>↗</span>

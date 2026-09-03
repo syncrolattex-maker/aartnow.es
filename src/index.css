@@ -2,15 +2,15 @@
 
 @layer base {
   :root {
-    /* Lama Lama Official Brand Color Palette */
+    /* Pure Minimalist Monochrome & Greyscale Palette (Zero Vivid Colors) */
     --ll-bg-black: #000000;
-    --ll-bg-surface: #0D0D0D;
+    --ll-bg-surface: #0A0A0A;
     --ll-bg-cream: #FFFDF3;
-    --ll-accent-green: #A3FF12; /* Lama Lama Signature Acid Electric Lime Green */
-    --ll-accent-red: #A3FF12;
-    --ll-text-light: #FFFDF3;
+    --ll-accent-mono: #FFFFFF;
+    --ll-text-light: #FFFFFF;
+    --ll-text-cream: #FFFDF3;
     --ll-text-dark: #000000;
-    --ll-border-subtle: rgba(255, 255, 255, 0.12);
+    --ll-border-subtle: rgba(255, 255, 255, 0.15);
   }
 
   html {
@@ -21,12 +21,12 @@
   }
 
   ::selection {
-    background-color: #A3FF12;
+    background-color: #FFFFFF;
     color: #000000;
   }
 }
 
-/* Custom Utilities for Lama Lama Aesthetic */
+/* Custom Utilities for Aesthetic Studio Look */
 .dot-matrix {
   background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
   background-size: 24px 24px;
@@ -67,15 +67,15 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #A3FF12;
+  background: #525252;
   border-radius: 0px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8AE600;
+  background: #A3A3A3;
 }
 
-/* Lama Lama Preloader Screen */
+/* Studio Preloader Screen */
 .ll-loader {
   position: fixed;
   inset: 0;

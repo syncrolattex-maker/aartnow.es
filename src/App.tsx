@@ -33,7 +33,7 @@ function AppContent() {
 
   return (
     <>
-      {/* Lama Lama Official Preloader Screen */}
+      {/* Monochrome Studio Preloader Screen */}
       <AnimatePresence>
         {loading && (
           <motion.div 
@@ -44,14 +44,14 @@ function AppContent() {
           >
             <div className="flex items-center gap-1 text-2xl font-bold text-white">
               <span>{Math.min(progress, 100)}</span>
-              <span className="text-[#A3FF12]">%</span>
+              <span className="text-white/50">%</span>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       <SmoothScroll>
-        <div className="relative min-h-screen bg-[#000000] text-[#FFFFFF] selection:bg-[#A3FF12] selection:text-[#000000] font-mono">
+        <div className="relative min-h-screen bg-[#000000] text-[#FFFFFF] selection:bg-[#FFFFFF] selection:text-[#000000] font-mono">
           <Scene />
           <div className="grain-overlay" />
           <Cursor />
@@ -64,17 +64,17 @@ function AppContent() {
             <ProjectList />
             <About />
             
-            {/* Lama Lama Footer */}
+            {/* Minimalist Studio Footer */}
             <footer className="py-28 px-6 md:px-16 bg-[#000000] text-white flex flex-col justify-between border-t border-white/10">
               <div className="max-w-[1400px] w-full mx-auto space-y-16">
                 
                 {/* Large Text Reveal */}
                 <div className="border-b border-white/10 pb-16 space-y-4">
-                  <span className="text-xs uppercase tracking-widest text-[#A3FF12]">
+                  <span className="text-xs uppercase tracking-widest text-white/50">
                     {t.footerConnect}
                   </span>
                   <h2 className="text-6xl md:text-9xl font-black uppercase tracking-tight text-white leading-none font-sans">
-                    {t.footerTitle}<span className="text-[#A3FF12]">.</span>
+                    {t.footerTitle}<span className="text-white/40">.</span>
                   </h2>
                 </div>
 
@@ -88,14 +88,14 @@ function AppContent() {
 
                   <div>
                     <span className="text-white text-sm font-bold uppercase block mb-2 font-sans">{t.navContact}</span>
-                    <a href="mailto:info@aartnow.es" className="text-[#A3FF12] font-bold text-sm hover:underline block">info@aartnow.es</a>
+                    <a href="mailto:info@aartnow.es" className="text-white font-bold text-sm hover:underline block">info@aartnow.es</a>
                   </div>
 
                   <div>
                     <span className="text-white text-sm font-bold uppercase block mb-2 font-sans">Connect</span>
                     <div className="flex gap-4">
-                      <a href="#" className="hover:text-[#A3FF12]">Instagram ↗</a>
-                      <a href="#" className="hover:text-[#A3FF12]">LinkedIn ↗</a>
+                      <a href="#" className="hover:text-white/60 transition-colors">Instagram ↗</a>
+                      <a href="#" className="hover:text-white/60 transition-colors">LinkedIn ↗</a>
                     </div>
                   </div>
                 </div>
