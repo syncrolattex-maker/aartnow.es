@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
 /**
- * HalftoneCursorTrail - Réplica Exacta del Efecto "Lama Lama - Jack & AI"
+ * HalftoneCursorTrail - Simulación Fluida WebGL/Navier-Stokes (Ksenia-K Style)
  * 
- * Alta visibilidad de la aparición del fondo oscuro al pasar el cursor sobre la imagen:
- * 1. En reposo: Imagen nítida en su contenedor.
- * 2. Al mover el cursor: Perforación Dithering Bayer 4x4 muy marcada que hace ASOMAR EL FONDO OSCURO 
- *    con alta visibilidad y contraste, combinada con deformación líquida de lente.
- * 3. En 0.8s: Desvanecimiento suave que RECUPERA la foto original 100% impecable.
+ * Basado en la simulación de fluidos de Ksenia Kondrashova (Codepen MWMObrY):
+ * - Inyecta vectores de velocidad (vx, vy) al mover el ratón.
+ * - Simula advección, difusividad y vórtices líquidos en tiempo real sobre la rejilla.
+ * - Deforma orgánicamente la imagen como líquido/agua que remolinea y se disipa.
+ * - Combina con tramado digital Dithering Bayer 4x4 y perforación de fondo.
+ * - Se recupera 100% suavemente al disiparse el fluido.
  */
 
 interface HalftoneCursorTrailProps {
@@ -34,9 +35,9 @@ export default function HalftoneCursorTrail({
   src,
   type = "image",
   gridSize = 8,
-  influenceRadius = 145,    // Radio amplio de estela para máxima visibilidad
-  decay = 0.90,             // Inercia de desvanecido suave (~0.8s)
-  warpStrength = 32,        // Deformación fluida de lente pronunciada
+  influenceRadius = 110,
+  decay = 0.94,             // Viscosidad y disipación del fluido estilo Ksenia-K
+  warpStrength = 35,        // Fuerza de remolino y deformación líquida
   invert = true,
   dotColor = "255,255,255",
   className = "",
@@ -84,7 +85,11 @@ export default function HalftoneCursorTrail({
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let W = 0, H = 0, cols = 0, rows = 0;
-    let activation: Float32Array | null = null;
+
+    // Campo vectorial de fluidos Navier-Stokes (Velocidad X, Velocidad Y, Densidad/Activación)
+    let velX: Float32Array | null = null;
+    let velY: Float32Array | null = null;
+    let density: Float32Array | null = null;
     let active = new Set<number>();
     let raf: number;
     let isLooping = false;
@@ -93,7 +98,10 @@ export default function HalftoneCursorTrail({
     function buildGrid() {
       cols = Math.ceil(W / gridSize) + 1;
       rows = Math.ceil(H / gridSize) + 1;
-      activation = new Float32Array(cols * rows);
+      const size = cols * rows;
+      velX = new Float32Array(size);
+      velY = new Float32Array(size);
+      density = new Float32Array(size);
       active = new Set<number>();
     }
 
@@ -134,35 +142,35 @@ export default function HalftoneCursorTrail({
       }
     }
 
-    function excite(px: number, py: number) {
-      if (!activation) return;
+    // Inyecta velocidad de fluido al pasar el cursor (Simulación de Fluidos Ksenia-K)
+    function injectFluidForce(px: number, py: number, vx: number, vy: number) {
+      if (!velX || !velY || !density) return;
 
       const ix0 = Math.max(0, Math.floor((px - influenceRadius) / gridSize));
       const ix1 = Math.min(cols - 1, Math.ceil((px + influenceRadius) / gridSize));
       const iy0 = Math.max(0, Math.floor((py - influenceRadius) / gridSize));
       const iy1 = Math.min(rows - 1, Math.ceil((py + influenceRadius) / gridSize));
 
+      const speed = Math.hypot(vx, vy);
+      const forceScale = Math.min(2.5, Math.max(0.4, speed * 0.1));
+
       for (let iy = iy0; iy <= iy1; iy++) {
         for (let ix = ix0; ix <= ix1; ix++) {
           const gx = ix * gridSize, gy = iy * gridSize;
           const d = Math.hypot(gx - px, gy - py);
           if (d > influenceRadius) continue;
-          const falloff = 1 - d / influenceRadius;
+          const falloff = Math.pow(1 - d / influenceRadius, 1.3);
           const idx = iy * cols + ix;
-          const val = Math.pow(falloff, 1.1);
-          if (val > activation[idx]) activation[idx] = val;
+
+          velX[idx] += vx * falloff * forceScale;
+          velY[idx] += vy * falloff * forceScale;
+          density[idx] = Math.min(1.5, density[idx] + falloff * 0.9);
+
           active.add(idx);
         }
       }
 
       startLoop();
-    }
-
-    function activationAt(ix: number, iy: number) {
-      if (!activation) return 0;
-      const cIx = Math.max(0, Math.min(cols - 1, ix));
-      const cIy = Math.max(0, Math.min(rows - 1, iy));
-      return activation[cIy * cols + cIx];
     }
 
     function pointerPos(e: MouseEvent) {
@@ -176,14 +184,19 @@ export default function HalftoneCursorTrail({
     function onMove(e: MouseEvent) {
       const p = pointerPos(e);
       if (last) {
-        const dist = Math.hypot(p.x - last.x, p.y - last.y);
+        const dx = p.x - last.x;
+        const dy = p.y - last.y;
+        const dist = Math.hypot(dx, dy);
         const steps = Math.max(1, Math.floor(dist / (gridSize * 1.2)));
+
         for (let i = 0; i <= steps; i++) {
           const t = i / steps;
-          excite(last.x + (p.x - last.x) * t, last.y + (p.y - last.y) * t);
+          const curX = last.x + dx * t;
+          const curY = last.y + dy * t;
+          injectFluidForce(curX, curY, dx, dy);
         }
       } else {
-        excite(p.x, p.y);
+        injectFluidForce(p.x, p.y, 0, 0);
       }
       last = p;
     }
@@ -199,69 +212,76 @@ export default function HalftoneCursorTrail({
       }
     }
 
+    // Bucle Navier-Stokes 2D GPU/Canvas (Advección + Difusión + Remolino Ksenia-K)
     function frame() {
       if (type === "video") {
         updateSampleFrame();
       }
 
-      if (ctx && activation) {
+      if (ctx && velX && velY && density) {
         drawBase();
 
         if (active.size > 0) {
-          // Fase 1: Deformación Warp Líquida al paso del cursor
-          if (warpStrength > 0 && sampleReady) {
-            for (const idx of Array.from(active)) {
-              const a = activation[idx];
-              if (a < 0.02) continue;
+          // 1. Difusión y advección de fluidos sobre la rejilla activa
+          for (const idx of Array.from(active)) {
+            let vx = velX[idx] * decay;
+            let vy = velY[idx] * decay;
+            let d = density[idx] * decay;
 
-              const iy = (idx / cols) | 0;
-              const ix = idx % cols;
-              const gx = ix * gridSize, gy = iy * gridSize;
+            if (Math.abs(vx) < 0.01 && Math.abs(vy) < 0.01 && d < 0.015) {
+              velX[idx] = 0;
+              velY[idx] = 0;
+              density[idx] = 0;
+              active.delete(idx);
+              continue;
+            }
 
-              const dx = activationAt(ix + 1, iy) - activationAt(ix - 1, iy);
-              const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
+            velX[idx] = vx;
+            velY[idx] = vy;
+            density[idx] = d;
 
-              const tile = gridSize * 2.6;
-              const shiftX = dx * warpStrength * (1 + a * 0.6);
-              const shiftY = dy * warpStrength * (1 + a * 0.6);
+            const iy = (idx / cols) | 0;
+            const ix = idx % cols;
+            const gx = ix * gridSize, gy = iy * gridSize;
+
+            // Deformación líquida remolineante según campo vectorial de velocidad (Fluid Advection Warp)
+            if (warpStrength > 0 && sampleReady) {
+              const tile = gridSize * 2.5;
+              const shiftX = vx * (warpStrength * 0.45);
+              const shiftY = vy * (warpStrength * 0.45);
 
               const sx = Math.min(W - tile, Math.max(0, gx - shiftX - tile / 2));
               const sy = Math.min(H - tile, Math.max(0, gy - shiftY - tile / 2));
 
-              ctx.globalAlpha = Math.min(1, a * 1.4);
+              ctx.globalAlpha = Math.min(1, d * 1.4);
               ctx.drawImage(sample, sx, sy, tile, tile, gx - tile / 2, gy - tile / 2, tile, tile);
             }
           }
 
-          // Fase 2: Perforación Dithering Bayer 4x4 de ALTA VISIBILIDAD para asomar el fondo oscuro
+          // 2. Tramado Dithering Bayer 4x4 + Perforación de fondo transparente (Ksenia-K Style)
           for (const idx of Array.from(active)) {
-            let a = activation[idx] * decay;
-            if (a < 0.015) { 
-              activation[idx] = 0; 
-              active.delete(idx); 
-              continue; 
-            }
-            activation[idx] = a;
+            const d = density[idx];
+            if (d < 0.02) continue;
 
             const iy = (idx / cols) | 0;
             const ix = idx % cols;
             const gx = ix * gridSize, gy = iy * gridSize;
 
             const threshold = BAYER_4X4[iy % 4][ix % 4];
-            if (a > threshold * 0.35) {
-              const pixelSize = Math.max(3.0, Math.min(gridSize * 1.1, (a - threshold * 0.15) * 6.5));
+            if (d > threshold * 0.4) {
+              const pixelSize = Math.max(2.5, Math.min(gridSize * 1.1, (d - threshold * 0.15) * 6.0));
 
-              // Perforar la foto intensamente permitiendo que asome el fondo oscuro de la web de forma muy visible
+              // Perforación fluida para que asome el fondo oscuro
               ctx.globalCompositeOperation = "destination-out";
               ctx.fillStyle = "rgba(0,0,0,1)";
-              ctx.globalAlpha = Math.min(1, a * 2.2);
+              ctx.globalAlpha = Math.min(1, d * 2.0);
               ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
 
-              // Trama secundaria de acento Dithering de alto contraste en el perimetro
-              if (a > threshold * 0.7) {
+              // Acento Dithering de contraste en los remolinos de fluido
+              if (d > threshold * 0.65) {
                 ctx.globalCompositeOperation = "source-over";
                 ctx.fillStyle = "rgba(255,255,255,0.9)";
-                ctx.globalAlpha = Math.min(1, a * 1.8);
+                ctx.globalAlpha = Math.min(1, d * 1.7);
                 ctx.fillRect(gx - pixelSize / 4, gy - pixelSize / 4, pixelSize / 2, pixelSize / 2);
               }
             }
