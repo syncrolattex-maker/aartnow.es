@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
 /**
- * DitherCursorTrail (Ultra-Rápido 60FPS + Deformación en Bordes)
- * Optimizado para rendimiento 100% fluido a 60FPS en imágenes y vídeos.
- * El efecto de deformación líquida y tramado Dithering se extiende con continuidad hasta los bordes.
+ * DitherCursorTrail (Deformación Fluida de Imagen + Borde Físico Deformable)
+ * Deforma la imagen Y el propio marco/borde exterior del contenedor al pasar el cursor,
+ * curvando el borde como una goma líquida fusionada con el tramado Dithering Bayer 4x4.
  */
 
 interface HalftoneCursorTrailProps {
@@ -30,10 +30,10 @@ const BAYER_4X4 = [
 export default function HalftoneCursorTrail({
   src,
   type = "image",
-  gridSize = 10,           // Rejilla optimizada para respuesta ultra fluida a 60FPS
-  influenceRadius = 120,   // Radio amplio para abarcar bordes
+  gridSize = 10,
+  influenceRadius = 130,
   decay = 0.92,
-  warpStrength = 24,       // Fuerza de deformación fluida optimizada
+  warpStrength = 28,
   invert = true,
   dotColor = "255,255,255",
   className = "",
@@ -130,7 +130,6 @@ export default function HalftoneCursorTrail({
 
     function excite(px: number, py: number) {
       if (!activation) return;
-      // Extender los límites para que la deformación afecte los bordes exteriores de la imagen
       const ix0 = Math.max(0, Math.floor((px - influenceRadius) / gridSize));
       const ix1 = Math.min(cols - 1, Math.ceil((px + influenceRadius) / gridSize));
       const iy0 = Math.max(0, Math.floor((py - influenceRadius) / gridSize));
@@ -213,15 +212,13 @@ export default function HalftoneCursorTrail({
               const ix = idx % cols;
               const gx = ix * gridSize, gy = iy * gridSize;
 
-              // Gradiente de deformación sin recortes en bordes
               const dx = activationAt(ix + 1, iy) - activationAt(ix - 1, iy);
               const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
 
               const tile = gridSize * 2.5;
-              const shiftX = dx * warpStrength * (1 + a * 0.5);
-              const shiftY = dy * warpStrength * (1 + a * 0.5);
+              const shiftX = dx * warpStrength * (1 + a * 0.6);
+              const shiftY = dy * warpStrength * (1 + a * 0.6);
 
-              // Clamping suave con margen para que los bordes de la foto se deformen orgánicamente
               const sx = Math.min(W - tile, Math.max(0, gx - shiftX - tile / 2));
               const sy = Math.min(H - tile, Math.max(0, gy - shiftY - tile / 2));
               const dxDest = gx - tile / 2;
@@ -264,6 +261,10 @@ export default function HalftoneCursorTrail({
 
           ctx.globalCompositeOperation = "source-over";
           ctx.globalAlpha = 1;
+
+          // Fase 3: Deformación del Marco/Borde Exterior de la Imagen
+          drawDeformedBorder(ctx, W, H);
+
         } else if (type === "image") {
           isLooping = false;
           return;
@@ -271,6 +272,50 @@ export default function HalftoneCursorTrail({
       }
 
       raf = requestAnimationFrame(frame);
+    }
+
+    // Dibuja el marco de borde deformado reactivo a lo largo de las 4 aristas
+    function drawDeformedBorder(c: CanvasRenderingContext2D, width: number, height: number) {
+      const step = 8;
+      c.beginPath();
+      c.strokeStyle = "rgba(255, 255, 255, 0.6)";
+      c.lineWidth = 2;
+
+      // 1. Arista Superior (0,0 -> W,0)
+      for (let x = 0; x <= width; x += step) {
+        const ix = Math.floor(x / gridSize);
+        const dy = activationAt(ix, 1) - activationAt(ix, 0);
+        const yOffset = dy * warpStrength * 0.8;
+        if (x === 0) c.moveTo(x, Math.max(0, yOffset));
+        else c.lineTo(x, Math.max(0, yOffset));
+      }
+
+      // 2. Arista Derecha (W,0 -> W,H)
+      for (let y = 0; y <= height; y += step) {
+        const iy = Math.floor(y / gridSize);
+        const dx = activationAt(cols - 1, iy) - activationAt(cols - 2, iy);
+        const xOffset = width + dx * warpStrength * 0.8;
+        c.lineTo(Math.min(width, xOffset), y);
+      }
+
+      // 3. Arista Inferior (W,H -> 0,H)
+      for (let x = width; x >= 0; x -= step) {
+        const ix = Math.floor(x / gridSize);
+        const dy = activationAt(ix, rows - 1) - activationAt(ix, rows - 2);
+        const yOffset = height + dy * warpStrength * 0.8;
+        c.lineTo(x, Math.min(height, yOffset));
+      }
+
+      // 4. Arista Izquierda (0,H -> 0,0)
+      for (let y = height; y >= 0; y -= step) {
+        const iy = Math.floor(y / gridSize);
+        const dx = activationAt(1, iy) - activationAt(0, iy);
+        const xOffset = dx * warpStrength * 0.8;
+        c.lineTo(Math.max(0, xOffset), y);
+      }
+
+      c.closePath();
+      c.stroke();
     }
 
     resize();
