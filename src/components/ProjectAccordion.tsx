@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useLanguage } from '../context/LanguageContext';
 import HalftoneHoverField from './HalftoneHoverField';
 import GlitchText from './GlitchText';
 
@@ -20,11 +21,12 @@ interface ProjectAccordionProps {
 /**
  * ProjectAccordion
  * Lista de proyectos tipo lamalama.com/work:
- * - Desktop: Estructura y estilos exactos intactos.
- * - Móvil: Navegación optimizada para pantallas táctiles (apilado fluido, targets de toque amplios y galería adaptada).
+ * - Todos los proyectos permanecen cerrados por defecto (openIndex = null).
+ * - Traducido dinámicamente según el idioma activo (es, val, en).
  */
 export default function ProjectAccordion({ projects = [] }: ProjectAccordionProps) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  // Por defecto todos los proyectos permanecen cerrados
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <div style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }} className="w-full">
@@ -47,6 +49,7 @@ interface ProjectRowProps {
 }
 
 function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
+  const { t } = useLanguage();
   const { title, tags = [], description, caseUrl, siteUrl, thumbnails = [], gallery = [] } = project;
 
   const headerRef = useRef<HTMLDivElement>(null);
@@ -56,7 +59,7 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
   const current = useRef({ x: 0, y: 0 });
   const raf = useRef<number | null>(null);
 
-  // La etiqueta "( VIEW + )" sigue al cursor con lerp magnético suave
+  // La etiqueta sigue al cursor con lerp magnético suave
   useEffect(() => {
     function tick() {
       current.current.x += (target.current.x - current.current.x) * 0.18;
@@ -158,7 +161,7 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
                 zIndex: 20,
               }}
             >
-              ( VIEW + )
+              {t.viewCaseBadge}
             </span>
           )}
         </div>
@@ -183,7 +186,7 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
         )}
       </div>
 
-      {/* Contenido expandido con aumento gradual de tamaño */}
+      {/* Contenido expandido */}
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div 
@@ -202,14 +205,14 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
             >
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-6">
                 
-                {/* Botones de Acción */}
+                {/* Botones de Acción Traducidos */}
                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                   {caseUrl && (
                     <a
                       href={caseUrl}
                       className="px-5 py-3 border border-white/30 text-white text-xs font-bold uppercase text-center hover:bg-[#f3ede4] hover:text-[#111] transition-colors"
                     >
-                      View case ↗
+                      {t.viewCaseBtn}
                     </a>
                   )}
                   {siteUrl && (
@@ -219,7 +222,7 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
                       rel="noreferrer"
                       className="px-5 py-3 border border-white/30 text-white text-xs font-bold uppercase text-center hover:bg-[#f3ede4] hover:text-[#111] transition-colors"
                     >
-                      Visit website ↗
+                      {t.visitWebsiteBtn}
                     </a>
                   )}
                 </div>

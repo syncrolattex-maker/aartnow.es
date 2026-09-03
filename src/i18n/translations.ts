@@ -19,7 +19,7 @@ export const translations = {
     heroTag: 'Diseñador & Desarrollador Freelance',
     heroH1Word1: 'Diseño',
     heroH1Word2: 'Marcas',
-    heroH1Word3: 'Digitals',
+    heroH1Word3: 'Digitales',
     heroH1Word4: 'Impactantes.',
     heroSubtitle: 'Diseñador y desarrollador freelance especializado en branding, experiencia de usuario, diseño 3D y código creativo WebGL. Sin agencias ni intermediarios: trabajo directamente contigo de principio a fin.',
     heroShowreelTitle: 'Sobre mí',
@@ -31,9 +31,17 @@ export const translations = {
     casesTag: '[ Trabajos destacados ]',
     casesTitle: 'Colaboro directamente con marcas que buscan destacar a través de lo digital.',
     casesSubtitle: 'Una selección de proyectos creados con precisión, código creativo y diseño.',
-    viewCase: 'Ver caso',
-    visitWebsite: 'Visitar web',
-    caseCursorText: 'VER CASO',
+    casesInstruction: '[ SELECCIONA UN PROYECTO PARA EXPLORAR ]',
+    viewCaseBtn: 'Ver caso ↗',
+    visitWebsiteBtn: 'Visitar web ↗',
+    viewCaseBadge: '( VER + )',
+    
+    // Project Descriptions
+    p1Desc: 'Motor de contenido IA y plataforma generativa para creadores digitales de última generación y flujos automatizados.',
+    p2Desc: 'Arte contemporáneo y sistema de diseño con tipografía de alta definición, mecánica de diseño espacial e identidad de marca.',
+    p3Desc: 'E-Commerce de nueva generación y experiencia WebGL interactiva con personalizador 3D en tiempo real y física de materiales.',
+    p4Desc: 'Computación espacial e identidad WebGL para estudio de arquitectura de lujo elevando la percepción digital de marca.',
+    p5Desc: 'Estrategia de marca y sistema de movimiento interactivo para estudio de producción audiovisual global.',
 
     // Services & About (5 Core Freelance Services)
     servicesTag: '[ Mis servicios ]',
@@ -50,6 +58,12 @@ export const translations = {
     s04Desc: 'Desarrollo plataformas digitales a medida con alto rendimiento, código creativo, Headless CMS e integración E-commerce.',
     s05Title: 'Marketing',
     s05Desc: 'Estrategias digitales y desarrollo de activos creativos para hacer crecer tu marca y convertir audiencias.',
+    
+    catBranding: 'Branding',
+    catDesign: 'Diseño',
+    cat3D: '3D',
+    catWebsites: 'Websites',
+    catMarketing: 'Marketing',
 
     // Interactive Inquiry Form
     contactTag: '[ INICIAR UN PROYECTO ]',
@@ -107,9 +121,17 @@ export const translations = {
     casesTag: '[ Treballs destacats ]',
     casesTitle: "Col·labore directament amb marques que busquen destacar a través del món digital.",
     casesSubtitle: "Una selecció de projectes creats amb precisió, codi creatiu i disseny.",
-    viewCase: 'Veure cas',
-    visitWebsite: 'Visitar web',
-    caseCursorText: 'VEURE CAS',
+    casesInstruction: '[ SELECCIONA UN PROJECTE PER A EXPLORAR ]',
+    viewCaseBtn: 'Veure cas ↗',
+    visitWebsiteBtn: 'Visitar web ↗',
+    viewCaseBadge: '( VEURE + )',
+
+    // Project Descriptions
+    p1Desc: 'Motor de contingut IA i plataforma generativa per a creadors digitals de darrera generació i fluxos automatitzats.',
+    p2Desc: 'Art contemporani i sistema de disseny amb tipografia d’alta definició, mecànica espacial i identitat de marca.',
+    p3Desc: 'E-Commerce de nova generació i experiència WebGL interactiva amb personalitzador 3D en temps real.',
+    p4Desc: 'Computació espacial i identitat WebGL per a estudi d’arquitectura de luxe elevant la percepció digital.',
+    p5Desc: 'Estratègia de marca i sistema interactiu en moviment per a estudi de producció audiovisual global.',
 
     // Services & About (5 Core Freelance Services)
     servicesTag: '[ Els meus serveis ]',
@@ -126,6 +148,12 @@ export const translations = {
     s04Desc: 'Desenvolupe plataformes digitals a mida amb alt rendiment, codi creatiu, Headless CMS i integració E-commerce.',
     s05Title: 'Màrqueting',
     s05Desc: "Estratègies digitals i desenvolupament d'actius creatius per a fer créixer la teua marca.",
+
+    catBranding: 'Branding',
+    catDesign: 'Disseny',
+    cat3D: '3D',
+    catWebsites: 'Websites',
+    catMarketing: 'Màrqueting',
 
     // Interactive Inquiry Form
     contactTag: '[ INICIAR UN PROJECTE ]',
@@ -183,9 +211,17 @@ export const translations = {
     casesTag: '[ Featured work ]',
     casesTitle: 'I partner directly with forward-thinking brands to craft digital experiences.',
     casesSubtitle: 'A curated selection of projects built with precision, code, and design.',
-    viewCase: 'View case',
-    visitWebsite: 'Visit website',
-    caseCursorText: 'VIEW CASE',
+    casesInstruction: '[ SELECT A PROJECT TO EXPLORE ]',
+    viewCaseBtn: 'View case ↗',
+    visitWebsiteBtn: 'Visit website ↗',
+    viewCaseBadge: '( VIEW + )',
+
+    // Project Descriptions
+    p1Desc: 'AI Content Engine & Generative Platform for next-generation digital creators and automated asset workflows.',
+    p2Desc: 'Contemporary Art & Design System with high-definition typography, spatial layout mechanics and brand identity.',
+    p3Desc: 'Next-Gen E-Commerce & Interactive WebGL Experience with real-time 3D product customizer and physics shaders.',
+    p4Desc: 'Spatial Computing & WebGL Identity for luxury architecture studio elevating digital brand perception.',
+    p5Desc: 'Brand Strategy & Interactive Motion System for global audiovisual production studio.',
 
     // Services & About (5 Core Freelance Services)
     servicesTag: '[ What I do ]',
@@ -202,6 +238,12 @@ export const translations = {
     s04Desc: 'I build custom digital platforms with ultra-high performance, fluid motion, Headless CMS, and E-commerce.',
     s05Title: 'Marketing',
     s05Desc: 'Targeted digital strategies and creative assets to connect brands with audiences that convert.',
+
+    catBranding: 'Branding',
+    catDesign: 'Design',
+    cat3D: '3D',
+    catWebsites: 'Websites',
+    catMarketing: 'Marketing',
 
     // Interactive Inquiry Form
     contactTag: '[ START A PROJECT ]',
