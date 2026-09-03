@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
 /**
- * DitherCursorTrail (Fusión Total Fondo + Imagen con Bleed Extendido)
- * Deforma la imagen Y el fondo exterior de la web como una sola masa líquida unificada,
- * permitiendo que la foto se desborde y fusione con el fondo de la página.
+ * DitherCursorTrail (Fusión Orgánica Sin Delimitación Fondo + Imagen)
+ * Elimina cualquier línea de borde o marco rígido. La imagen y el fondo de la web
+ * se mezclan y disuelven fluidamente sin ninguna delimitación mediante el tramado Dithering Bayer 4x4.
  */
 
 interface HalftoneCursorTrailProps {
@@ -27,16 +27,15 @@ const BAYER_4X4 = [
   [15/16,  7/16, 13/16,  5/16]
 ];
 
-// Margen de sangrado para permitir que la deformación se fusione con el fondo fuera de la caja
-const BLEED_MARGIN = 50;
+const BLEED_MARGIN = 40;
 
 export default function HalftoneCursorTrail({
   src,
   type = "image",
   gridSize = 10,
-  influenceRadius = 150,
+  influenceRadius = 140,
   decay = 0.93,
-  warpStrength = 35,
+  warpStrength = 32,
   invert = true,
   dotColor = "255,255,255",
   className = "",
@@ -104,7 +103,6 @@ export default function HalftoneCursorTrail({
       stageH = rect.height;
       if (stageW <= 0 || stageH <= 0) return;
 
-      // El área del Canvas incluye un margen de sangrado (Bleed) exterior para que se fusione con el fondo
       W = stageW + BLEED_MARGIN * 2;
       H = stageH + BLEED_MARGIN * 2;
 
@@ -133,14 +131,12 @@ export default function HalftoneCursorTrail({
     function drawBase() {
       if (ctx && sampleReady && stageW > 0 && stageH > 0) {
         ctx.clearRect(0, 0, W, H);
-        // Dibujar la imagen centrada dentro del canvas sangrado
         ctx.drawImage(sample, BLEED_MARGIN, BLEED_MARGIN, stageW, stageH);
       }
     }
 
     function excite(px: number, py: number) {
       if (!activation) return;
-      // Posición del ratón ajustada con el offset de sangrado
       const cx = px + BLEED_MARGIN;
       const cy = py + BLEED_MARGIN;
 
@@ -212,11 +208,11 @@ export default function HalftoneCursorTrail({
       }
 
       if (ctx && activation) {
-        // Base de la imagen centrada
+        // Dibuja la base centrada
         drawBase();
 
         if (active.size > 0) {
-          // Fase 1: Deformación Warp extendida que desborda la foto sobre el fondo
+          // Fase 1: Deformación Warp orgánica que desborda la imagen sobre el fondo sin líneas de borde
           if (warpStrength > 0 && sampleReady) {
             for (const idx of Array.from(active)) {
               const a = activation[idx];
@@ -230,10 +226,9 @@ export default function HalftoneCursorTrail({
               const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
 
               const tile = gridSize * 2.8;
-              const shiftX = dx * warpStrength * (1 + a * 0.8);
-              const shiftY = dy * warpStrength * (1 + a * 0.8);
+              const shiftX = dx * warpStrength * (1 + a * 0.7);
+              const shiftY = dy * warpStrength * (1 + a * 0.7);
 
-              // Coordenadas relativas a la imagen original
               const imgGx = gx - BLEED_MARGIN;
               const imgGy = gy - BLEED_MARGIN;
 
@@ -245,7 +240,7 @@ export default function HalftoneCursorTrail({
             }
           }
 
-          // Fase 2: Cuantización Dithering Bayer 4x4 fusionada que abarca foto y fondo
+          // Fase 2: Cuantización Dithering Bayer 4x4 fusionada que disuelve fondo e imagen sin delimitación
           if (invert) {
             ctx.globalCompositeOperation = "difference";
             ctx.fillStyle = "rgb(255,255,255)";
@@ -277,10 +272,6 @@ export default function HalftoneCursorTrail({
 
           ctx.globalCompositeOperation = "source-over";
           ctx.globalAlpha = 1;
-
-          // Fase 3: Deformación fluida del marco exterior de la foto fusionado con el fondo
-          drawFusedLiquidBorder(ctx, stageW, stageH);
-
         } else if (type === "image") {
           isLooping = false;
           return;
@@ -288,60 +279,6 @@ export default function HalftoneCursorTrail({
       }
 
       raf = requestAnimationFrame(frame);
-    }
-
-    // Dibuja el marco de la foto deformándose fluidamente hacia el fondo exterior
-    function drawFusedLiquidBorder(c: CanvasRenderingContext2D, sW: number, sH: number) {
-      const step = 8;
-      const b = BLEED_MARGIN;
-
-      c.beginPath();
-      c.strokeStyle = "rgba(255, 255, 255, 0.7)";
-      c.lineWidth = 2;
-
-      // 1. Borde Superior
-      for (let x = 0; x <= sW; x += step) {
-        const gx = x + b;
-        const ix = Math.floor(gx / gridSize);
-        const iy = Math.floor(b / gridSize);
-        const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
-        const yOffset = b + dy * warpStrength * 0.9;
-        if (x === 0) c.moveTo(gx, yOffset);
-        else c.lineTo(gx, yOffset);
-      }
-
-      // 2. Borde Derecho
-      for (let y = 0; y <= sH; y += step) {
-        const gy = y + b;
-        const iy = Math.floor(gy / gridSize);
-        const ix = Math.floor((sW + b) / gridSize);
-        const dx = activationAt(ix + 1, iy) - activationAt(ix - 1, iy);
-        const xOffset = sW + b + dx * warpStrength * 0.9;
-        c.lineTo(xOffset, gy);
-      }
-
-      // 3. Borde Inferior
-      for (let x = sW; x >= 0; x -= step) {
-        const gx = x + b;
-        const ix = Math.floor(gx / gridSize);
-        const iy = Math.floor((sH + b) / gridSize);
-        const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
-        const yOffset = sH + b + dy * warpStrength * 0.9;
-        c.lineTo(gx, yOffset);
-      }
-
-      // 4. Borde Izquierdo
-      for (let y = sH; y >= 0; y -= step) {
-        const gy = y + b;
-        const iy = Math.floor(gy / gridSize);
-        const ix = Math.floor(b / gridSize);
-        const dx = activationAt(ix + 1, iy) - activationAt(ix - 1, iy);
-        const xOffset = b + dx * warpStrength * 0.9;
-        c.lineTo(xOffset, gy);
-      }
-
-      c.closePath();
-      c.stroke();
     }
 
     resize();
