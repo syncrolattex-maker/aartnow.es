@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
 /**
- * DitherCursorTrail (Tramado Digital Bayer 4x4 + Deformación Warp de Imagen)
- * Deforma la imagen/vídeo al pasar el cursor (efecto bulge/ondulación) y
- * aplica cuantización Dithering por matriz Bayer 4x4 en tiempo real.
+ * DitherCursorTrail (Deformación Liquida Pronunciada + Tramado Dithering Fusonados)
+ * Deforma profundamente la imagen/vídeo al pasar el cursor (efecto lente líquida / warp pronunciado)
+ * fusionando en tiempo real la deformación con la trama digital Bayer 4x4.
  */
 
 interface HalftoneCursorTrailProps {
@@ -31,9 +31,9 @@ export default function HalftoneCursorTrail({
   src,
   type = "image",
   gridSize = 6,
-  influenceRadius = 95,
-  decay = 0.91,
-  warpStrength = 18,
+  influenceRadius = 140,
+  decay = 0.93,
+  warpStrength = 36,
   invert = true,
   dotColor = "255,255,255",
   className = "",
@@ -142,7 +142,7 @@ export default function HalftoneCursorTrail({
           if (d > influenceRadius) continue;
           const falloff = 1 - d / influenceRadius;
           const idx = iy * cols + ix;
-          const val = Math.pow(falloff, 1.2);
+          const val = Math.pow(falloff, 1.1);
           if (val > activation[idx]) activation[idx] = val;
           active.add(idx);
         }
@@ -168,7 +168,7 @@ export default function HalftoneCursorTrail({
       const p = pointerPos(e);
       if (last) {
         const dist = Math.hypot(p.x - last.x, p.y - last.y);
-        const steps = Math.max(1, Math.floor(dist / (gridSize * 1.5)));
+        const steps = Math.max(1, Math.floor(dist / (gridSize * 1.2)));
         for (let i = 0; i <= steps; i++) {
           const t = i / steps;
           excite(last.x + (p.x - last.x) * t, last.y + (p.y - last.y) * t);
@@ -199,11 +199,11 @@ export default function HalftoneCursorTrail({
         // 1) Dibuja la base limpia de la imagen
         drawBase();
 
-        // 2) Deformación warp líquida + Cuantización Dithering digital en celdas activas
+        // 2) Fusión de Deformación Líquida Pronunciada + Dithering Bayer 4x4
         if (active.size > 0) {
           for (const idx of Array.from(active)) {
             let a = activation[idx] * decay;
-            if (a < 0.02) { 
+            if (a < 0.015) { 
               activation[idx] = 0; 
               active.delete(idx); 
               continue; 
@@ -214,25 +214,31 @@ export default function HalftoneCursorTrail({
             const ix = idx % cols;
             const gx = ix * gridSize, gy = iy * gridSize;
 
-            // Deformación warp / bulge de la imagen según el gradiente local
-            if (warpStrength > 0 && sampleReady) {
-              const dx = activationAt(ix + 1, iy) - activationAt(ix - 1, iy);
-              const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
+            // 1. Deformación líquida warp muy marcada según gradiente de aceleración
+            const dx = activationAt(ix + 1, iy) - activationAt(ix - 1, iy);
+            const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
+            const gradMag = Math.hypot(dx, dy);
 
-              const tile = gridSize * 1.6;
-              const sx = Math.min(W - tile, Math.max(0, gx - dx * warpStrength - tile / 2));
-              const sy = Math.min(H - tile, Math.max(0, gy - dy * warpStrength - tile / 2));
+            if (warpStrength > 0 && sampleReady) {
+              const tile = gridSize * 2.2;
+              const shiftX = dx * warpStrength * (1 + a * 0.8);
+              const shiftY = dy * warpStrength * (1 + a * 0.8);
+
+              const sx = Math.min(W - tile, Math.max(0, gx - shiftX - tile / 2));
+              const sy = Math.min(H - tile, Math.max(0, gy - shiftY - tile / 2));
               const dxDest = Math.min(W - tile, Math.max(0, gx - tile / 2));
               const dyDest = Math.min(H - tile, Math.max(0, gy - tile / 2));
 
-              ctx.globalAlpha = 1;
+              ctx.globalAlpha = Math.min(1, a * 1.4);
               ctx.drawImage(sample, sx, sy, tile, tile, dxDest, dyDest, tile, tile);
             }
 
-            // Tramado Dithering digital (píxeles cuadrados Bayer 4x4)
+            // 2. Fusión directa con tramado Dithering digital en píxeles cuadrados cuantizados
             const threshold = BAYER_4X4[iy % 4][ix % 4];
-            if (a > threshold * 0.6) {
-              const pixelSize = Math.max(1.8, Math.min(gridSize - 0.5, (a - threshold * 0.25) * 4.5));
+            const fusedAmp = Math.min(1, gradMag * 1.5 + a * 0.9);
+
+            if (fusedAmp > threshold * 0.5) {
+              const pixelSize = Math.max(2.0, Math.min(gridSize, (fusedAmp - threshold * 0.2) * 5));
 
               if (invert) {
                 ctx.globalCompositeOperation = "difference";
@@ -241,7 +247,7 @@ export default function HalftoneCursorTrail({
                 ctx.globalCompositeOperation = "source-over";
                 ctx.fillStyle = `rgb(${dotColor})`;
               }
-              ctx.globalAlpha = Math.min(1, a * 1.6);
+              ctx.globalAlpha = Math.min(1, fusedAmp * 1.7);
               ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
               ctx.globalCompositeOperation = "source-over";
             }
