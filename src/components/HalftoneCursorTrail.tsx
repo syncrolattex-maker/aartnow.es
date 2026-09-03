@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
 /**
- * DitherCursorTrail (Efecto Borrado/Mezcla Líquida Temporal con Recuperación a la Imagen Original)
+ * HalftoneCursorTrail - Réplica Exacta del Efecto "Lama Lama - Jack & AI"
  * 
- * 1. En reposo: La imagen se muestra 100% nítida y perfecta en su contenedor.
- * 2. Al pasar el ratón: El cursor genera una estela de mezcla líquida y borrado mediante
- *    cuantización Dithering Bayer 4x4 y deformación de lente, haciendo visible el fondo oscuro.
- * 3. Al alejarse el cursor: La estela se desvanece suavemente y la imagen RECUPERA 100% su estado original.
+ * 1. En reposo: La imagen del proyecto se muestra 100% nítida, limpia y en alta resolución.
+ * 2. Al mover el cursor: Deja una estela fluida de deformación líquida (displacement warp) 
+ *    combinada con tramado digital Dithering Bayer 4x4 y contraste adaptativo sobre la imagen.
+ * 3. Inercia de decaimiento: La estela permanece visible ~0.8s tras el paso del ratón 
+ *    y se desvanece suavemente a 60 FPS hasta RECUPERAR la foto original 100% limpia.
  */
 
 interface HalftoneCursorTrailProps {
@@ -14,7 +15,6 @@ interface HalftoneCursorTrailProps {
   type?: 'video' | 'image';
   gridSize?: number;
   influenceRadius?: number;
-  dotRadius?: number;
   decay?: number;
   warpStrength?: number;
   invert?: boolean;
@@ -33,10 +33,10 @@ const BAYER_4X4 = [
 export default function HalftoneCursorTrail({
   src,
   type = "image",
-  gridSize = 10,
-  influenceRadius = 130,
-  decay = 0.89,             // Decaimiento rápido para que la imagen vuelva a su estado original enseguida
-  warpStrength = 30,        // Fuerza de la estela líquida
+  gridSize = 8,
+  influenceRadius = 115,    // Radio de la estela líquida Lama Lama
+  decay = 0.90,             // Inercia de desvanecido suave (~0.8s)
+  warpStrength = 24,        // Fuerza de deformación fluida
   invert = true,
   dotColor = "255,255,255",
   className = "",
@@ -127,7 +127,7 @@ export default function HalftoneCursorTrail({
       }
     }
 
-    // Dibuja la imagen limpia 100% nítida
+    // Dibuja la base nítida original
     function drawBase() {
       if (ctx && sampleReady && W > 0 && H > 0) {
         ctx.clearRect(0, 0, W, H);
@@ -150,7 +150,7 @@ export default function HalftoneCursorTrail({
           if (d > influenceRadius) continue;
           const falloff = 1 - d / influenceRadius;
           const idx = iy * cols + ix;
-          const val = Math.pow(falloff, 1.1);
+          const val = Math.pow(falloff, 1.15);
           if (val > activation[idx]) activation[idx] = val;
           active.add(idx);
         }
@@ -178,7 +178,7 @@ export default function HalftoneCursorTrail({
       const p = pointerPos(e);
       if (last) {
         const dist = Math.hypot(p.x - last.x, p.y - last.y);
-        const steps = Math.max(1, Math.floor(dist / (gridSize * 1.5)));
+        const steps = Math.max(1, Math.floor(dist / (gridSize * 1.2)));
         for (let i = 0; i <= steps; i++) {
           const t = i / steps;
           excite(last.x + (p.x - last.x) * t, last.y + (p.y - last.y) * t);
@@ -206,12 +206,11 @@ export default function HalftoneCursorTrail({
       }
 
       if (ctx && activation) {
-        // 1. Dibuja la base nítida original
+        // Base impecable de la foto
         drawBase();
 
-        // 2. Si hay actividad por el paso del ratón, dibuja el efecto de mezcla líquida y borrado
         if (active.size > 0) {
-          // Fase A: Deformación líquida temporal (Liquid Lens Warp)
+          // Fase 1: Deformación Warp Líquida al paso del cursor (Lama Lama Style)
           if (warpStrength > 0 && sampleReady) {
             for (const idx of Array.from(active)) {
               const a = activation[idx];
@@ -224,23 +223,22 @@ export default function HalftoneCursorTrail({
               const dx = activationAt(ix + 1, iy) - activationAt(ix - 1, iy);
               const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
 
-              const tile = gridSize * 2.5;
-              const shiftX = dx * warpStrength * (1 + a * 0.6);
-              const shiftY = dy * warpStrength * (1 + a * 0.6);
+              const tile = gridSize * 2.4;
+              const shiftX = dx * warpStrength * (1 + a * 0.5);
+              const shiftY = dy * warpStrength * (1 + a * 0.5);
 
               const sx = Math.min(W - tile, Math.max(0, gx - shiftX - tile / 2));
               const sy = Math.min(H - tile, Math.max(0, gy - shiftY - tile / 2));
 
-              ctx.globalAlpha = Math.min(1, a * 1.4);
+              ctx.globalAlpha = Math.min(1, a * 1.3);
               ctx.drawImage(sample, sx, sy, tile, tile, gx - tile / 2, gy - tile / 2, tile, tile);
             }
           }
 
-          // Fase B: Efecto de borrado y mezcla Dithering Bayer 4x4 (se ve el fondo oscuro a través de los píxeles)
+          // Fase 2: Cuantización Dithering Bayer 4x4 sobre la estela deformada
           for (const idx of Array.from(active)) {
             let a = activation[idx] * decay;
-            // Cuando cae por debajo de 0.02, se elimina de activos y vuelve 100% a la imagen original
-            if (a < 0.02) { 
+            if (a < 0.015) { 
               activation[idx] = 0; 
               active.delete(idx); 
               continue; 
@@ -253,7 +251,7 @@ export default function HalftoneCursorTrail({
 
             const threshold = BAYER_4X4[iy % 4][ix % 4];
             if (a > threshold * 0.5) {
-              const pixelSize = Math.max(2.0, Math.min(gridSize, (a - threshold * 0.25) * 4.5));
+              const pixelSize = Math.max(2.0, Math.min(gridSize - 0.5, (a - threshold * 0.2) * 4.2));
 
               if (invert) {
                 ctx.globalCompositeOperation = "difference";
@@ -263,7 +261,7 @@ export default function HalftoneCursorTrail({
                 ctx.fillStyle = `rgb(${dotColor})`;
               }
 
-              ctx.globalAlpha = Math.min(1, a * 1.6);
+              ctx.globalAlpha = Math.min(1, a * 1.5);
               ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
               ctx.globalCompositeOperation = "source-over";
             }
@@ -271,7 +269,6 @@ export default function HalftoneCursorTrail({
 
           ctx.globalAlpha = 1;
         } else {
-          // Cuando termina de desvanecerse la estela, se detiene el bucle y la imagen vuelve a ser la original nítida
           drawBase();
           isLooping = false;
           return;
