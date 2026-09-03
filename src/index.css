@@ -1,5 +1,55 @@
 @import "tailwindcss";
 
+/* Suisse Intl Custom Font Declarations */
+@font-face {
+  font-family: 'SuisseIntl';
+  src: url('/fonts/SuisseIntl-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SuisseIntl';
+  src: url('/fonts/SuisseIntl-Regular.otf') format('opentype'),
+       url('/fonts/SuisseIntl-Book.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SuisseIntl';
+  src: url('/fonts/SuisseIntl-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SuisseIntl';
+  src: url('/fonts/SuisseIntl-SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SuisseIntl';
+  src: url('/fonts/SuisseIntl-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SuisseIntl';
+  src: url('/fonts/SuisseIntl-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     /* Pure Minimalist Monochrome & Greyscale Palette (Zero Vivid Colors) */
@@ -13,11 +63,16 @@
     --ll-border-subtle: rgba(255, 255, 255, 0.15);
   }
 
-  html {
+  html, body {
     scroll-behavior: smooth;
     background-color: var(--ll-bg-black);
     color: var(--ll-text-light);
-    font-family: 'SuisseBPIntl', system-ui, -apple-system, sans-serif;
+    font-family: 'SuisseIntl', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Aplica Suisse Intl a todos los Títulos, Navegación, Clases Sans y Mono */
+  h1, h2, h3, h4, h5, h6, nav, header, button, .font-sans, .font-mono {
+    font-family: 'SuisseIntl', system-ui, -apple-system, sans-serif !important;
   }
 
   ::selection {
