@@ -1,16 +1,9 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
 /**
- * HalftoneCursorTrail
- * Rastro de puntos (halftone) + distorsión ("bulge") del fondo, siguiendo al
- * cursor sobre una imagen o vídeo — recreación exacta de lamalama.com.
- *
- * Mejoras clave:
- * - `invert = true`: Usa blend mode "difference" (`ctx.globalCompositeOperation = "difference"`),
- *   lo que hace que los puntos salgan oscuros sobre zonas claras y claros sobre zonas oscuras automáticamente.
- * - Parámetros ajustados según el vídeo original: gridSize = 6, dotRadius = 2, warpStrength = 8, decay = 0.90.
- * - Desactivado en móviles (< 1024px / touch) para velocidad de navegación 100% nativa.
- * - Pausado automático del bucle de animación en imágenes estáticas en reposo.
+ * DitherCursorTrail (Tramado Digital Bayer 4x4)
+ * Sustituye el efecto halftone por un tramado digital por cuantización de matriz Dithering
+ * sobre imágenes y vídeos en movimiento cuando el cursor interactúa.
  */
 
 interface HalftoneCursorTrailProps {
@@ -27,12 +20,18 @@ interface HalftoneCursorTrailProps {
   style?: CSSProperties;
 }
 
+const BAYER_4X4 = [
+  [ 0/16,  8/16,  2/16, 10/16],
+  [12/16,  4/16, 14/16,  6/16],
+  [ 3/16, 11/16,  1/16,  9/16],
+  [15/16,  7/16, 13/16,  5/16]
+];
+
 export default function HalftoneCursorTrail({
   src,
   type = "video",
   gridSize = 6,
-  influenceRadius = 70,
-  dotRadius = 2,
+  influenceRadius = 75,
   decay = 0.90,
   warpStrength = 8,
   invert = true,
@@ -45,7 +44,6 @@ export default function HalftoneCursorTrail({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isTouch, setIsTouch] = useState(false);
 
-  // Detecta dispositivos táctiles / móviles para desactivar en móvil
   useEffect(() => {
     const mq = window.matchMedia("(pointer: coarse)");
     const update = () => {
@@ -119,7 +117,7 @@ export default function HalftoneCursorTrail({
         sctx.drawImage(source, 0, 0, W, H);
         sampleReady = true;
       } catch (e) {
-        /* Fuente aún no lista o problema de CORS */
+        /* Fuente no lista */
       }
     }
 
@@ -144,7 +142,7 @@ export default function HalftoneCursorTrail({
           if (d > influenceRadius) continue;
           const falloff = 1 - d / influenceRadius;
           const idx = iy * cols + ix;
-          const val = Math.pow(falloff, 1.4);
+          const val = Math.pow(falloff, 1.3);
           if (val > activation[idx]) activation[idx] = val;
           active.add(idx);
         }
@@ -198,10 +196,10 @@ export default function HalftoneCursorTrail({
       }
 
       if (ctx && activation) {
-        // 1) Base: la imagen/vídeo íntegro
+        // Base intacta
         drawBase();
 
-        // 2) Por cada celda activa: tile desplazado (bulge) + punto de tinta encima
+        // Aplicación del tramado Dithering Bayer 4x4 en celdas activas
         if (active.size > 0) {
           for (const idx of Array.from(active)) {
             let a = activation[idx] * decay;
@@ -216,6 +214,7 @@ export default function HalftoneCursorTrail({
             const ix = idx % cols;
             const gx = ix * gridSize, gy = iy * gridSize;
 
+            // 1) Warp displacement de fondo
             if (warpStrength > 0 && sampleReady) {
               const dx = activationAt(ix + 1, iy) - activationAt(ix - 1, iy);
               const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
@@ -230,24 +229,25 @@ export default function HalftoneCursorTrail({
               ctx.drawImage(sample, sx, sy, tile, tile, dxDest, dyDest, tile, tile);
             }
 
-            const r = dotRadius * a;
-            if (invert) {
-              // Blend "difference": sale oscuro sobre fondo claro y claro sobre fondo oscuro
-              ctx.globalCompositeOperation = "difference";
-              ctx.fillStyle = "rgb(255,255,255)";
-            } else {
+            // 2) Cuantización Dithering digital (píxeles cuadrados Bayer)
+            const threshold = BAYER_4X4[iy % 4][ix % 4];
+            if (a > threshold * 0.7) {
+              const pixelSize = Math.max(1.5, Math.min(gridSize - 0.5, (a - threshold * 0.3) * 4));
+
+              if (invert) {
+                ctx.globalCompositeOperation = "difference";
+                ctx.fillStyle = "rgb(255,255,255)";
+              } else {
+                ctx.globalCompositeOperation = "source-over";
+                ctx.fillStyle = `rgb(${dotColor})`;
+              }
+              ctx.globalAlpha = Math.min(1, a * 1.5);
+              ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
               ctx.globalCompositeOperation = "source-over";
-              ctx.fillStyle = `rgb(${dotColor})`;
             }
-            ctx.globalAlpha = Math.min(1, a * 1.3);
-            ctx.beginPath();
-            ctx.arc(gx, gy, Math.max(0.3, r), 0, Math.PI * 2);
-            ctx.fill();
-            ctx.globalCompositeOperation = "source-over";
           }
           ctx.globalAlpha = 1;
         } else if (type === "image") {
-          // Pausar animación cuando no queden celdas activas en imágenes estáticas
           isLooping = false;
           return;
         }
@@ -287,7 +287,7 @@ export default function HalftoneCursorTrail({
         (source as HTMLVideoElement).removeEventListener("loadeddata", onLoaded);
       }
     };
-  }, [src, type, gridSize, influenceRadius, dotRadius, decay, warpStrength, invert, dotColor, isTouch]);
+  }, [src, type, gridSize, influenceRadius, decay, warpStrength, invert, dotColor, isTouch]);
 
   return (
     <div

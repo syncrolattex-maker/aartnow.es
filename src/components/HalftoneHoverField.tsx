@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
 /**
- * HalftoneHoverField
- * Campo de puntos (halftone) que reacciona al hover dentro de su contenedor,
- * igual que el efecto de lamalama.com sobre fondo plano (sin vídeo que desplazar
- * debajo — solo la rejilla de puntos que se enciende/apaga con decaimiento orgánico).
+ * DitherHoverField (Bayer 4x4 Digital Tramado)
+ * Reemplaza la estética de halftone por un tramado digital (Dithering)
+ * ultra estético y reactivo al cursor sobre fondos planos.
  */
 
 interface HalftoneHoverFieldProps {
@@ -17,12 +16,18 @@ interface HalftoneHoverFieldProps {
   style?: CSSProperties;
 }
 
+const BAYER_4X4 = [
+  [ 0/16,  8/16,  2/16, 10/16],
+  [12/16,  4/16, 14/16,  6/16],
+  [ 3/16, 11/16,  1/16,  9/16],
+  [15/16,  7/16, 13/16,  5/16]
+];
+
 export default function HalftoneHoverField({
   gridSize = 6,
   influenceRadius = 90,
-  dotRadius = 2,
   decay = 0.90,
-  dotColor = "255,255,255", // Blanco para filas oscuras del acordeón
+  dotColor = "255,255,255",
   className = "",
   style = {},
 }: HalftoneHoverFieldProps) {
@@ -30,7 +35,6 @@ export default function HalftoneHoverField({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isTouch, setIsTouch] = useState(false);
 
-  // Detecta móviles / pantallas táctiles para desactivar en móvil
   useEffect(() => {
     const mq = window.matchMedia("(pointer: coarse)");
     const update = () => {
@@ -101,7 +105,7 @@ export default function HalftoneHoverField({
           if (d > influenceRadius) continue;
           const falloff = 1 - d / influenceRadius;
           const idx = iy * cols + ix;
-          const val = Math.pow(falloff, 1.4);
+          const val = Math.pow(falloff, 1.3);
           if (val > activation[idx]) activation[idx] = val;
           active.add(idx);
         }
@@ -153,12 +157,15 @@ export default function HalftoneHoverField({
             const iy = (idx / cols) | 0;
             const ix = idx % cols;
             const gx = ix * gridSize, gy = iy * gridSize;
-            const r = dotRadius * a;
 
-            ctx.globalAlpha = Math.min(1, a * 1.3);
-            ctx.beginPath();
-            ctx.arc(gx, gy, Math.max(0.3, r), 0, Math.PI * 2);
-            ctx.fill();
+            // Dithering threshold mediante matriz Bayer 4x4
+            const threshold = BAYER_4X4[iy % 4][ix % 4];
+            if (a > threshold * 0.75) {
+              const pixelSize = Math.max(1.5, Math.min(gridSize - 1, (a - threshold * 0.3) * 4));
+              ctx.globalAlpha = Math.min(1, a * 1.5);
+              // Pincel píxel cuadrado para acabado Dithering digital brutalista
+              ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
+            }
           }
           ctx.globalAlpha = 1;
         }
@@ -192,7 +199,7 @@ export default function HalftoneHoverField({
         host.removeEventListener("mouseleave", onLeave);
       }
     };
-  }, [gridSize, influenceRadius, dotRadius, decay, dotColor, isTouch]);
+  }, [gridSize, influenceRadius, decay, dotColor, isTouch]);
 
   if (isTouch) return null;
 

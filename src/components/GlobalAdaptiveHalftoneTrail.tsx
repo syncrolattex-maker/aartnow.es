@@ -1,5 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 
+/**
+ * GlobalAdaptiveDitherTrail
+ * Rastro global de tramado digital (Dithering Bayer 4x4) adaptativo
+ * que reacciona con píxeles cuánticos al movimiento del cursor en toda la web.
+ */
+
+const BAYER_4X4 = [
+  [ 0/16,  8/16,  2/16, 10/16],
+  [12/16,  4/16, 14/16,  6/16],
+  [ 3/16, 11/16,  1/16,  9/16],
+  [15/16,  7/16, 13/16,  5/16]
+];
+
 export default function GlobalAdaptiveHalftoneTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isTouch, setIsTouch] = useState(false);
@@ -25,7 +38,6 @@ export default function GlobalAdaptiveHalftoneTrail() {
   }, []);
 
   useEffect(() => {
-    // Completely disable trail execution on mobile / touch devices
     if (isTouch) return;
 
     const canvas = canvasRef.current;
@@ -39,13 +51,12 @@ export default function GlobalAdaptiveHalftoneTrail() {
     let H = window.innerHeight;
     let cols = 0, rows = 0;
     
-    const gridSize = 6;           // Fine dot grid spacing
-    const influenceRadius = 75;   // Influence radius
-    const dotRadius = 2.2;        // Fine small dot radius
-    const decay = 0.92;           // Smooth decay
+    const gridSize = 6;
+    const influenceRadius = 75;
+    const decay = 0.92;
 
     let activation: Float32Array | null = null;
-    let dotColors: string[] = [];  // Color string per grid index
+    let dotColors: string[] = [];
     let active = new Set<number>();
     let raf: number;
     let isLooping = false;
@@ -75,10 +86,10 @@ export default function GlobalAdaptiveHalftoneTrail() {
         const elem = document.elementFromPoint(px, py);
         if (elem) {
           if (elem.closest('#work')) {
-            return '10, 10, 10'; // Black dots on light cream background (#FFFDF3)
+            return '10, 10, 10';
           }
           if (elem.closest('#contact')) {
-            return '0, 0, 0';   // Black dots on Electric Red banner (#FF1300)
+            return '0, 0, 0';
           }
 
           const style = window.getComputedStyle(elem);
@@ -92,7 +103,7 @@ export default function GlobalAdaptiveHalftoneTrail() {
               const b = parseInt(match[2], 10);
               const lum = 0.299 * r + 0.587 * g + 0.114 * b;
               if (lum > 130) {
-                return '10, 10, 10'; // Dark dots on light background
+                return '10, 10, 10';
               }
             }
           }
@@ -100,7 +111,7 @@ export default function GlobalAdaptiveHalftoneTrail() {
       } catch (e) {
         /* Fallback */
       }
-      return '255, 255, 255'; // White dots on dark background
+      return '255, 255, 255';
     }
 
     function excite(px: number, py: number) {
@@ -119,7 +130,7 @@ export default function GlobalAdaptiveHalftoneTrail() {
           if (d > influenceRadius) continue;
           const falloff = 1 - d / influenceRadius;
           const idx = iy * cols + ix;
-          const val = Math.pow(falloff, 1.4);
+          const val = Math.pow(falloff, 1.3);
           if (val > activation[idx]) {
             activation[idx] = val;
             dotColors[idx] = colorForPoint;
@@ -180,13 +191,15 @@ export default function GlobalAdaptiveHalftoneTrail() {
             const iy = (idx / cols) | 0;
             const ix = idx % cols;
             const gx = ix * gridSize, gy = iy * gridSize;
-            const r = dotRadius * a;
 
-            ctx.fillStyle = `rgb(${dotColors[idx] || '255, 255, 255'})`;
-            ctx.globalAlpha = Math.min(1, a * 1.4);
-            ctx.beginPath();
-            ctx.arc(gx, gy, Math.max(0.3, r), 0, Math.PI * 2);
-            ctx.fill();
+            // Dithering threshold por matriz Bayer 4x4
+            const threshold = BAYER_4X4[iy % 4][ix % 4];
+            if (a > threshold * 0.7) {
+              const pixelSize = Math.max(1.5, Math.min(gridSize - 0.5, (a - threshold * 0.3) * 4));
+              ctx.fillStyle = `rgb(${dotColors[idx] || '255, 255, 255'})`;
+              ctx.globalAlpha = Math.min(1, a * 1.5);
+              ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
+            }
           }
           ctx.globalAlpha = 1;
         } else {
@@ -211,7 +224,6 @@ export default function GlobalAdaptiveHalftoneTrail() {
     };
   }, [isTouch]);
 
-  // Don't render canvas on mobile / touch devices
   if (isTouch) return null;
 
   return (
