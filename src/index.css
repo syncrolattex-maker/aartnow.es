@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
 @import "tailwindcss";
 
 /* Suisse Intl Custom Font Declarations (Light, Regular, Bold) */
@@ -69,9 +70,14 @@
     font-family: 'SuisseIntl', system-ui, -apple-system, sans-serif;
   }
 
-  /* Aplica Suisse Intl a todos los Títulos, Navegación, Clases Sans y Mono */
-  h1, h2, h3, h4, h5, h6, nav, header, button, .font-sans, .font-mono {
+  /* Tipografía Primaria: Suisse Intl para Títulos, Navegación Header, Botones y Sans */
+  h1, h2, h3, h4, h5, h6, nav, header, button, .font-sans {
     font-family: 'SuisseIntl', system-ui, -apple-system, sans-serif !important;
+  }
+
+  /* Tipografía Secundaria: Sometype Mono para Badges, Metadatos, Códigos, Mono y Detalles */
+  .font-mono, code, pre, label, input, textarea, select {
+    font-family: 'Sometype Mono', monospace !important;
   }
 
   ::selection {
@@ -141,4 +147,5 @@
   z-index: 9999;
   background-color: #000000;
   color: #FFFFFF;
+  font-family: 'Sometype Mono', monospace !important;
 }
