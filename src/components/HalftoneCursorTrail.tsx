@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
 /**
- * DitherCursorTrail (Fusión Orgánica Sin Delimitación Fondo + Imagen)
- * Elimina cualquier línea de borde o marco rígido. La imagen y el fondo de la web
- * se mezclan y disuelven fluidamente sin ninguna delimitación mediante el tramado Dithering Bayer 4x4.
+ * DitherCursorTrail (Fusión Total Negro + Imagen Sin Cuadro Delimitador)
+ * Aplica difuminado de bordes (Feather Vignette) en los 4 márgenes de la imagen,
+ * permitiendo que el negro del fondo y la imagen se mezclen de forma 100% orgánica
+ * sin ningún cuadro o borde rectangular visible al pasar el cursor.
  */
 
 interface HalftoneCursorTrailProps {
@@ -33,7 +34,7 @@ export default function HalftoneCursorTrail({
   src,
   type = "image",
   gridSize = 10,
-  influenceRadius = 140,
+  influenceRadius = 150,
   decay = 0.93,
   warpStrength = 32,
   invert = true,
@@ -118,10 +119,49 @@ export default function HalftoneCursorTrail({
       drawBase();
     }
 
+    // Actualiza la imagen e incluye un desvanecido de bordes (Feather Vignette) para eliminar el cuadro delimitador
     function updateSampleFrame() {
       if (!sctx || !source || stageW <= 0 || stageH <= 0) return;
       try {
+        sctx.clearRect(0, 0, stageW, stageH);
         sctx.drawImage(source, 0, 0, stageW, stageH);
+
+        // Aplicar máscara de gradiente de desvanecido en los 4 bordes para eliminar cualquier rectángulo
+        const fade = Math.min(stageW, stageH) * 0.08;
+        if (fade > 5) {
+          sctx.globalCompositeOperation = "destination-out";
+
+          // Borde Superior
+          let gTop = sctx.createLinearGradient(0, 0, 0, fade);
+          gTop.addColorStop(0, "rgba(0,0,0,1)");
+          gTop.addColorStop(1, "rgba(0,0,0,0)");
+          sctx.fillStyle = gTop;
+          sctx.fillRect(0, 0, stageW, fade);
+
+          // Borde Inferior
+          let gBot = sctx.createLinearGradient(0, stageH - fade, 0, stageH);
+          gBot.addColorStop(0, "rgba(0,0,0,0)");
+          gBot.addColorStop(1, "rgba(0,0,0,1)");
+          sctx.fillStyle = gBot;
+          sctx.fillRect(0, stageH - fade, stageW, fade);
+
+          // Borde Izquierdo
+          let gLeft = sctx.createLinearGradient(0, 0, fade, 0);
+          gLeft.addColorStop(0, "rgba(0,0,0,1)");
+          gLeft.addColorStop(1, "rgba(0,0,0,0)");
+          sctx.fillStyle = gLeft;
+          sctx.fillRect(0, 0, fade, stageH);
+
+          // Borde Derecho
+          let gRight = sctx.createLinearGradient(stageW - fade, 0, stageW, 0);
+          gRight.addColorStop(0, "rgba(0,0,0,0)");
+          gRight.addColorStop(1, "rgba(0,0,0,1)");
+          sctx.fillStyle = gRight;
+          sctx.fillRect(stageW - fade, 0, fade, stageH);
+
+          sctx.globalCompositeOperation = "source-over";
+        }
+
         sampleReady = true;
       } catch (e) {
         /* Fuente no lista */
@@ -208,11 +248,10 @@ export default function HalftoneCursorTrail({
       }
 
       if (ctx && activation) {
-        // Dibuja la base centrada
         drawBase();
 
         if (active.size > 0) {
-          // Fase 1: Deformación Warp orgánica que desborda la imagen sobre el fondo sin líneas de borde
+          // Fase 1: Deformación Warp orgánica sin marco delimitador
           if (warpStrength > 0 && sampleReady) {
             for (const idx of Array.from(active)) {
               const a = activation[idx];
@@ -240,7 +279,7 @@ export default function HalftoneCursorTrail({
             }
           }
 
-          // Fase 2: Cuantización Dithering Bayer 4x4 fusionada que disuelve fondo e imagen sin delimitación
+          // Fase 2: Tramado Dithering Bayer 4x4 fusionando el negro del fondo con la imagen
           if (invert) {
             ctx.globalCompositeOperation = "difference";
             ctx.fillStyle = "rgb(255,255,255)";
@@ -317,7 +356,7 @@ export default function HalftoneCursorTrail({
   return (
     <div
       ref={stageRef}
-      className={`relative w-full h-full overflow-visible ${className}`}
+      className={`relative w-full h-full overflow-visible bg-black ${className}`}
       style={{
         cursor: isTouch ? "auto" : "none",
         ...style,

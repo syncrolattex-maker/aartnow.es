@@ -76,8 +76,8 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
           </p>
         </div>
 
-        {/* Main Showcase Hero Media Container with Background + Image Liquid Fusion */}
-        <div className="w-full h-[50vh] md:h-[70vh] relative overflow-visible bg-neutral-900 shadow-2xl">
+        {/* Main Showcase Hero Media Container with Seamless Black + Image Liquid Fusion */}
+        <div className="w-full h-[50vh] md:h-[70vh] relative overflow-visible bg-black">
           <HalftoneCursorTrail src={caseItem.heroImage} type="image" warpStrength={36} influenceRadius={160} />
         </div>
 
@@ -161,12 +161,12 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
 
         </div>
 
-        {/* Gallery Grid with Background + Image Liquid Fusion Distortion */}
+        {/* Gallery Grid with Seamless Black + Image Dithering Fusion */}
         <div className="space-y-6 pt-12 border-t border-white/15">
-          <span className="text-xs text-white/40 uppercase tracking-widest font-bold block">[ GALERÍA VISUAL DE FUSIÓN LÍQUIDA FONDO + IMAGEN ]</span>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <span className="text-xs text-white/40 uppercase tracking-widest font-bold block">[ GALERÍA VISUAL DE FUSIÓN FONDO NEGRO + IMAGEN ]</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {caseItem.gallery.map((imgSrc, i) => (
-              <div key={i} className="h-80 md:h-[450px] relative overflow-visible bg-neutral-900 shadow-2xl">
+              <div key={i} className="h-80 md:h-[450px] relative overflow-visible bg-black">
                 <HalftoneCursorTrail src={imgSrc} type="image" warpStrength={35} influenceRadius={150} />
               </div>
             ))}
