@@ -76,9 +76,9 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
           </p>
         </div>
 
-        {/* Main Showcase Hero Media Container with Seamless Black + Image Liquid Fusion */}
-        <div className="w-full h-[50vh] md:h-[70vh] relative overflow-visible bg-black">
-          <HalftoneCursorTrail src={caseItem.heroImage} type="image" warpStrength={36} influenceRadius={160} />
+        {/* Portada Principal del Proyecto: Imagen Nítida con Borrado/Mezcla Líquida al pasar el Cursor */}
+        <div className="w-full h-[50vh] md:h-[70vh] border border-white/15 relative overflow-hidden bg-neutral-900 shadow-2xl">
+          <HalftoneCursorTrail src={caseItem.heroImage} type="image" warpStrength={30} influenceRadius={150} />
         </div>
 
         {/* Services & Core Info Bar */}
@@ -161,13 +161,13 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
 
         </div>
 
-        {/* Gallery Grid with Seamless Black + Image Dithering Fusion */}
+        {/* Galería del Proyecto: Imágenes Nítidas con Borrado/Mezcla Líquida y Recuperación */}
         <div className="space-y-6 pt-12 border-t border-white/15">
-          <span className="text-xs text-white/40 uppercase tracking-widest font-bold block">[ GALERÍA VISUAL DE FUSIÓN FONDO NEGRO + IMAGEN ]</span>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <span className="text-xs text-white/40 uppercase tracking-widest font-bold block">[ GALERÍA VISUAL CON EFECTO DE MEZCLA LÍQUIDA Y RECUPERACIÓN ]</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {caseItem.gallery.map((imgSrc, i) => (
-              <div key={i} className="h-80 md:h-[450px] relative overflow-visible bg-black">
-                <HalftoneCursorTrail src={imgSrc} type="image" warpStrength={35} influenceRadius={150} />
+              <div key={i} className="h-80 md:h-[450px] border border-white/15 relative overflow-hidden bg-neutral-900 shadow-2xl">
+                <HalftoneCursorTrail src={imgSrc} type="image" warpStrength={28} influenceRadius={140} />
               </div>
             ))}
           </div>

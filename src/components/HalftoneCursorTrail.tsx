@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
 /**
- * DitherCursorTrail (Fusión Total Negro + Imagen Sin Cuadro Delimitador)
- * Aplica difuminado de bordes (Feather Vignette) en los 4 márgenes de la imagen,
- * permitiendo que el negro del fondo y la imagen se mezclen de forma 100% orgánica
- * sin ningún cuadro o borde rectangular visible al pasar el cursor.
+ * DitherCursorTrail (Efecto Borrado/Mezcla Líquida Temporal con Recuperación a la Imagen Original)
+ * 
+ * 1. En reposo: La imagen se muestra 100% nítida y perfecta en su contenedor.
+ * 2. Al pasar el ratón: El cursor genera una estela de mezcla líquida y borrado mediante
+ *    cuantización Dithering Bayer 4x4 y deformación de lente, haciendo visible el fondo oscuro.
+ * 3. Al alejarse el cursor: La estela se desvanece suavemente y la imagen RECUPERA 100% su estado original.
  */
 
 interface HalftoneCursorTrailProps {
@@ -28,15 +30,13 @@ const BAYER_4X4 = [
   [15/16,  7/16, 13/16,  5/16]
 ];
 
-const BLEED_MARGIN = 40;
-
 export default function HalftoneCursorTrail({
   src,
   type = "image",
   gridSize = 10,
-  influenceRadius = 150,
-  decay = 0.93,
-  warpStrength = 32,
+  influenceRadius = 130,
+  decay = 0.89,             // Decaimiento rápido para que la imagen vuelva a su estado original enseguida
+  warpStrength = 30,        // Fuerza de la estela líquida
   invert = true,
   dotColor = "255,255,255",
   className = "",
@@ -83,7 +83,7 @@ export default function HalftoneCursorTrail({
     if (!sctx) return;
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    let stageW = 0, stageH = 0, W = 0, H = 0, cols = 0, rows = 0;
+    let W = 0, H = 0, cols = 0, rows = 0;
     let activation: Float32Array | null = null;
     let active = new Set<number>();
     let raf: number;
@@ -100,95 +100,53 @@ export default function HalftoneCursorTrail({
     function resize() {
       if (!stage || !canvas || !ctx) return;
       const rect = stage.getBoundingClientRect();
-      stageW = rect.width; 
-      stageH = rect.height;
-      if (stageW <= 0 || stageH <= 0) return;
-
-      W = stageW + BLEED_MARGIN * 2;
-      H = stageH + BLEED_MARGIN * 2;
+      W = rect.width; 
+      H = rect.height;
+      if (W <= 0 || H <= 0) return;
 
       canvas.width = W * dpr;
       canvas.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      sample.width = stageW;
-      sample.height = stageH;
+      sample.width = W;
+      sample.height = H;
 
       buildGrid();
       updateSampleFrame();
       drawBase();
     }
 
-    // Actualiza la imagen e incluye un desvanecido de bordes (Feather Vignette) para eliminar el cuadro delimitador
     function updateSampleFrame() {
-      if (!sctx || !source || stageW <= 0 || stageH <= 0) return;
+      if (!sctx || !source || W <= 0 || H <= 0) return;
       try {
-        sctx.clearRect(0, 0, stageW, stageH);
-        sctx.drawImage(source, 0, 0, stageW, stageH);
-
-        // Aplicar máscara de gradiente de desvanecido en los 4 bordes para eliminar cualquier rectángulo
-        const fade = Math.min(stageW, stageH) * 0.08;
-        if (fade > 5) {
-          sctx.globalCompositeOperation = "destination-out";
-
-          // Borde Superior
-          let gTop = sctx.createLinearGradient(0, 0, 0, fade);
-          gTop.addColorStop(0, "rgba(0,0,0,1)");
-          gTop.addColorStop(1, "rgba(0,0,0,0)");
-          sctx.fillStyle = gTop;
-          sctx.fillRect(0, 0, stageW, fade);
-
-          // Borde Inferior
-          let gBot = sctx.createLinearGradient(0, stageH - fade, 0, stageH);
-          gBot.addColorStop(0, "rgba(0,0,0,0)");
-          gBot.addColorStop(1, "rgba(0,0,0,1)");
-          sctx.fillStyle = gBot;
-          sctx.fillRect(0, stageH - fade, stageW, fade);
-
-          // Borde Izquierdo
-          let gLeft = sctx.createLinearGradient(0, 0, fade, 0);
-          gLeft.addColorStop(0, "rgba(0,0,0,1)");
-          gLeft.addColorStop(1, "rgba(0,0,0,0)");
-          sctx.fillStyle = gLeft;
-          sctx.fillRect(0, 0, fade, stageH);
-
-          // Borde Derecho
-          let gRight = sctx.createLinearGradient(stageW - fade, 0, stageW, 0);
-          gRight.addColorStop(0, "rgba(0,0,0,0)");
-          gRight.addColorStop(1, "rgba(0,0,0,1)");
-          sctx.fillStyle = gRight;
-          sctx.fillRect(stageW - fade, 0, fade, stageH);
-
-          sctx.globalCompositeOperation = "source-over";
-        }
-
+        sctx.clearRect(0, 0, W, H);
+        sctx.drawImage(source, 0, 0, W, H);
         sampleReady = true;
       } catch (e) {
         /* Fuente no lista */
       }
     }
 
+    // Dibuja la imagen limpia 100% nítida
     function drawBase() {
-      if (ctx && sampleReady && stageW > 0 && stageH > 0) {
+      if (ctx && sampleReady && W > 0 && H > 0) {
         ctx.clearRect(0, 0, W, H);
-        ctx.drawImage(sample, BLEED_MARGIN, BLEED_MARGIN, stageW, stageH);
+        ctx.drawImage(sample, 0, 0, W, H);
       }
     }
 
     function excite(px: number, py: number) {
       if (!activation) return;
-      const cx = px + BLEED_MARGIN;
-      const cy = py + BLEED_MARGIN;
 
-      const ix0 = Math.max(0, Math.floor((cx - influenceRadius) / gridSize));
-      const ix1 = Math.min(cols - 1, Math.ceil((cx + influenceRadius) / gridSize));
-      const iy0 = Math.max(0, Math.floor((cy - influenceRadius) / gridSize));
-      const iy1 = Math.min(rows - 1, Math.ceil((cy + influenceRadius) / gridSize));
+      const ix0 = Math.max(0, Math.floor((px - influenceRadius) / gridSize));
+      const ix1 = Math.min(cols - 1, Math.ceil((px + influenceRadius) / gridSize));
+      const iy0 = Math.max(0, Math.floor((py - influenceRadius) / gridSize));
+      const iy1 = Math.min(rows - 1, Math.ceil((py + influenceRadius) / gridSize));
 
       for (let iy = iy0; iy <= iy1; iy++) {
         for (let ix = ix0; ix <= ix1; ix++) {
           const gx = ix * gridSize, gy = iy * gridSize;
-          const d = Math.hypot(gx - cx, gy - cy);
+          const d = Math.hypot(gx - px, gy - py);
           if (d > influenceRadius) continue;
           const falloff = 1 - d / influenceRadius;
           const idx = iy * cols + ix;
@@ -248,10 +206,12 @@ export default function HalftoneCursorTrail({
       }
 
       if (ctx && activation) {
+        // 1. Dibuja la base nítida original
         drawBase();
 
+        // 2. Si hay actividad por el paso del ratón, dibuja el efecto de mezcla líquida y borrado
         if (active.size > 0) {
-          // Fase 1: Deformación Warp orgánica sin marco delimitador
+          // Fase A: Deformación líquida temporal (Liquid Lens Warp)
           if (warpStrength > 0 && sampleReady) {
             for (const idx of Array.from(active)) {
               const a = activation[idx];
@@ -264,32 +224,22 @@ export default function HalftoneCursorTrail({
               const dx = activationAt(ix + 1, iy) - activationAt(ix - 1, iy);
               const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
 
-              const tile = gridSize * 2.8;
-              const shiftX = dx * warpStrength * (1 + a * 0.7);
-              const shiftY = dy * warpStrength * (1 + a * 0.7);
+              const tile = gridSize * 2.5;
+              const shiftX = dx * warpStrength * (1 + a * 0.6);
+              const shiftY = dy * warpStrength * (1 + a * 0.6);
 
-              const imgGx = gx - BLEED_MARGIN;
-              const imgGy = gy - BLEED_MARGIN;
-
-              const sx = Math.min(stageW - tile, Math.max(0, imgGx - shiftX - tile / 2));
-              const sy = Math.min(stageH - tile, Math.max(0, imgGy - shiftY - tile / 2));
+              const sx = Math.min(W - tile, Math.max(0, gx - shiftX - tile / 2));
+              const sy = Math.min(H - tile, Math.max(0, gy - shiftY - tile / 2));
 
               ctx.globalAlpha = Math.min(1, a * 1.4);
               ctx.drawImage(sample, sx, sy, tile, tile, gx - tile / 2, gy - tile / 2, tile, tile);
             }
           }
 
-          // Fase 2: Tramado Dithering Bayer 4x4 fusionando el negro del fondo con la imagen
-          if (invert) {
-            ctx.globalCompositeOperation = "difference";
-            ctx.fillStyle = "rgb(255,255,255)";
-          } else {
-            ctx.globalCompositeOperation = "source-over";
-            ctx.fillStyle = `rgb(${dotColor})`;
-          }
-
+          // Fase B: Efecto de borrado y mezcla Dithering Bayer 4x4 (se ve el fondo oscuro a través de los píxeles)
           for (const idx of Array.from(active)) {
             let a = activation[idx] * decay;
+            // Cuando cae por debajo de 0.02, se elimina de activos y vuelve 100% a la imagen original
             if (a < 0.02) { 
               activation[idx] = 0; 
               active.delete(idx); 
@@ -302,16 +252,27 @@ export default function HalftoneCursorTrail({
             const gx = ix * gridSize, gy = iy * gridSize;
 
             const threshold = BAYER_4X4[iy % 4][ix % 4];
-            if (a > threshold * 0.55) {
+            if (a > threshold * 0.5) {
               const pixelSize = Math.max(2.0, Math.min(gridSize, (a - threshold * 0.25) * 4.5));
+
+              if (invert) {
+                ctx.globalCompositeOperation = "difference";
+                ctx.fillStyle = "rgb(255,255,255)";
+              } else {
+                ctx.globalCompositeOperation = "source-over";
+                ctx.fillStyle = `rgb(${dotColor})`;
+              }
+
               ctx.globalAlpha = Math.min(1, a * 1.6);
               ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
+              ctx.globalCompositeOperation = "source-over";
             }
           }
 
-          ctx.globalCompositeOperation = "source-over";
           ctx.globalAlpha = 1;
-        } else if (type === "image") {
+        } else {
+          // Cuando termina de desvanecerse la estela, se detiene el bucle y la imagen vuelve a ser la original nítida
+          drawBase();
           isLooping = false;
           return;
         }
@@ -356,7 +317,7 @@ export default function HalftoneCursorTrail({
   return (
     <div
       ref={stageRef}
-      className={`relative w-full h-full overflow-visible bg-black ${className}`}
+      className={`relative w-full h-full overflow-hidden ${className}`}
       style={{
         cursor: isTouch ? "auto" : "none",
         ...style,
@@ -387,11 +348,9 @@ export default function HalftoneCursorTrail({
           ref={canvasRef}
           style={{
             position: "absolute",
-            top: -BLEED_MARGIN,
-            left: -BLEED_MARGIN,
-            width: `calc(100% + ${BLEED_MARGIN * 2}px)`,
-            height: `calc(100% + ${BLEED_MARGIN * 2}px)`,
-            pointerEvents: "none",
+            inset: 0,
+            width: "100%",
+            height: "100%",
           }}
         />
       )}
