@@ -4,6 +4,7 @@ import StickyBar from './components/StickyBar';
 import Hero from './components/Hero';
 import ProjectList from './components/ProjectList';
 import About from './components/About';
+import AdminLeads from './components/AdminLeads';
 import SmoothScroll from './components/SmoothScroll';
 import Cursor from './components/Cursor';
 import GlobalAdaptiveHalftoneTrail from './components/GlobalAdaptiveHalftoneTrail';
@@ -15,6 +16,17 @@ function AppContent() {
   const { t } = useLanguage();
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [isAdminRoute, setIsAdminRoute] = useState(false);
+
+  useEffect(() => {
+    // Comprobar si la ruta es /admin o /admin/leads
+    const checkPath = () => {
+      setIsAdminRoute(window.location.pathname.startsWith('/admin'));
+    };
+    checkPath();
+    window.addEventListener('popstate', checkPath);
+    return () => window.removeEventListener('popstate', checkPath);
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -30,6 +42,10 @@ function AppContent() {
 
     return () => clearInterval(timer);
   }, []);
+
+  if (isAdminRoute) {
+    return <AdminLeads />;
+  }
 
   return (
     <>
