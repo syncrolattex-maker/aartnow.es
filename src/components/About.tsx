@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
 import GlitchText from './GlitchText';
 import PowerGlitchText from './PowerGlitchText';
+import BudgetEstimator from './BudgetEstimator';
 
 export default function About() {
   const { t } = useLanguage();
   const [openService, setOpenService] = useState<number | null>(0);
   const [selectedTypes, setSelectedTypes] = useState<string[]>(['Websites']);
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<'estimator' | 'form'>('estimator');
 
   const services = [
     {
@@ -67,7 +69,7 @@ export default function About() {
     <section id="about" className="py-32 px-6 md:px-16 bg-[#0A0A0A] border-b border-white/10 text-[#FFFDF3] font-mono">
       <div className="max-w-[1400px] mx-auto space-y-28">
         
-        {/* Minimalist Studio Full-Width Accordion Services Section */}
+        {/* Services Section */}
         <div className="space-y-12">
           
           {/* Section Header */}
@@ -182,97 +184,129 @@ export default function About() {
 
         </div>
 
-        {/* Studio Contact Banner (Monochrome Pitch Black #000000 Container) */}
-        <div id="contact" className="pt-12">
-          <div className="bg-[#000000] text-[#FFFDF3] border border-white/20 rounded-none p-8 md:p-14 relative overflow-hidden shadow-2xl space-y-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-white/15 pb-8 gap-4">
-              <div>
-                <span className="text-xs font-mono uppercase tracking-widest text-white/50 font-bold block mb-2">
-                  {t.contactTag}
-                </span>
-                <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white font-sans">
-                  <GlitchText text={t.contactTitle} /> <span className="italic font-serif font-light text-white/60">{t.contactTitleAccent}</span>.
-                </h3>
-              </div>
-
-              <div className="font-mono text-xs text-white/40 font-bold">
-                {t.contactResponseTime}
-              </div>
-            </div>
-
-            {formSubmitted ? (
-              <div className="p-8 bg-[#111111] text-[#FFFDF3] border border-white/15 rounded-none text-center font-mono space-y-2">
-                <p className="text-white font-bold text-lg">{t.successTitle}</p>
-                <p className="text-xs text-white/60">{t.successDesc}</p>
-              </div>
-            ) : (
-              <form onSubmit={(e) => { e.preventDefault(); setFormSubmitted(true); }} className="space-y-6">
-                <div>
-                  <p className="text-xs uppercase text-white/60 mb-3 font-black">{t.questionProject}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {['Branding', 'Diseño', '3D', 'Websites', 'Marketing'].map((type) => {
-                      const isSelected = selectedTypes.includes(type);
-                      return (
-                        <button
-                          type="button"
-                          key={type}
-                          data-magnetic="true"
-                          onClick={() => toggleType(type)}
-                          className={`px-4 py-2 rounded-none text-xs font-bold transition-all ${
-                            isSelected 
-                              ? 'bg-white text-black' 
-                              : 'bg-white/5 text-white/70 border border-white/15 hover:bg-white/20 hover:text-white'
-                          }`}
-                        >
-                          {type}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-xs uppercase text-white/60 font-bold mb-2">{t.nameLabel}</label>
-                    <input 
-                      type="text" 
-                      required 
-                      className="w-full bg-[#111111] border border-white/15 rounded-none px-4 py-3 text-xs text-white font-bold outline-none focus:border-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs uppercase text-white/60 font-bold mb-2">{t.emailLabel}</label>
-                    <input 
-                      type="email" 
-                      required 
-                      className="w-full bg-[#111111] border border-white/15 rounded-none px-4 py-3 text-xs text-white font-bold outline-none focus:border-white"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs uppercase text-white/60 font-bold mb-2">{t.messageLabel}</label>
-                  <textarea 
-                    rows={3} 
-                    placeholder={t.messagePlaceholder}
-                    className="w-full bg-[#111111] border border-white/15 rounded-none px-4 py-3 text-xs text-white font-bold outline-none focus:border-white"
-                  />
-                </div>
-
-                <div className="flex justify-between items-center pt-2">
-                  <span className="text-[10px] text-white/40 font-bold">{t.requiredFields}</span>
-                  <button 
-                    type="submit" 
-                    data-magnetic="true"
-                    className="px-8 py-3.5 bg-white text-black font-black uppercase text-xs rounded-none hover:bg-neutral-300 transition-all cursor-pointer shadow-xl"
-                  >
-                    {t.submitBtn} →
-                  </button>
-                </div>
-              </form>
-            )}
-
+        {/* Studio Contact & Budget Estimator Container */}
+        <div id="contact" className="pt-12 space-y-8">
+          
+          {/* Mode Switcher Tabs */}
+          <div className="flex flex-wrap items-center justify-center gap-4 border-b border-white/15 pb-6">
+            <button
+              type="button"
+              onClick={() => setActiveTab('estimator')}
+              className={`px-6 py-3 border text-xs font-bold uppercase transition-all cursor-pointer ${
+                activeTab === 'estimator'
+                  ? 'bg-white text-black border-white'
+                  : 'bg-white/5 text-white/70 border-white/15 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              [ ⚡ ESTIMADOR DE PRESUPUESTO ONLINE ]
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('form')}
+              className={`px-6 py-3 border text-xs font-bold uppercase transition-all cursor-pointer ${
+                activeTab === 'form'
+                  ? 'bg-white text-black border-white'
+                  : 'bg-white/5 text-white/70 border-white/15 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              [ ✉️ FORMULARIO DE CONTACTO DIRECTO ]
+            </button>
           </div>
+
+          {activeTab === 'estimator' ? (
+            <BudgetEstimator />
+          ) : (
+            <div className="bg-[#000000] text-[#FFFDF3] border border-white/20 rounded-none p-8 md:p-14 relative overflow-hidden shadow-2xl space-y-8">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-white/15 pb-8 gap-4">
+                <div>
+                  <span className="text-xs font-mono uppercase tracking-widest text-white/50 font-bold block mb-2">
+                    {t.contactTag}
+                  </span>
+                  <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white font-sans">
+                    <GlitchText text={t.contactTitle} /> <span className="italic font-serif font-light text-white/60">{t.contactTitleAccent}</span>.
+                  </h3>
+                </div>
+
+                <div className="font-mono text-xs text-white/40 font-bold">
+                  {t.contactResponseTime}
+                </div>
+              </div>
+
+              {formSubmitted ? (
+                <div className="p-8 bg-[#111111] text-[#FFFDF3] border border-white/15 rounded-none text-center font-mono space-y-2">
+                  <p className="text-white font-bold text-lg">{t.successTitle}</p>
+                  <p className="text-xs text-white/60">{t.successDesc}</p>
+                </div>
+              ) : (
+                <form onSubmit={(e) => { e.preventDefault(); setFormSubmitted(true); }} className="space-y-6">
+                  <div>
+                    <p className="text-xs uppercase text-white/60 mb-3 font-black">{t.questionProject}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {[t.catBranding, t.catDesign, t.cat3D, t.catWebsites, t.catMarketing].map((type) => {
+                        const isSelected = selectedTypes.includes(type);
+                        return (
+                          <button
+                            type="button"
+                            key={type}
+                            data-magnetic="true"
+                            onClick={() => toggleType(type)}
+                            className={`px-4 py-2 rounded-none text-xs font-bold transition-all ${
+                              isSelected 
+                                ? 'bg-white text-black' 
+                                : 'bg-white/5 text-white/70 border border-white/15 hover:bg-white/20 hover:text-white'
+                            }`}
+                          >
+                            {type}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs uppercase text-white/60 font-bold mb-2">{t.nameLabel}</label>
+                      <input 
+                        type="text" 
+                        required 
+                        className="w-full bg-[#111111] border border-white/15 rounded-none px-4 py-3 text-xs text-white font-bold outline-none focus:border-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase text-white/60 font-bold mb-2">{t.emailLabel}</label>
+                      <input 
+                        type="email" 
+                        required 
+                        className="w-full bg-[#111111] border border-white/15 rounded-none px-4 py-3 text-xs text-white font-bold outline-none focus:border-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase text-white/60 font-bold mb-2">{t.messageLabel}</label>
+                    <textarea 
+                      rows={3} 
+                      placeholder={t.messagePlaceholder}
+                      className="w-full bg-[#111111] border border-white/15 rounded-none px-4 py-3 text-xs text-white font-bold outline-none focus:border-white"
+                    />
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-[10px] text-white/40 font-bold">{t.requiredFields}</span>
+                    <button 
+                      type="submit" 
+                      data-magnetic="true"
+                      className="px-8 py-3.5 bg-white text-black font-black uppercase text-xs rounded-none hover:bg-neutral-300 transition-all cursor-pointer shadow-xl"
+                    >
+                      {t.submitBtn} →
+                    </button>
+                  </div>
+                </form>
+              )}
+
+            </div>
+          )}
+
         </div>
 
       </div>
