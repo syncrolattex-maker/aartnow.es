@@ -7,7 +7,12 @@ export default function GlobalAdaptiveHalftoneTrail() {
   useEffect(() => {
     const mq = window.matchMedia('(pointer: coarse)');
     const update = () => {
-      setIsTouch(mq.matches || window.innerWidth < 768);
+      const isMobileDevice = 
+        mq.matches || 
+        window.innerWidth < 1024 || 
+        ('ontouchstart' in window) || 
+        (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+      setIsTouch(isMobileDevice);
     };
     update();
     mq.addEventListener?.('change', update);

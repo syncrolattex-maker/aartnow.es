@@ -115,7 +115,7 @@ export default function Header() {
       />
 
       {/* Fixed Top Centered Header Capsule (Frosted Glass Effect) */}
-      <header className="fixed left-1/2 -translate-x-1/2 top-4 z-50 w-[calc(100vw-32px)] max-w-[438px] flex flex-col font-mono pointer-events-auto">
+      <header className="fixed left-1/2 -translate-x-1/2 top-4 z-50 w-[calc(100vw-32px)] max-w-[580px] md:max-w-[640px] flex flex-col font-mono pointer-events-auto">
         <div className="bg-black/50 backdrop-blur-2xl backdrop-saturate-150 border border-white/20 rounded-lg overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)] transition-all duration-300">
           
           {/* Header Bar */}
