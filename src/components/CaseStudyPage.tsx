@@ -76,9 +76,9 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
           </p>
         </div>
 
-        {/* Main Showcase Hero Media Container with Halftone Effect */}
+        {/* Main Showcase Hero Media Container with Dithering + Liquid Warp Deformation */}
         <div className="w-full h-[50vh] md:h-[70vh] border border-white/20 relative overflow-hidden bg-neutral-900 shadow-2xl">
-          <HalftoneCursorTrail src={caseItem.heroImage} type="image" />
+          <HalftoneCursorTrail src={caseItem.heroImage} type="image" warpStrength={20} influenceRadius={100} />
         </div>
 
         {/* Services & Core Info Bar */}
@@ -161,17 +161,13 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
 
         </div>
 
-        {/* Gallery Grid */}
+        {/* Gallery Grid with Interactive Dithering + Liquid Image Warp Distortion */}
         <div className="space-y-6 pt-12 border-t border-white/15">
-          <span className="text-xs text-white/40 uppercase tracking-widest font-bold block">[ GALERÍA VISUAL DEL CASO ]</span>
+          <span className="text-xs text-white/40 uppercase tracking-widest font-bold block">[ GALERÍA VISUAL INTERACTIVA DEL CASO ]</span>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {caseItem.gallery.map((imgSrc, i) => (
-              <div key={i} className="h-80 md:h-[450px] border border-white/15 overflow-hidden bg-neutral-900 shadow-2xl">
-                <img
-                  src={imgSrc}
-                  alt={`${caseItem.title} gallery asset ${i + 1}`}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                />
+              <div key={i} className="h-80 md:h-[450px] border border-white/15 overflow-hidden bg-neutral-900 shadow-2xl relative">
+                <HalftoneCursorTrail src={imgSrc} type="image" warpStrength={18} influenceRadius={95} />
               </div>
             ))}
           </div>

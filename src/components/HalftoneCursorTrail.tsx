@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
 /**
- * DitherCursorTrail (Tramado Digital Bayer 4x4)
- * Sustituye el efecto halftone por un tramado digital por cuantización de matriz Dithering
- * sobre imágenes y vídeos en movimiento cuando el cursor interactúa.
+ * DitherCursorTrail (Tramado Digital Bayer 4x4 + Deformación Warp de Imagen)
+ * Deforma la imagen/vídeo al pasar el cursor (efecto bulge/ondulación) y
+ * aplica cuantización Dithering por matriz Bayer 4x4 en tiempo real.
  */
 
 interface HalftoneCursorTrailProps {
@@ -29,11 +29,11 @@ const BAYER_4X4 = [
 
 export default function HalftoneCursorTrail({
   src,
-  type = "video",
+  type = "image",
   gridSize = 6,
-  influenceRadius = 75,
-  decay = 0.90,
-  warpStrength = 8,
+  influenceRadius = 95,
+  decay = 0.91,
+  warpStrength = 18,
   invert = true,
   dotColor = "255,255,255",
   className = "",
@@ -142,7 +142,7 @@ export default function HalftoneCursorTrail({
           if (d > influenceRadius) continue;
           const falloff = 1 - d / influenceRadius;
           const idx = iy * cols + ix;
-          const val = Math.pow(falloff, 1.3);
+          const val = Math.pow(falloff, 1.2);
           if (val > activation[idx]) activation[idx] = val;
           active.add(idx);
         }
@@ -196,10 +196,10 @@ export default function HalftoneCursorTrail({
       }
 
       if (ctx && activation) {
-        // Base intacta
+        // 1) Dibuja la base limpia de la imagen
         drawBase();
 
-        // Aplicación del tramado Dithering Bayer 4x4 en celdas activas
+        // 2) Deformación warp líquida + Cuantización Dithering digital en celdas activas
         if (active.size > 0) {
           for (const idx of Array.from(active)) {
             let a = activation[idx] * decay;
@@ -214,12 +214,12 @@ export default function HalftoneCursorTrail({
             const ix = idx % cols;
             const gx = ix * gridSize, gy = iy * gridSize;
 
-            // 1) Warp displacement de fondo
+            // Deformación warp / bulge de la imagen según el gradiente local
             if (warpStrength > 0 && sampleReady) {
               const dx = activationAt(ix + 1, iy) - activationAt(ix - 1, iy);
               const dy = activationAt(ix, iy + 1) - activationAt(ix, iy - 1);
 
-              const tile = gridSize * 1.4;
+              const tile = gridSize * 1.6;
               const sx = Math.min(W - tile, Math.max(0, gx - dx * warpStrength - tile / 2));
               const sy = Math.min(H - tile, Math.max(0, gy - dy * warpStrength - tile / 2));
               const dxDest = Math.min(W - tile, Math.max(0, gx - tile / 2));
@@ -229,10 +229,10 @@ export default function HalftoneCursorTrail({
               ctx.drawImage(sample, sx, sy, tile, tile, dxDest, dyDest, tile, tile);
             }
 
-            // 2) Cuantización Dithering digital (píxeles cuadrados Bayer)
+            // Tramado Dithering digital (píxeles cuadrados Bayer 4x4)
             const threshold = BAYER_4X4[iy % 4][ix % 4];
-            if (a > threshold * 0.7) {
-              const pixelSize = Math.max(1.5, Math.min(gridSize - 0.5, (a - threshold * 0.3) * 4));
+            if (a > threshold * 0.6) {
+              const pixelSize = Math.max(1.8, Math.min(gridSize - 0.5, (a - threshold * 0.25) * 4.5));
 
               if (invert) {
                 ctx.globalCompositeOperation = "difference";
@@ -241,7 +241,7 @@ export default function HalftoneCursorTrail({
                 ctx.globalCompositeOperation = "source-over";
                 ctx.fillStyle = `rgb(${dotColor})`;
               }
-              ctx.globalAlpha = Math.min(1, a * 1.5);
+              ctx.globalAlpha = Math.min(1, a * 1.6);
               ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
               ctx.globalCompositeOperation = "source-over";
             }
