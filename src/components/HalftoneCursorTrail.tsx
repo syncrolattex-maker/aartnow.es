@@ -1,5 +1,17 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
+/**
+ * HalftoneCursorTrail
+ * Rastro de puntos (halftone) + distorsión ("bulge") del fondo, siguiendo al
+ * cursor sobre una imagen o vídeo — recreación oficial del efecto de lamalama.com.
+ *
+ * Características:
+ * - Rejilla fija de celdas sobre la imagen/vídeo.
+ * - Al mover el cursor, las celdas se activan con caída exponencial y decaen suavemente.
+ * - Copia de tiles desplazados según el gradiente local para generar el efecto "bulge" / burbuja.
+ * - Desactivado en móviles para mantener un rendimiento 100% ligero y nativo.
+ */
+
 interface HalftoneCursorTrailProps {
   src: string;
   type?: 'video' | 'image';
@@ -15,14 +27,14 @@ interface HalftoneCursorTrailProps {
 
 export default function HalftoneCursorTrail({
   src,
-  type = 'image',
-  gridSize = 12,
+  type = "video",
+  gridSize = 10,
   influenceRadius = 90,
-  dotRadius = 3.5,
+  dotRadius = 3,
   decay = 0.93,
   warpStrength = 16,
-  dotColor = '255,19,0', // Default: Jack & AI Electric Red (#FF1300)
-  className = '',
+  dotColor = "10,10,10",
+  className = "",
   style = {},
 }: HalftoneCursorTrailProps) {
   const stageRef = useRef<HTMLDivElement>(null);
@@ -30,17 +42,24 @@ export default function HalftoneCursorTrail({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isTouch, setIsTouch] = useState(false);
 
-  // Detect touch pointer / mobile screen
+  // Detecta dispositivos táctiles / pantallas móviles para desactivar en móvil
   useEffect(() => {
-    const mq = window.matchMedia('(pointer: coarse)');
-    const update = () => setIsTouch(mq.matches || window.innerWidth < 768);
+    const mq = window.matchMedia("(pointer: coarse)");
+    const update = () => {
+      const isMobileDevice = 
+        mq.matches || 
+        window.innerWidth < 1024 || 
+        ('ontouchstart' in window) || 
+        (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+      setIsTouch(isMobileDevice);
+    };
     update();
-    mq.addEventListener?.('change', update);
-    window.addEventListener('resize', update);
+    mq.addEventListener?.("change", update);
+    window.addEventListener("resize", update);
 
     return () => {
-      mq.removeEventListener?.('change', update);
-      window.removeEventListener('resize', update);
+      mq.removeEventListener?.("change", update);
+      window.removeEventListener("resize", update);
     };
   }, []);
 
@@ -52,14 +71,14 @@ export default function HalftoneCursorTrail({
     const canvas = canvasRef.current;
     if (!stage || !source || !canvas) return;
 
-    const ctx = canvas.getContext('2d', { alpha: false });
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const sample = document.createElement('canvas');
-    const sctx = sample.getContext('2d', { willReadFrequently: true });
+    const sample = document.createElement("canvas");
+    const sctx = sample.getContext("2d", { willReadFrequently: true });
     if (!sctx) return;
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let W = 0, H = 0, cols = 0, rows = 0;
     let activation: Float32Array | null = null;
     let active = new Set<number>();
@@ -84,8 +103,8 @@ export default function HalftoneCursorTrail({
       canvas.width = W * dpr;
       canvas.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      sample.width = Math.max(1, W);
-      sample.height = Math.max(1, H);
+      sample.width = W;
+      sample.height = H;
       buildGrid();
       updateSampleFrame();
       drawBase();
@@ -97,7 +116,7 @@ export default function HalftoneCursorTrail({
         sctx.drawImage(source, 0, 0, W, H);
         sampleReady = true;
       } catch (e) {
-        /* Source frame not ready or CORS constraint */
+        /* Fuente aún no lista o problema de CORS */
       }
     }
 
@@ -171,16 +190,18 @@ export default function HalftoneCursorTrail({
     }
 
     function frame() {
-      if (type === 'video') {
+      if (type === "video") {
         updateSampleFrame();
       }
 
       if (ctx && activation) {
+        // 1) Base: la imagen/vídeo íntegro
         drawBase();
 
+        // 2) Por cada celda activa: tile desplazado (bulge) + punto de tinta
         if (active.size > 0) {
           ctx.fillStyle = `rgb(${dotColor})`;
-          
+
           for (const idx of Array.from(active)) {
             let a = activation[idx] * decay;
             if (a < 0.02) { 
@@ -215,7 +236,8 @@ export default function HalftoneCursorTrail({
             ctx.fill();
           }
           ctx.globalAlpha = 1;
-        } else if (type === 'image') {
+        } else if (type === "image") {
+          // Pausar animación cuando no queden celdas activas en imágenes estáticas
           isLooping = false;
           return;
         }
@@ -225,34 +247,34 @@ export default function HalftoneCursorTrail({
     }
 
     resize();
-    window.addEventListener('resize', resize);
-    stage.addEventListener('mousemove', onMove);
-    stage.addEventListener('mouseleave', onEnd);
+    window.addEventListener("resize", resize);
+    stage.addEventListener("mousemove", onMove);
+    stage.addEventListener("mouseleave", onEnd);
 
     const onLoaded = () => {
       updateSampleFrame();
       drawBase();
     };
 
-    if (type === 'image') {
+    if (type === "image") {
       const img = source as HTMLImageElement;
       if (img.complete) onLoaded();
-      img.addEventListener('load', onLoaded);
+      img.addEventListener("load", onLoaded);
     } else {
       const video = source as HTMLVideoElement;
-      video.addEventListener('loadeddata', onLoaded);
+      video.addEventListener("loadeddata", onLoaded);
       startLoop();
     }
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener('resize', resize);
-      stage.removeEventListener('mousemove', onMove);
-      stage.removeEventListener('mouseleave', onEnd);
-      if (type === 'image') {
-        (source as HTMLImageElement).removeEventListener('load', onLoaded);
+      window.removeEventListener("resize", resize);
+      stage.removeEventListener("mousemove", onMove);
+      stage.removeEventListener("mouseleave", onEnd);
+      if (type === "image") {
+        (source as HTMLImageElement).removeEventListener("load", onLoaded);
       } else {
-        (source as HTMLVideoElement).removeEventListener('loadeddata', onLoaded);
+        (source as HTMLVideoElement).removeEventListener("loadeddata", onLoaded);
       }
     };
   }, [src, type, gridSize, influenceRadius, dotRadius, decay, warpStrength, dotColor, isTouch]);
@@ -262,11 +284,11 @@ export default function HalftoneCursorTrail({
       ref={stageRef}
       className={`relative w-full h-full overflow-hidden ${className}`}
       style={{
-        cursor: isTouch ? 'auto' : 'none',
+        cursor: isTouch ? "auto" : "none",
         ...style,
       }}
     >
-      {type === 'video' ? (
+      {type === "video" ? (
         <video
           ref={sourceRef as React.RefObject<HTMLVideoElement>}
           src={src}
@@ -275,7 +297,7 @@ export default function HalftoneCursorTrail({
           loop
           playsInline
           crossOrigin="anonymous"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', visibility: isTouch ? 'visible' : 'hidden' }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", visibility: isTouch ? "visible" : "hidden" }}
         />
       ) : (
         <img
@@ -283,13 +305,18 @@ export default function HalftoneCursorTrail({
           src={src}
           alt=""
           crossOrigin="anonymous"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', visibility: isTouch ? 'visible' : 'hidden' }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", visibility: isTouch ? "visible" : "hidden" }}
         />
       )}
       {!isTouch && (
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 w-full h-full"
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+          }}
         />
       )}
     </div>
