@@ -1,17 +1,14 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
 /**
- * HalftoneCursorTrail - Simulación de Fluidos Ksenia-K (Codepen jENEMjN)
- * con Tramado Dithering Bayer 4x4 PREDOMINANTE
+ * HalftoneCursorTrail - Simulación Fluida Ksenia-K Ultra-Rápida a 60 FPS
  * 
- * 1. DEFORMACIÓN FLUIDA KSENIA-K (Codepen jENEMjN):
- *    Inercia de advección y ondas de desplazamiento líquido orgánico (water ripples / fluid mesh)
- *    al mover el ratón sobre la imagen.
- * 2. EFECTO DITHERING PREDOMINANTE:
- *    La malla del fluido está compuesta de forma dominante por píxeles de cuantización Bayer 4x4 
- *    de alto contraste (dither stipple matrix), haciendo que la trama digital sea la protagonista visual.
+ * 1. RENDIMIENTO ULTRARRÁPIDO 60 FPS (Cero Lag):
+ *    Rejilla optimizada (gridSize = 11) con ejecuciones en una sola pasada para respuesta 100% fluida e instantánea.
+ * 2. EFECTO DITHERING Y DEFORMACIÓN LÍQUIDA COMBINADOS:
+ *    Aplica la deformación de advección de fluido (Ksenia-K) combinada con el tramado Dithering Bayer 4x4.
  * 3. RECUPERACIÓN NÍTIDA 100%:
- *    El fluido se disipa a 60 FPS (~0.9s) restaurando la fotografía original 100% impecable.
+ *    La estela líquida se desvanece suavemente restaurando la fotografía original 100% impecable.
  */
 
 interface HalftoneCursorTrailProps {
@@ -37,10 +34,10 @@ const BAYER_4X4 = [
 export default function HalftoneCursorTrail({
   src,
   type = "image",
-  gridSize = 6,             // Rejilla fina de alta resolución para Dithering Bayer 4x4 dominante
-  influenceRadius = 135,    // Radio amplio de la onda de fluido Ksenia-K
-  decay = 0.95,             // Inercia líquida fluida (~0.9s)
-  warpStrength = 32,        // Fuerza de desplazamiento líquido
+  gridSize = 11,            // Rejilla super optimizada a 60FPS sin tirones
+  influenceRadius = 130,    // Radio amplio de respuesta
+  decay = 0.92,             // Inercia fluida suave
+  warpStrength = 28,        // Deformación de vorticidad líquida
   invert = true,
   dotColor = "255,255,255",
   className = "",
@@ -89,7 +86,6 @@ export default function HalftoneCursorTrail({
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let W = 0, H = 0, cols = 0, rows = 0;
 
-    // Campos Vectoriales de Simulación Fluida (Velocidades X, Y y Densidad de la onda Ksenia-K)
     let velX: Float32Array | null = null;
     let velY: Float32Array | null = null;
     let density: Float32Array | null = null;
@@ -145,7 +141,6 @@ export default function HalftoneCursorTrail({
       }
     }
 
-    // Inyecta velocidad de fluido al pasar el cursor (Simulación de Fluidos Ksenia-K jENEMjN)
     function injectFluidForce(px: number, py: number, vx: number, vy: number) {
       if (!velX || !velY || !density) return;
 
@@ -155,24 +150,23 @@ export default function HalftoneCursorTrail({
       const iy1 = Math.min(rows - 1, Math.ceil((py + influenceRadius) / gridSize));
 
       const speed = Math.hypot(vx, vy);
-      const forceScale = Math.min(3.0, Math.max(0.6, speed * 0.15));
+      const forceScale = Math.min(2.5, Math.max(0.4, speed * 0.12));
 
       for (let iy = iy0; iy <= iy1; iy++) {
         for (let ix = ix0; ix <= ix1; ix++) {
           const gx = ix * gridSize, gy = iy * gridSize;
           const d = Math.hypot(gx - px, gy - py);
           if (d > influenceRadius) continue;
-          const falloff = Math.pow(1 - d / influenceRadius, 1.25);
+          const falloff = Math.pow(1 - d / influenceRadius, 1.2);
           const idx = iy * cols + ix;
 
-          // Vorticidad fluida estilo Ksenia-K: el movimiento añade componente de remolino acuoso
-          const angle = Math.atan2(gy - py, gx - px) + Math.PI * 0.45;
-          const swirlX = Math.cos(angle) * speed * 0.4;
-          const swirlY = Math.sin(angle) * speed * 0.4;
+          const angle = Math.atan2(gy - py, gx - px) + Math.PI * 0.4;
+          const swirlX = Math.cos(angle) * speed * 0.3;
+          const swirlY = Math.sin(angle) * speed * 0.3;
 
           velX[idx] += (vx + swirlX) * falloff * forceScale;
           velY[idx] += (vy + swirlY) * falloff * forceScale;
-          density[idx] = Math.min(2.0, density[idx] + falloff * 1.2);
+          density[idx] = Math.min(1.8, density[idx] + falloff * 1.1);
 
           active.add(idx);
         }
@@ -195,7 +189,7 @@ export default function HalftoneCursorTrail({
         const dx = p.x - last.x;
         const dy = p.y - last.y;
         const dist = Math.hypot(dx, dy);
-        const steps = Math.max(1, Math.floor(dist / (gridSize * 1.1)));
+        const steps = Math.max(1, Math.floor(dist / (gridSize * 1.4)));
 
         for (let i = 0; i <= steps; i++) {
           const t = i / steps;
@@ -226,17 +220,16 @@ export default function HalftoneCursorTrail({
       }
 
       if (ctx && velX && velY && density) {
-        // Base impecable
         drawBase();
 
         if (active.size > 0) {
-          // 1. Simulación de Fluidos Ksenia-K: Advección + Desplazamiento Líquido
+          // Renderizado ultra-rápido en una sola pasada unificada a 60 FPS
           for (const idx of Array.from(active)) {
             let vx = velX[idx] * decay;
             let vy = velY[idx] * decay;
             let d = density[idx] * decay;
 
-            if (Math.abs(vx) < 0.006 && Math.abs(vy) < 0.006 && d < 0.01) {
+            if (Math.abs(vx) < 0.01 && Math.abs(vy) < 0.01 && d < 0.015) {
               velX[idx] = 0;
               velY[idx] = 0;
               density[idx] = 0;
@@ -252,11 +245,11 @@ export default function HalftoneCursorTrail({
             const ix = idx % cols;
             const gx = ix * gridSize, gy = iy * gridSize;
 
-            // Deformación fluida de la foto por advección de velocidad
+            // 1. Deformación fluida de la foto
             if (warpStrength > 0 && sampleReady) {
               const tile = gridSize * 2.4;
-              const shiftX = vx * (warpStrength * 0.4);
-              const shiftY = vy * (warpStrength * 0.4);
+              const shiftX = vx * (warpStrength * 0.35);
+              const shiftY = vy * (warpStrength * 0.35);
 
               const sx = Math.min(W - tile, Math.max(0, gx - shiftX - tile / 2));
               const sy = Math.min(H - tile, Math.max(0, gy - shiftY - tile / 2));
@@ -264,37 +257,20 @@ export default function HalftoneCursorTrail({
               ctx.globalAlpha = Math.min(1, d * 1.3);
               ctx.drawImage(sample, sx, sy, tile, tile, gx - tile / 2, gy - tile / 2, tile, tile);
             }
-          }
 
-          // 2. EFECTO DITHERING PREDOMINANTE (Bayer 4x4 Stipple Matrix de Máxima Densidad)
-          for (const idx of Array.from(active)) {
-            const d = density[idx];
-            if (d < 0.012) continue;
-
-            const iy = (idx / cols) | 0;
-            const ix = idx % cols;
-            const gx = ix * gridSize, gy = iy * gridSize;
-
+            // 2. Tramado Dithering Bayer 4x4 Predominante de alta velocidad
             const threshold = BAYER_4X4[iy % 4][ix % 4];
-            if (d > threshold * 0.18) {
-              const pixelSize = Math.max(2.6, Math.min(gridSize, (d - threshold * 0.08) * 8.0));
+            if (d > threshold * 0.25) {
+              const pixelSize = Math.max(2.4, Math.min(gridSize, (d - threshold * 0.1) * 6.5));
 
-              // Perforación transparente para que asome el fondo oscuro
-              ctx.globalCompositeOperation = "destination-out";
-              ctx.fillStyle = "rgba(0,0,0,1)";
-              ctx.globalAlpha = Math.min(1, d * 2.0);
-              ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
-
-              // Trama Dithering Bayer 4x4 Predominante en Difference Invert Mode
               ctx.globalCompositeOperation = "difference";
               ctx.fillStyle = "rgb(255,255,255)";
-              ctx.globalAlpha = Math.min(1, d * 2.5);
+              ctx.globalAlpha = Math.min(1, d * 2.0);
               ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
               ctx.globalCompositeOperation = "source-over";
             }
           }
 
-          ctx.globalCompositeOperation = "source-over";
           ctx.globalAlpha = 1;
         } else {
           drawBase();
