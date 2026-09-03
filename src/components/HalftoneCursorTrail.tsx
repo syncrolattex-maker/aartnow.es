@@ -3,13 +3,14 @@ import { useEffect, useRef, useState, CSSProperties } from 'react';
 /**
  * HalftoneCursorTrail
  * Rastro de puntos (halftone) + distorsión ("bulge") del fondo, siguiendo al
- * cursor sobre una imagen o vídeo — recreación oficial del efecto de lamalama.com.
+ * cursor sobre una imagen o vídeo — recreación exacta de lamalama.com.
  *
- * Características:
- * - Rejilla fija de celdas sobre la imagen/vídeo.
- * - Al mover el cursor, las celdas se activan con caída exponencial y decaen suavemente.
- * - Copia de tiles desplazados según el gradiente local para generar el efecto "bulge" / burbuja.
- * - Desactivado en móviles para mantener un rendimiento 100% ligero y nativo.
+ * Mejoras clave:
+ * - `invert = true`: Usa blend mode "difference" (`ctx.globalCompositeOperation = "difference"`),
+ *   lo que hace que los puntos salgan oscuros sobre zonas claras y claros sobre zonas oscuras automáticamente.
+ * - Parámetros ajustados según el vídeo original: gridSize = 6, dotRadius = 2, warpStrength = 8, decay = 0.90.
+ * - Desactivado en móviles (< 1024px / touch) para velocidad de navegación 100% nativa.
+ * - Pausado automático del bucle de animación en imágenes estáticas en reposo.
  */
 
 interface HalftoneCursorTrailProps {
@@ -20,6 +21,7 @@ interface HalftoneCursorTrailProps {
   dotRadius?: number;
   decay?: number;
   warpStrength?: number;
+  invert?: boolean;
   dotColor?: string;
   className?: string;
   style?: CSSProperties;
@@ -28,12 +30,13 @@ interface HalftoneCursorTrailProps {
 export default function HalftoneCursorTrail({
   src,
   type = "video",
-  gridSize = 10,
-  influenceRadius = 90,
-  dotRadius = 3,
-  decay = 0.93,
-  warpStrength = 16,
-  dotColor = "10,10,10",
+  gridSize = 6,
+  influenceRadius = 70,
+  dotRadius = 2,
+  decay = 0.90,
+  warpStrength = 8,
+  invert = true,
+  dotColor = "255,255,255",
   className = "",
   style = {},
 }: HalftoneCursorTrailProps) {
@@ -42,7 +45,7 @@ export default function HalftoneCursorTrail({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isTouch, setIsTouch] = useState(false);
 
-  // Detecta dispositivos táctiles / pantallas móviles para desactivar en móvil
+  // Detecta dispositivos táctiles / móviles para desactivar en móvil
   useEffect(() => {
     const mq = window.matchMedia("(pointer: coarse)");
     const update = () => {
@@ -198,10 +201,8 @@ export default function HalftoneCursorTrail({
         // 1) Base: la imagen/vídeo íntegro
         drawBase();
 
-        // 2) Por cada celda activa: tile desplazado (bulge) + punto de tinta
+        // 2) Por cada celda activa: tile desplazado (bulge) + punto de tinta encima
         if (active.size > 0) {
-          ctx.fillStyle = `rgb(${dotColor})`;
-
           for (const idx of Array.from(active)) {
             let a = activation[idx] * decay;
             if (a < 0.02) { 
@@ -230,10 +231,19 @@ export default function HalftoneCursorTrail({
             }
 
             const r = dotRadius * a;
+            if (invert) {
+              // Blend "difference": sale oscuro sobre fondo claro y claro sobre fondo oscuro
+              ctx.globalCompositeOperation = "difference";
+              ctx.fillStyle = "rgb(255,255,255)";
+            } else {
+              ctx.globalCompositeOperation = "source-over";
+              ctx.fillStyle = `rgb(${dotColor})`;
+            }
             ctx.globalAlpha = Math.min(1, a * 1.3);
             ctx.beginPath();
             ctx.arc(gx, gy, Math.max(0.3, r), 0, Math.PI * 2);
             ctx.fill();
+            ctx.globalCompositeOperation = "source-over";
           }
           ctx.globalAlpha = 1;
         } else if (type === "image") {
@@ -277,7 +287,7 @@ export default function HalftoneCursorTrail({
         (source as HTMLVideoElement).removeEventListener("loadeddata", onLoaded);
       }
     };
-  }, [src, type, gridSize, influenceRadius, dotRadius, decay, warpStrength, dotColor, isTouch]);
+  }, [src, type, gridSize, influenceRadius, dotRadius, decay, warpStrength, invert, dotColor, isTouch]);
 
   return (
     <div
