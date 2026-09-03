@@ -6,6 +6,7 @@ import ProjectList from './components/ProjectList';
 import About from './components/About';
 import AdminLeads from './components/AdminLeads';
 import BudgetEstimator from './components/BudgetEstimator';
+import CaseStudyPage from './components/CaseStudyPage';
 import SmoothScroll from './components/SmoothScroll';
 import Cursor from './components/Cursor';
 import GlobalAdaptiveHalftoneTrail from './components/GlobalAdaptiveHalftoneTrail';
@@ -54,15 +55,19 @@ function AppContent() {
   const { t } = useLanguage();
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [currentRoute, setCurrentRoute] = useState<'home' | 'admin' | 'presupuesto'>('home');
+  const [currentRoute, setCurrentRoute] = useState<'home' | 'admin' | 'presupuesto' | 'case'>('home');
+  const [caseSlug, setCaseSlug] = useState<string>('jack-and-ai');
 
   useEffect(() => {
     const checkPath = () => {
-      const path = window.location.pathname.toLowerCase();
+      const path = window.location.pathname;
       if (path.startsWith('/admin')) {
         setCurrentRoute('admin');
       } else if (path.startsWith('/presupuesto') || path.startsWith('/estimador')) {
         setCurrentRoute('presupuesto');
+      } else if (path.startsWith('/cases/')) {
+        setCurrentRoute('case');
+        setCaseSlug(path.replace('/cases/', '').replace(/\/$/, ''));
       } else {
         setCurrentRoute('home');
       }
@@ -93,6 +98,10 @@ function AppContent() {
 
   if (currentRoute === 'presupuesto') {
     return <StandaloneEstimatorPage />;
+  }
+
+  if (currentRoute === 'case') {
+    return <CaseStudyPage slug={caseSlug} />;
   }
 
   return (

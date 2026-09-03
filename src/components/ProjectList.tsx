@@ -10,7 +10,7 @@ export default function ProjectList() {
       title: "Jack & AI",
       tags: [t.s01Title, "AI Platform"],
       description: t.p1Desc,
-      caseUrl: "https://jackandai.com",
+      caseUrl: "/cases/jack-and-ai",
       siteUrl: "https://jackandai.com",
       thumbnails: [
         "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=75&w=600&auto=format&fit=crop",
@@ -28,7 +28,7 @@ export default function ProjectList() {
       title: "Refraction House",
       tags: [t.s01Title, t.s02Title],
       description: t.p2Desc,
-      caseUrl: "#contact",
+      caseUrl: "/cases/refraction-house",
       siteUrl: "#contact",
       thumbnails: [
         "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=75&w=600&auto=format&fit=crop",
@@ -43,7 +43,7 @@ export default function ProjectList() {
       title: "Structural Studio",
       tags: [t.s04Title, "Interactive Web"],
       description: t.p3Desc,
-      caseUrl: "#contact",
+      caseUrl: "/cases/structural-studio",
       siteUrl: "#contact",
       thumbnails: [
         "https://images.unsplash.com/photo-1558655146-d09347e92766?q=75&w=600&auto=format&fit=crop",
@@ -58,7 +58,7 @@ export default function ProjectList() {
       title: "Monolith Digital",
       tags: ["Spatial", t.s03Title],
       description: t.p4Desc,
-      caseUrl: "#contact",
+      caseUrl: "/cases/monolith-digital",
       siteUrl: "#contact",
       thumbnails: [
         "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=75&w=600&auto=format&fit=crop",
@@ -73,7 +73,7 @@ export default function ProjectList() {
       title: "Kinetic Motion",
       tags: [t.s01Title, "Motion System"],
       description: t.p5Desc,
-      caseUrl: "#contact",
+      caseUrl: "/cases/kinetic-motion",
       siteUrl: "#contact",
       thumbnails: [
         "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=75&w=600&auto=format&fit=crop",

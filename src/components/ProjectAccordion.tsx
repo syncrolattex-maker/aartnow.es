@@ -21,11 +21,9 @@ interface ProjectAccordionProps {
 /**
  * ProjectAccordion
  * Lista de proyectos tipo lamalama.com/work:
- * - Todos los proyectos permanecen cerrados por defecto (openIndex = null).
- * - Traducido dinámicamente según el idioma activo (es, val, en).
+ * - Botón "Ver caso" abre la página de estudio del caso en una NUEVA pestaña (target="_blank").
  */
 export default function ProjectAccordion({ projects = [] }: ProjectAccordionProps) {
-  // Por defecto todos los proyectos permanecen cerrados
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
@@ -205,11 +203,13 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
             >
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-6">
                 
-                {/* Botones de Acción Traducidos */}
+                {/* Botones de Acción: Ver Caso abre en nueva pestaña (target="_blank") */}
                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                   {caseUrl && (
                     <a
                       href={caseUrl}
+                      target="_blank"
+                      rel="noreferrer"
                       className="px-5 py-3 border border-white/30 text-white text-xs font-bold uppercase text-center hover:bg-[#f3ede4] hover:text-[#111] transition-colors"
                     >
                       {t.viewCaseBtn}
