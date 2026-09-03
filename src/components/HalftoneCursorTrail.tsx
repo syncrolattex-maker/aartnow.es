@@ -3,11 +3,10 @@ import { useEffect, useRef, useState, CSSProperties } from 'react';
 /**
  * HalftoneCursorTrail - Réplica Exacta del Efecto "Lama Lama - Jack & AI"
  * 
- * 1. En reposo: La imagen del proyecto se muestra 100% nítida, limpia y en alta resolución.
- * 2. Al mover el cursor: Deja una estela fluida de deformación líquida (displacement warp) 
- *    combinada con tramado digital Dithering Bayer 4x4 y contraste adaptativo sobre la imagen.
- * 3. Inercia de decaimiento: La estela permanece visible ~0.8s tras el paso del ratón 
- *    y se desvanece suavemente a 60 FPS hasta RECUPERAR la foto original 100% limpia.
+ * 1. En reposo: La imagen del proyecto se muestra 100% nítida y completa.
+ * 2. Al mover el cursor: La estela fluida de deformación (displacement warp) y tramado Dithering Bayer 4x4
+ *    hace que EL FONDO OSCURO DE LA WEB ASOME / SE MEZCLE a través de los píxeles cuantizados de la imagen.
+ * 3. Al alejarse el cursor: La estela se desvanece suavemente (~0.8s) y la foto RECUPERA 100% su estado impecable.
  */
 
 interface HalftoneCursorTrailProps {
@@ -34,9 +33,9 @@ export default function HalftoneCursorTrail({
   src,
   type = "image",
   gridSize = 8,
-  influenceRadius = 115,    // Radio de la estela líquida Lama Lama
+  influenceRadius = 120,    // Radio amplio de estela
   decay = 0.90,             // Inercia de desvanecido suave (~0.8s)
-  warpStrength = 24,        // Fuerza de deformación fluida
+  warpStrength = 26,        // Deformación fluida de lente
   invert = true,
   dotColor = "255,255,255",
   className = "",
@@ -127,7 +126,6 @@ export default function HalftoneCursorTrail({
       }
     }
 
-    // Dibuja la base nítida original
     function drawBase() {
       if (ctx && sampleReady && W > 0 && H > 0) {
         ctx.clearRect(0, 0, W, H);
@@ -210,7 +208,7 @@ export default function HalftoneCursorTrail({
         drawBase();
 
         if (active.size > 0) {
-          // Fase 1: Deformación Warp Líquida al paso del cursor (Lama Lama Style)
+          // Fase 1: Deformación Warp Líquida al paso del cursor
           if (warpStrength > 0 && sampleReady) {
             for (const idx of Array.from(active)) {
               const a = activation[idx];
@@ -235,7 +233,7 @@ export default function HalftoneCursorTrail({
             }
           }
 
-          // Fase 2: Cuantización Dithering Bayer 4x4 sobre la estela deformada
+          // Fase 2: Cuantización Dithering Bayer 4x4 + Permite que asome el fondo oscuro
           for (const idx of Array.from(active)) {
             let a = activation[idx] * decay;
             if (a < 0.015) { 
@@ -250,20 +248,19 @@ export default function HalftoneCursorTrail({
             const gx = ix * gridSize, gy = iy * gridSize;
 
             const threshold = BAYER_4X4[iy % 4][ix % 4];
-            if (a > threshold * 0.5) {
-              const pixelSize = Math.max(2.0, Math.min(gridSize - 0.5, (a - threshold * 0.2) * 4.2));
+            if (a > threshold * 0.45) {
+              const pixelSize = Math.max(2.0, Math.min(gridSize - 0.5, (a - threshold * 0.2) * 4.4));
 
-              if (invert) {
-                ctx.globalCompositeOperation = "difference";
-                ctx.fillStyle = "rgb(255,255,255)";
-              } else {
-                ctx.globalCompositeOperation = "source-over";
-                ctx.fillStyle = `rgb(${dotColor})`;
-              }
-
-              ctx.globalAlpha = Math.min(1, a * 1.5);
+              // Permite hacer 'perforación / borrado' de píxeles para que asome el fondo oscuro de la web
+              ctx.globalCompositeOperation = "destination-out";
+              ctx.fillStyle = "rgba(0,0,0,1)";
+              ctx.globalAlpha = Math.min(1, a * 1.4);
               ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
+
+              // Superpone el punto Dithering de alto contraste (Lama Lama Style)
               ctx.globalCompositeOperation = "source-over";
+              ctx.fillStyle = invert ? "rgba(255,255,255,0.85)" : `rgba(${dotColor},0.85)`;
+              ctx.fillRect(gx - pixelSize / 4, gy - pixelSize / 4, pixelSize / 2, pixelSize / 2);
             }
           }
 
