@@ -22,8 +22,8 @@ const BAYER_4X4 = [
 
 const GRID_SIZE   = 6;    // px entre celdas (~5-7px, medido en Lama Lama)
 const DOT_RADIUS  = 1.5;  // radio fijo del punto en px — constante
-const INFLUENCE_R = 48;   // radio de influencia reducido — trail más corto
-const DECAY       = 0.84; // decay rápido — cola corta, menos celdas activas
+const INFLUENCE_R = 82;   // radio de influencia restablecido a 82px según preferencia del usuario
+const DECAY       = 0.88; // decaimiento equilibrado a 60fps
 const THRESHOLD_K = 0.28; // sensibilidad del threshold Bayer
 
 export default function GlobalAdaptiveHalftoneTrail() {

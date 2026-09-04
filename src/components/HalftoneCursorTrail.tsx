@@ -37,9 +37,9 @@ export default function HalftoneCursorTrail({
   src,
   type = 'image',
   gridSize        = 6,
-  influenceRadius = 48,  // radio reducido — trail más corto
-  decay           = 0.84, // decay rápido — menos celdas activas en movimiento rápido
-  warpStrength    = 14,
+  influenceRadius = 82,  // radio de influencia 82px según preferencia del usuario
+  decay           = 0.88, // decaimiento suave y ágil a 60fps
+  warpStrength    = 75,   // deformación más acusada y visible estilo lente líquida
   className       = '',
   style           = {},
 }: HalftoneCursorTrailProps) {
@@ -194,41 +194,43 @@ export default function HalftoneCursorTrail({
 
       drawBase();
 
-      // Convertir Set a Array UNA sola vez — reutilizado en ambos passes
       const activeArr = Array.from(active);
 
-      // ── Paso 1: Lente de distorsión (UV offset por gradiente de activación)
-      // Optimización: checkerboard skip (solo celdas pares ix+iy) con tile 2× para
-      // cubrir el mismo área con la mitad de llamadas drawImage
+      // ── Paso 1: Lente de distorsión más acusada (UV offset por gradiente amplio)
       if (warpStrength > 0 && sampleReady) {
-        const tileSize = gridSize * 2; // tile doble compensa el skip
         ctx.save();
-        ctx.globalAlpha = 0.7;
         for (let i = 0; i < activeArr.length; i++) {
           const idx = activeArr[i];
           const a = activation[idx];
-          if (a < 0.1) continue; // solo celdas con activación significativa
+          if (a < 0.06) continue;
 
           const iy = (idx / cols) | 0;
           const ix = idx % cols;
-          if ((ix + iy) & 1) continue; // checkerboard: solo pares — 50% menos drawImage
 
-          const idxL = iy * cols + Math.max(0, ix - 1);
-          const idxR = iy * cols + Math.min(cols - 1, ix + 1);
-          const idxU = Math.max(0, iy - 1) * cols + ix;
-          const idxD = Math.min(rows - 1, iy + 1) * cols + ix;
+          // Muestreo a 2 celdas de distancia para una onda curva más suave y ancha
+          const idxL = iy * cols + Math.max(0, ix - 2);
+          const idxR = iy * cols + Math.min(cols - 1, ix + 2);
+          const idxU = Math.max(0, iy - 2) * cols + ix;
+          const idxD = Math.min(rows - 1, iy + 2) * cols + ix;
 
-          const gradX = (activation[idxR] - activation[idxL]) * 0.5;
-          const gradY = (activation[idxD] - activation[idxU]) * 0.5;
+          const gradX = activation[idxR] - activation[idxL];
+          const gradY = activation[idxD] - activation[idxU];
+
+          const dispX = -gradX * warpStrength;
+          const dispY = -gradY * warpStrength;
+
+          if (dispX * dispX + dispY * dispY < 0.25) continue;
 
           const gx = ix * gridSize;
           const gy = iy * gridSize;
-          const sx = Math.min(W - tileSize, Math.max(0, gx - gradX * warpStrength));
-          const sy = Math.min(H - tileSize, Math.max(0, gy - gradY * warpStrength));
-          const tileW = Math.min(tileSize, W - gx);
-          const tileH = Math.min(tileSize, H - gy);
+          const tileW = Math.min(gridSize + 0.8, W - gx);
+          const tileH = Math.min(gridSize + 0.8, H - gy);
           if (tileW <= 0 || tileH <= 0) continue;
 
+          const sx = Math.min(W - tileW, Math.max(0, gx + dispX));
+          const sy = Math.min(H - tileH, Math.max(0, gy + dispY));
+
+          ctx.globalAlpha = Math.min(1.0, 0.45 + a * 1.1);
           ctx.drawImage(sample, sx, sy, tileW, tileH, gx, gy, tileW, tileH);
         }
         ctx.restore();

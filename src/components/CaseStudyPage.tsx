@@ -93,10 +93,6 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
         <div className="relative w-full aspect-video border border-white/15 overflow-hidden bg-neutral-900 shadow-2xl">
           <HalftoneCursorTrail
             src={caseItem.heroImage}
-            warpStrength={35}
-            gridSize={9}
-            decay={0.93}
-            influenceRadius={130}
           />
         </div>
 
@@ -155,10 +151,6 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
               >
                 <HalftoneCursorTrail
                   src={imgUrl}
-                  warpStrength={35}
-                  gridSize={9}
-                  decay={0.93}
-                  influenceRadius={130}
                 />
               </div>
             ))}
