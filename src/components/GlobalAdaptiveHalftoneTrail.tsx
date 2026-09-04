@@ -1,18 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * GlobalAdaptiveHalftoneTrail
- * Rastro global de tramado digital Dithering Bayer 4x4 adaptativo
- * Aplicado al 100% de todas las páginas y secciones.
- * Al desplegar el menú de navegación se oculta y desactiva completamente.
+ * GlobalAdaptiveHalftoneTrail — Efecto Lama Lama (lamalama.com)
+ *
+ * Rastro de puntos Ordered Dithering (Bayer 4×4) sobre TODA la web.
+ * - Rejilla fija de celdas (GRID_SIZE px de separación)
+ * - DOT_RADIUS fijo — NO varía con activación (esto NO es halftone)
+ * - Activación (0→1) por celda con falloff suave cuadrático
+ * - Decay por frame → efecto "cometa" con cola que se desvanece
+ * - Celda se pinta si activation > threshold Bayer (ordered dithering)
+ * - globalCompositeOperation "difference" + blanco → claro/oscuro automático
+ * - Se pausa cuando el menú está abierto (data-menu-open="true")
  */
 
 const BAYER_4X4 = [
   [ 0/16,  8/16,  2/16, 10/16],
   [12/16,  4/16, 14/16,  6/16],
   [ 3/16, 11/16,  1/16,  9/16],
-  [15/16,  7/16, 13/16,  5/16]
+  [15/16,  7/16, 13/16,  5/16],
 ];
+
+const GRID_SIZE   = 6;    // px entre celdas (~5-7px, medido en Lama Lama)
+const DOT_RADIUS  = 1.5;  // radio fijo del punto en px — constante
+const INFLUENCE_R = 82;   // radio de influencia del cursor (~70-90px)
+const DECAY       = 0.91; // decaimiento por frame a 60fps
+const THRESHOLD_K = 0.28; // sensibilidad del threshold Bayer
 
 export default function GlobalAdaptiveHalftoneTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -21,17 +33,16 @@ export default function GlobalAdaptiveHalftoneTrail() {
   useEffect(() => {
     const mq = window.matchMedia('(pointer: coarse)');
     const update = () => {
-      const isMobileDevice = 
-        mq.matches || 
-        window.innerWidth < 1024 || 
-        ('ontouchstart' in window) || 
-        (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+      const isMobileDevice =
+        mq.matches ||
+        window.innerWidth < 1024 ||
+        ('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0);
       setIsTouch(isMobileDevice);
     };
     update();
     mq.addEventListener?.('change', update);
     window.addEventListener('resize', update);
-
     return () => {
       mq.removeEventListener?.('change', update);
       window.removeEventListener('resize', update);
@@ -43,30 +54,20 @@ export default function GlobalAdaptiveHalftoneTrail() {
 
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    let W = window.innerWidth;
-    let H = window.innerHeight;
-    let cols = 0, rows = 0;
-    
-    const gridSize = 6;
-    const influenceRadius = 85;
-    const decay = 0.93;
-
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let W = 0, H = 0, cols = 0, rows = 0;
     let activation: Float32Array | null = null;
-    let dotColors: string[] = [];
     let active = new Set<number>();
-    let raf: number;
+    let raf = 0;
     let isLooping = false;
 
     function buildGrid() {
-      cols = Math.ceil(W / gridSize) + 1;
-      rows = Math.ceil(H / gridSize) + 1;
+      cols = Math.ceil(W / GRID_SIZE) + 1;
+      rows = Math.ceil(H / GRID_SIZE) + 1;
       activation = new Float32Array(cols * rows);
-      dotColors = new Array(cols * rows).fill('255, 255, 255');
       active = new Set<number>();
     }
 
@@ -75,62 +76,31 @@ export default function GlobalAdaptiveHalftoneTrail() {
       W = window.innerWidth;
       H = window.innerHeight;
       if (W <= 0 || H <= 0) return;
-
-      canvas.width = W * dpr;
+      canvas.width  = W * dpr;
       canvas.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       buildGrid();
     }
 
-    function getContrastColorAt(px: number, py: number): string {
-      try {
-        const elem = document.elementFromPoint(px, py);
-        if (elem) {
-          const style = window.getComputedStyle(elem);
-          const bg = style.backgroundColor;
-
-          if (bg && bg.startsWith('rgb')) {
-            const match = bg.match(/\d+/g);
-            if (match && match.length >= 3) {
-              const r = parseInt(match[0], 10);
-              const g = parseInt(match[1], 10);
-              const b = parseInt(match[2], 10);
-              const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-              if (lum > 160) {
-                return '10, 10, 10';
-              }
-            }
-          }
-        }
-      } catch (e) {
-        /* Fallback */
-      }
-      return '255, 255, 255';
-    }
-
     function excite(px: number, py: number) {
       if (!activation) return;
-      if (document.body.getAttribute('data-menu-open') === 'true' || document.body.classList.contains('menu-open')) return;
+      if (document.body.getAttribute('data-menu-open') === 'true') return;
 
-      const colorForPoint = getContrastColorAt(px, py);
-
-      const ix0 = Math.max(0, Math.floor((px - influenceRadius) / gridSize));
-      const ix1 = Math.min(cols - 1, Math.ceil((px + influenceRadius) / gridSize));
-      const iy0 = Math.max(0, Math.floor((py - influenceRadius) / gridSize));
-      const iy1 = Math.min(rows - 1, Math.ceil((py + influenceRadius) / gridSize));
+      const ix0 = Math.max(0, Math.floor((px - INFLUENCE_R) / GRID_SIZE));
+      const ix1 = Math.min(cols - 1, Math.ceil((px + INFLUENCE_R) / GRID_SIZE));
+      const iy0 = Math.max(0, Math.floor((py - INFLUENCE_R) / GRID_SIZE));
+      const iy1 = Math.min(rows - 1, Math.ceil((py + INFLUENCE_R) / GRID_SIZE));
 
       for (let iy = iy0; iy <= iy1; iy++) {
         for (let ix = ix0; ix <= ix1; ix++) {
-          const gx = ix * gridSize, gy = iy * gridSize;
-          const d = Math.hypot(gx - px, gy - py);
-          if (d > influenceRadius) continue;
-          const falloff = 1 - d / influenceRadius;
+          const gx = ix * GRID_SIZE, gy = iy * GRID_SIZE;
+          const dist = Math.hypot(gx - px, gy - py);
+          if (dist > INFLUENCE_R) continue;
+          // Falloff cuadrático suave: 1 en el cursor, 0 en el borde
+          const t = 1 - dist / INFLUENCE_R;
+          const val = t * t;
           const idx = iy * cols + ix;
-          const val = Math.pow(falloff, 1.2);
-          if (val > activation[idx]) {
-            activation[idx] = val;
-            dotColors[idx] = colorForPoint;
-          }
+          if (val > activation[idx]) activation[idx] = val;
           active.add(idx);
         }
       }
@@ -138,20 +108,14 @@ export default function GlobalAdaptiveHalftoneTrail() {
       startLoop();
     }
 
-    function pointerPos(e: MouseEvent) {
-      return { x: e.clientX, y: e.clientY };
-    }
-
     let last: { x: number; y: number } | null = null;
 
     function onMove(e: MouseEvent) {
-      if (document.body.getAttribute('data-menu-open') === 'true' || document.body.classList.contains('menu-open')) {
-        return;
-      }
-      const p = pointerPos(e);
+      if (document.body.getAttribute('data-menu-open') === 'true') return;
+      const p = { x: e.clientX, y: e.clientY };
       if (last) {
-        const dist = Math.hypot(p.x - last.x, p.y - last.y);
-        const steps = Math.max(1, Math.floor(dist / (gridSize * 1.5)));
+        const dist  = Math.hypot(p.x - last.x, p.y - last.y);
+        const steps = Math.max(1, Math.floor(dist / (GRID_SIZE * 1.5)));
         for (let i = 0; i <= steps; i++) {
           const t = i / steps;
           excite(last.x + (p.x - last.x) * t, last.y + (p.y - last.y) * t);
@@ -162,9 +126,7 @@ export default function GlobalAdaptiveHalftoneTrail() {
       last = p;
     }
 
-    function onLeave() {
-      last = null;
-    }
+    function onLeave() { last = null; }
 
     function startLoop() {
       if (!isLooping) {
@@ -176,7 +138,7 @@ export default function GlobalAdaptiveHalftoneTrail() {
     function frame() {
       if (!ctx || !activation) return;
 
-      if (document.body.getAttribute('data-menu-open') === 'true' || document.body.classList.contains('menu-open')) {
+      if (document.body.getAttribute('data-menu-open') === 'true') {
         ctx.clearRect(0, 0, W, H);
         isLooping = false;
         return;
@@ -184,33 +146,51 @@ export default function GlobalAdaptiveHalftoneTrail() {
 
       ctx.clearRect(0, 0, W, H);
 
-      if (active.size > 0) {
-        for (const idx of Array.from(active)) {
-          activation[idx] *= decay;
-
-          if (activation[idx] < 0.015) {
-            activation[idx] = 0;
-            active.delete(idx);
-            continue;
-          }
-
-          const a = activation[idx];
-          const iy = (idx / cols) | 0;
-          const ix = idx % cols;
-          const gx = ix * gridSize, gy = iy * gridSize;
-
-          const threshold = BAYER_4X4[iy % 4][ix % 4];
-
-          if (a > threshold * 0.3) {
-            const pixelSize = Math.max(1.8, (a - threshold * 0.1) * gridSize * 1.2);
-            ctx.fillStyle = `rgba(${dotColors[idx]}, ${Math.min(0.9, a * 1.6)})`;
-            ctx.fillRect(gx, gy, pixelSize, pixelSize);
-          }
-        }
-      } else {
+      if (active.size === 0) {
         isLooping = false;
         return;
       }
+
+      // Un único save/restore para todo el pass — "difference" + blanco
+      // → puntos claros sobre oscuro, oscuros sobre claro (automático)
+      ctx.save();
+      ctx.globalCompositeOperation = 'difference';
+      ctx.fillStyle = 'white';
+
+      for (const idx of Array.from(active)) {
+        activation[idx] *= DECAY;
+        const a = activation[idx];
+
+        if (a < 0.012) {
+          activation[idx] = 0;
+          active.delete(idx);
+          continue;
+        }
+
+        const iy = (idx / cols) | 0;
+        const ix = idx % cols;
+        const gx = ix * GRID_SIZE;
+        const gy = iy * GRID_SIZE;
+
+        // Ordered Dithering Bayer 4×4:
+        // punto ENCENDIDO si activación supera el threshold de su celda
+        const threshold = BAYER_4X4[iy % 4][ix % 4];
+        if (a <= threshold * THRESHOLD_K) continue;
+
+        // Punto de radio FIJO (no halftone) — solo la opacidad varía
+        // para una transición suave al aparecer/desaparecer
+        ctx.globalAlpha = Math.min(0.95, 0.5 + a * 0.5);
+        ctx.beginPath();
+        ctx.arc(
+          gx + GRID_SIZE * 0.5,
+          gy + GRID_SIZE * 0.5,
+          DOT_RADIUS,
+          0, Math.PI * 2
+        );
+        ctx.fill();
+      }
+
+      ctx.restore();
 
       raf = requestAnimationFrame(frame);
     }
@@ -236,7 +216,7 @@ export default function GlobalAdaptiveHalftoneTrail() {
       style={{
         position: 'fixed',
         inset: 0,
-        width: '100vw',
+        width:  '100vw',
         height: '100vh',
         pointerEvents: 'none',
         zIndex: 99,
