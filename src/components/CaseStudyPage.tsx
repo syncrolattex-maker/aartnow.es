@@ -13,12 +13,22 @@ interface CaseStudyPageProps {
 }
 
 export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
-  // Buscar datos del caso o fallback a jack-and-ai
+  // Buscar datos del caso o fallback seguro a jack-and-ai
   const caseItem = casesData[slug] || casesData["jack-and-ai"];
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
+
+  const navigateTo = (path: string, e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    window.history.pushState({}, '', path);
+    window.dispatchEvent(new Event('popstate'));
+    window.scrollTo(0, 0);
+  };
+
+  const galleryList = caseItem.gallery || [];
+  const websiteUrl = caseItem.websiteUrl || caseItem.siteUrl || "";
 
   return (
     <div className="min-h-screen bg-[#000000] text-[#FFFDF3] font-mono selection:bg-white selection:text-black relative">
@@ -35,7 +45,8 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/15 pb-6">
           <a
             href="/"
-            className="text-xs text-white/60 hover:text-white uppercase font-bold tracking-widest transition-colors flex items-center gap-2"
+            onClick={(e) => navigateTo('/', e)}
+            className="text-xs text-white/60 hover:text-white uppercase font-bold tracking-widest transition-colors flex items-center gap-2 cursor-pointer"
           >
             <span>←</span>
             <span>VOLVER A TRABAJOS</span>
@@ -60,9 +71,9 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
               </h1>
             </div>
 
-            {caseItem.siteUrl && (
+            {websiteUrl && (
               <a
-                href={caseItem.siteUrl}
+                href={websiteUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="px-6 py-3.5 bg-white text-black font-sans font-black uppercase text-xs tracking-wider hover:bg-neutral-200 transition-colors shadow-lg flex items-center gap-2"
@@ -74,7 +85,7 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
           </div>
 
           <p className="text-sm md:text-base text-white/80 max-w-3xl leading-relaxed">
-            {caseItem.tagline}
+            {caseItem.subtitle || caseItem.overview}
           </p>
         </div>
 
@@ -101,7 +112,7 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
           </div>
           <div>
             <span className="text-white/40 block mb-1">[ SERVICES ]</span>
-            <span className="font-bold text-white">{caseItem.services.join(" / ")}</span>
+            <span className="font-bold text-white">{(caseItem.services || []).join(" / ")}</span>
           </div>
           <div>
             <span className="text-white/40 block mb-1">[ PLATFORM ]</span>
@@ -137,7 +148,7 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
           </h2>
 
           <div className="grid grid-cols-1 gap-12">
-            {caseItem.galleryImages.map((imgUrl, i) => (
+            {galleryList.map((imgUrl, i) => (
               <div
                 key={i}
                 className="relative w-full aspect-[16/10] border border-white/15 overflow-hidden bg-neutral-900 shadow-2xl"
@@ -160,7 +171,8 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
             <span className="text-xs text-white/40 uppercase block mb-1">[ SIGUIENTE CASO ]</span>
             <a
               href={`/cases/${caseItem.nextSlug}`}
-              className="text-2xl md:text-4xl font-black uppercase text-white font-sans hover:underline"
+              onClick={(e) => navigateTo(`/cases/${caseItem.nextSlug}`, e)}
+              className="text-2xl md:text-4xl font-black uppercase text-white font-sans hover:underline cursor-pointer"
             >
               {caseItem.nextTitle} ↗
             </a>
@@ -168,7 +180,8 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
 
           <a
             href="/"
-            className="px-6 py-3 border border-white/30 text-white text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-colors"
+            onClick={(e) => navigateTo('/', e)}
+            className="px-6 py-3 border border-white/30 text-white text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-colors cursor-pointer"
           >
             VER TODOS LOS CASOS
           </a>
