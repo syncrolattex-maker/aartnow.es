@@ -223,14 +223,50 @@ export default function HalftoneCursorTrail({
       }
 
       if (ctx && velX && velY && density) {
-        drawBase();
 
         if (active.size > 0) {
-          // Bucle único ultra-optimizado: 1. Deformación Ksenia-K + 2. Dithering Bayer 4x4 Predominante
+          // Paso 1: dibujar imagen base completa
+          drawBase();
+
+          // Paso 2: UV-displacement warp Ksenia Kondrashova (jENEMjN)
+          // Cada celda tesela exactamente gridSize×gridSize desde la posición UV desplazada
+          // → toda la superficie de la imagen se deforma como líquido continuo
+          if (warpStrength > 0 && sampleReady) {
+            ctx.save();
+            for (const idx of Array.from(active)) {
+              const vx = velX[idx];
+              const vy = velY[idx];
+              const d  = density[idx];
+
+              const iy = (idx / cols) | 0;
+              const ix = idx % cols;
+              const gx = ix * gridSize;
+              const gy = iy * gridSize;
+
+              // UV-source desplazado hacia atrás del flujo (arrastre líquido)
+              const shiftX = vx * warpStrength;
+              const shiftY = vy * warpStrength;
+              const sx = Math.min(W - gridSize, Math.max(0, gx - shiftX));
+              const sy = Math.min(H - gridSize, Math.max(0, gy - shiftY));
+
+              const tileW = Math.min(gridSize, W - gx);
+              const tileH = Math.min(gridSize, H - gy);
+              if (tileW <= 0 || tileH <= 0) continue;
+
+              ctx.globalAlpha = Math.min(1, d * 1.8);
+              ctx.drawImage(sample, sx, sy, tileW, tileH, gx, gy, tileW, tileH);
+            }
+            ctx.restore();
+          }
+
+          // Paso 3: Dithering Bayer 4x4 PREDOMINANTE + decay de velocidad
+          ctx.save();
+          ctx.globalCompositeOperation = "difference";
+          ctx.fillStyle = "rgb(255,255,255)";
           for (const idx of Array.from(active)) {
             let vx = velX[idx] * decay;
             let vy = velY[idx] * decay;
-            let d = density[idx] * decay;
+            let d  = density[idx] * decay;
 
             if (Math.abs(vx) < 0.01 && Math.abs(vy) < 0.01 && d < 0.015) {
               velX[idx] = 0;
@@ -246,35 +282,18 @@ export default function HalftoneCursorTrail({
 
             const iy = (idx / cols) | 0;
             const ix = idx % cols;
-            const gx = ix * gridSize, gy = iy * gridSize;
+            const gx = ix * gridSize;
+            const gy = iy * gridSize;
 
-            // 1. DEFORMACIÓN FLUIDA KSENIA KONDRASHOVA (jENEMjN)
-            if (warpStrength > 0 && sampleReady) {
-              const tile = gridSize * 2.2;
-              const shiftX = vx * (warpStrength * 0.38);
-              const shiftY = vy * (warpStrength * 0.38);
-
-              const sx = Math.min(W - tile, Math.max(0, gx - shiftX - tile / 2));
-              const sy = Math.min(H - tile, Math.max(0, gy - shiftY - tile / 2));
-
-              ctx.globalAlpha = Math.min(1, d * 1.3);
-              ctx.drawImage(sample, sx, sy, tile, tile, gx - tile / 2, gy - tile / 2, tile, tile);
-            }
-
-            // 2. TRAMADO DITHERING BAYER 4x4 PREDOMINANTE
             const threshold = BAYER_4X4[iy % 4][ix % 4];
-            if (d > threshold * 0.2) {
-              const pixelSize = Math.max(2.8, Math.min(gridSize * 1.1, (d - threshold * 0.08) * 7.5));
-
-              ctx.globalCompositeOperation = "difference";
-              ctx.fillStyle = "rgb(255,255,255)";
-              ctx.globalAlpha = Math.min(1, d * 2.2);
-              ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
-              ctx.globalCompositeOperation = "source-over";
+            if (d > threshold * 0.18) {
+              const pixelSize = Math.max(3, Math.min(gridSize, (d - threshold * 0.06) * 8));
+              ctx.globalAlpha = Math.min(1, d * 2.4);
+              ctx.fillRect(gx + (gridSize - pixelSize) * 0.5, gy + (gridSize - pixelSize) * 0.5, pixelSize, pixelSize);
             }
           }
+          ctx.restore();
 
-          ctx.globalAlpha = 1;
         } else {
           drawBase();
           isLooping = false;
