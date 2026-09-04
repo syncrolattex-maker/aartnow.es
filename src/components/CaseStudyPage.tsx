@@ -89,8 +89,8 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
           </p>
         </div>
 
-        {/* Hero Image Container: Fusión de Deformación Fluida Ksenia-K (jENEMjN) + Dithering Bayer 4x4 */}
-        <div className="relative w-full aspect-video border border-white/15 overflow-hidden bg-neutral-900 shadow-2xl">
+        {/* Hero Image Container: Deformación Integral de Silueta (Malla WebGL) + Dithering Bayer 4x4 */}
+        <div className="relative w-full aspect-video overflow-visible bg-neutral-950/40 shadow-2xl">
           <HalftoneCursorTrail
             src={caseItem.heroImage}
           />
@@ -147,7 +147,7 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
             {galleryList.map((imgUrl, i) => (
               <div
                 key={i}
-                className="relative w-full aspect-[16/10] border border-white/15 overflow-hidden bg-neutral-900 shadow-2xl"
+                className="relative w-full aspect-[16/10] overflow-visible bg-neutral-950/40 shadow-2xl"
               >
                 <HalftoneCursorTrail
                   src={imgUrl}
