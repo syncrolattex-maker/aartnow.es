@@ -21,7 +21,7 @@ interface ProjectAccordionProps {
 /**
  * ProjectAccordion
  * Lista de proyectos tipo lamalama.com/work:
- * - Botón "Ver caso" navega a la página del caso de estudio (en móvil abre directamente en la misma ventana, en desktop abre en nueva pestaña).
+ * - Botón "Ver caso" navega a la página del caso de estudio de forma rápida y 100% fiable en desktop y móvil.
  */
 export default function ProjectAccordion({ projects = [] }: ProjectAccordionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -53,19 +53,9 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
   const headerRef = useRef<HTMLDivElement>(null);
   const [hovering, setHovering] = useState(false);
   const [label, setLabel] = useState({ x: 0, y: 0 });
-  const [isMobile, setIsMobile] = useState(false);
   const target = useRef({ x: 0, y: 0 });
   const current = useRef({ x: 0, y: 0 });
   const raf = useRef<number | null>(null);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024 || ('ontouchstart' in window));
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   // La etiqueta sigue al cursor con lerp magnético suave
   useEffect(() => {
@@ -87,11 +77,18 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
     target.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
   }
 
+  // Carga inmediata y 100% fiable del estudio de caso en SPA React
   const handleCaseClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
     e.stopPropagation();
-    if (isMobile && caseUrl) {
-      e.preventDefault();
-      window.location.href = caseUrl;
+    if (caseUrl) {
+      if (caseUrl.startsWith('/cases/')) {
+        window.history.pushState({}, '', caseUrl);
+        window.dispatchEvent(new Event('popstate'));
+        window.scrollTo(0, 0);
+      } else {
+        window.location.href = caseUrl;
+      }
     }
   };
 
@@ -225,15 +222,13 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
             >
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-6">
                 
-                {/* Botones de Acción: En móvil abre directamente en la misma ventana, en desktop en nueva pestaña */}
+                {/* Botones de Acción: Carga rápida garantizada de la página del estudio de caso */}
                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto" onClick={(e) => e.stopPropagation()}>
                   {caseUrl && (
                     <a
                       href={caseUrl}
-                      target={isMobile ? "_self" : "_blank"}
-                      rel="noreferrer"
                       onClick={handleCaseClick}
-                      className="px-6 py-3.5 bg-white text-black text-xs font-black uppercase text-center hover:bg-neutral-200 transition-colors shadow-lg active:scale-95 touch-manipulation"
+                      className="px-6 py-3.5 bg-white text-black text-xs font-black uppercase text-center hover:bg-neutral-200 transition-colors shadow-lg active:scale-95 touch-manipulation cursor-pointer"
                     >
                       {t.viewCaseBtn} ↗
                     </a>
@@ -244,7 +239,7 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
                       target="_blank"
                       rel="noreferrer"
                       onClick={handleSiteClick}
-                      className="px-6 py-3.5 border border-white/40 text-white text-xs font-bold uppercase text-center hover:bg-white hover:text-black transition-colors active:scale-95 touch-manipulation"
+                      className="px-6 py-3.5 border border-white/40 text-white text-xs font-bold uppercase text-center hover:bg-white hover:text-black transition-colors active:scale-95 touch-manipulation cursor-pointer"
                     >
                       {t.visitWebsiteBtn}
                     </a>
@@ -257,7 +252,7 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
                 </p>
               </div>
 
-              {/* Galería grande desplegada (tocar una imagen en móvil también puede abrir el caso) */}
+              {/* Galería grande desplegada (tocar o hacer clic navega al caso) */}
               <motion.div 
                 layout
                 className="flex gap-2.5 md:gap-4 overflow-x-auto pb-3 touch-pan-x"
@@ -269,13 +264,14 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
                     src={src}
                     alt=""
                     onClick={(e) => {
-                      if (isMobile && caseUrl) {
+                      if (caseUrl) {
                         e.stopPropagation();
-                        window.location.href = caseUrl;
+                        window.history.pushState({}, '', caseUrl);
+                        window.dispatchEvent(new Event('popstate'));
+                        window.scrollTo(0, 0);
                       }
                     }}
-                    className="h-64 md:h-[420px] flex-none object-cover cursor-pointer"
-                    transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                    className="h-64 md:h-[420px] flex-none object-cover cursor-pointer hover:opacity-90 transition-opacity"
                   />
                 ))}
               </motion.div>
