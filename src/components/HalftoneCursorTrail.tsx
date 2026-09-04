@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState, CSSProperties } from 'react';
 
 /**
- * HalftoneCursorTrail - Fusión Exclusiva de 2 Efectos (100% Ultra-Rápido 60FPS)
+ * HalftoneCursorTrail - Deformación Fluida Ksenia Kondrashova (jENEMjN)
+ * con Tramado Dithering Bayer 4x4 PREDOMINANTE
  * 
- * FUSIÓN ÚNICA Y LIGERA:
- * 1. Deformación Líquida Ksenia-K (Desplazamiento por vectores de velocidad al mover el ratón).
- * 2. Tramado Dithering Bayer 4x4 (Cuantización de píxeles gráficos de alto contraste).
- * 
- * Se han eliminado todas las demás capas y cálculos adicionales para lograr máxima velocidad 60FPS sin lag.
+ * 1. DEFORMACIÓN FLUIDA KSENIA KONDRASHOVA (jENEMjN):
+ *    Al pasar el cursor, la imagen se deforma con física de fluidos de advección y remolino líquido.
+ * 2. TRAMADO DITHERING PREDOMINANTE:
+ *    La trama de cuantización Bayer 4x4 es el protagonista visual principal sobre la masa de fluido.
+ * 3. RECUPERACIÓN Y VELOCIDAD 60 FPS:
+ *    Se desvanece suavemente (~0.8s) restaurando la imagen original limpia a 60 FPS sin tirones.
  */
 
 interface HalftoneCursorTrailProps {
@@ -33,10 +35,10 @@ const BAYER_4X4 = [
 export default function HalftoneCursorTrail({
   src,
   type = "image",
-  gridSize = 12,            // Rejilla super ligera para 60 FPS instantáneos
-  influenceRadius = 120,    // Radio de respuesta
-  decay = 0.90,             // Disipación rápida y ágil
-  warpStrength = 30,        // Fuerza de deformación fluida Ksenia-K
+  gridSize = 9,             // Rejilla de alta velocidad optimizada a 60 FPS
+  influenceRadius = 125,    // Radio amplio de respuesta fluida
+  decay = 0.92,             // Inercia líquida ágil y suave
+  warpStrength = 32,        // Deformación de fluido Ksenia Kondrashova (jENEMjN)
   invert = true,
   dotColor = "255,255,255",
   className = "",
@@ -87,6 +89,7 @@ export default function HalftoneCursorTrail({
 
     let velX: Float32Array | null = null;
     let velY: Float32Array | null = null;
+    let density: Float32Array | null = null;
     let active = new Set<number>();
     let raf: number;
     let isLooping = false;
@@ -98,6 +101,7 @@ export default function HalftoneCursorTrail({
       const size = cols * rows;
       velX = new Float32Array(size);
       velY = new Float32Array(size);
+      density = new Float32Array(size);
       active = new Set<number>();
     }
 
@@ -138,8 +142,9 @@ export default function HalftoneCursorTrail({
       }
     }
 
+    // Inyecta velocidad de fluido al pasar el cursor (Ksenia Kondrashova jENEMjN)
     function injectFluidForce(px: number, py: number, vx: number, vy: number) {
-      if (!velX || !velY) return;
+      if (!velX || !velY || !density) return;
 
       const ix0 = Math.max(0, Math.floor((px - influenceRadius) / gridSize));
       const ix1 = Math.min(cols - 1, Math.ceil((px + influenceRadius) / gridSize));
@@ -147,18 +152,24 @@ export default function HalftoneCursorTrail({
       const iy1 = Math.min(rows - 1, Math.ceil((py + influenceRadius) / gridSize));
 
       const speed = Math.hypot(vx, vy);
-      const forceScale = Math.min(2.0, Math.max(0.4, speed * 0.1));
+      const forceScale = Math.min(2.5, Math.max(0.4, speed * 0.12));
 
       for (let iy = iy0; iy <= iy1; iy++) {
         for (let ix = ix0; ix <= ix1; ix++) {
           const gx = ix * gridSize, gy = iy * gridSize;
           const d = Math.hypot(gx - px, gy - py);
           if (d > influenceRadius) continue;
-          const falloff = 1 - d / influenceRadius;
+          const falloff = Math.pow(1 - d / influenceRadius, 1.2);
           const idx = iy * cols + ix;
 
-          velX[idx] += vx * falloff * forceScale;
-          velY[idx] += vy * falloff * forceScale;
+          // Componente de remolino fluido Ksenia-K
+          const angle = Math.atan2(gy - py, gx - px) + Math.PI * 0.45;
+          const swirlX = Math.cos(angle) * speed * 0.35;
+          const swirlY = Math.sin(angle) * speed * 0.35;
+
+          velX[idx] += (vx + swirlX) * falloff * forceScale;
+          velY[idx] += (vy + swirlY) * falloff * forceScale;
+          density[idx] = Math.min(1.8, density[idx] + falloff * 1.1);
 
           active.add(idx);
         }
@@ -180,7 +191,15 @@ export default function HalftoneCursorTrail({
       if (last) {
         const dx = p.x - last.x;
         const dy = p.y - last.y;
-        injectFluidForce(p.x, p.y, dx, dy);
+        const dist = Math.hypot(dx, dy);
+        const steps = Math.max(1, Math.floor(dist / (gridSize * 1.2)));
+
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps;
+          const curX = last.x + dx * t;
+          const curY = last.y + dy * t;
+          injectFluidForce(curX, curY, dx, dy);
+        }
       } else {
         injectFluidForce(p.x, p.y, 0, 0);
       }
@@ -198,53 +217,59 @@ export default function HalftoneCursorTrail({
       }
     }
 
-    // Bucle ultra-ligero de 2 efectos fusionados (1. Deformación Ksenia-K + 2. Dithering Bayer 4x4)
     function frame() {
       if (type === "video") {
         updateSampleFrame();
       }
 
-      if (ctx && velX && velY) {
+      if (ctx && velX && velY && density) {
         drawBase();
 
         if (active.size > 0) {
+          // Bucle único ultra-optimizado: 1. Deformación Ksenia-K + 2. Dithering Bayer 4x4 Predominante
           for (const idx of Array.from(active)) {
             let vx = velX[idx] * decay;
             let vy = velY[idx] * decay;
+            let d = density[idx] * decay;
 
-            if (Math.abs(vx) < 0.05 && Math.abs(vy) < 0.05) {
+            if (Math.abs(vx) < 0.01 && Math.abs(vy) < 0.01 && d < 0.015) {
               velX[idx] = 0;
               velY[idx] = 0;
+              density[idx] = 0;
               active.delete(idx);
               continue;
             }
 
             velX[idx] = vx;
             velY[idx] = vy;
+            density[idx] = d;
 
             const iy = (idx / cols) | 0;
             const ix = idx % cols;
             const gx = ix * gridSize, gy = iy * gridSize;
-            const speed = Math.hypot(vx, vy);
 
-            // EFECTO 1: Deformación Ksenia-K (Desplazamiento por vectores de velocidad)
-            const shiftX = vx * (warpStrength * 0.3);
-            const shiftY = vy * (warpStrength * 0.3);
-            const sx = Math.min(W - gridSize, Math.max(0, gx - shiftX));
-            const sy = Math.min(H - gridSize, Math.max(0, gy - shiftY));
+            // 1. DEFORMACIÓN FLUIDA KSENIA KONDRASHOVA (jENEMjN)
+            if (warpStrength > 0 && sampleReady) {
+              const tile = gridSize * 2.2;
+              const shiftX = vx * (warpStrength * 0.38);
+              const shiftY = vy * (warpStrength * 0.38);
 
-            // Dibujar trozo deformado Ksenia-K
-            ctx.globalAlpha = Math.min(1, speed * 0.15);
-            ctx.drawImage(sample, sx, sy, gridSize, gridSize, gx, gy, gridSize, gridSize);
+              const sx = Math.min(W - tile, Math.max(0, gx - shiftX - tile / 2));
+              const sy = Math.min(H - tile, Math.max(0, gy - shiftY - tile / 2));
 
-            // EFECTO 2: Tramado Dithering Bayer 4x4 (Píxeles de contraste)
+              ctx.globalAlpha = Math.min(1, d * 1.3);
+              ctx.drawImage(sample, sx, sy, tile, tile, gx - tile / 2, gy - tile / 2, tile, tile);
+            }
+
+            // 2. TRAMADO DITHERING BAYER 4x4 PREDOMINANTE
             const threshold = BAYER_4X4[iy % 4][ix % 4];
-            if (speed * 0.08 > threshold * 0.3) {
-              const pixelSize = Math.max(3, gridSize * 0.85);
+            if (d > threshold * 0.2) {
+              const pixelSize = Math.max(2.8, Math.min(gridSize * 1.1, (d - threshold * 0.08) * 7.5));
+
               ctx.globalCompositeOperation = "difference";
               ctx.fillStyle = "rgb(255,255,255)";
-              ctx.globalAlpha = Math.min(1, speed * 0.2);
-              ctx.fillRect(gx, gy, pixelSize, pixelSize);
+              ctx.globalAlpha = Math.min(1, d * 2.2);
+              ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
               ctx.globalCompositeOperation = "source-over";
             }
           }
