@@ -37,8 +37,8 @@ export default function HalftoneCursorTrail({
   src,
   type = 'image',
   gridSize        = 6,
-  influenceRadius = 82,
-  decay           = 0.91,
+  influenceRadius = 48,  // radio reducido — trail más corto
+  decay           = 0.84, // decay rápido — menos celdas activas en movimiento rápido
   warpStrength    = 14,
   className       = '',
   style           = {},
