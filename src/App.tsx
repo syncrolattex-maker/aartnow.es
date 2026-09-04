@@ -18,6 +18,7 @@ function StandaloneEstimatorPage() {
   return (
     <div className="min-h-screen bg-[#000000] text-[#FFFDF3] font-mono py-16 px-4 md:px-12 flex flex-col items-center justify-center relative selection:bg-white selection:text-black">
       <Scene />
+      <div className="dither-bg-overlay" />
       <div className="grain-overlay" />
       <Cursor />
       <GlobalAdaptiveHalftoneTrail />
@@ -126,6 +127,7 @@ function AppContent() {
       <SmoothScroll>
         <div className="relative min-h-screen bg-[#000000] text-[#FFFFFF] selection:bg-[#FFFFFF] selection:text-[#000000] font-mono">
           <Scene />
+          <div className="dither-bg-overlay" />
           <div className="grain-overlay" />
           <Cursor />
           <GlobalAdaptiveHalftoneTrail />
@@ -138,7 +140,7 @@ function AppContent() {
             <About />
             
             {/* Minimalist Studio Footer */}
-            <footer className="py-28 px-6 md:px-16 bg-[#000000] text-white flex flex-col justify-between border-t border-white/10">
+            <footer className="py-28 px-6 md:px-16 bg-black/60 text-white flex flex-col justify-between border-t border-white/10">
               <div className="max-w-[1400px] w-full mx-auto space-y-16">
                 
                 {/* Large Text Reveal */}

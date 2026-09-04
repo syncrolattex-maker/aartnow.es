@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * GlobalAdaptiveDitherTrail
- * Rastro global de tramado digital (Dithering Bayer 4x4) adaptativo
- * que reacciona con píxeles cuánticos al movimiento del cursor en toda la web.
+ * GlobalAdaptiveHalftoneTrail
+ * Rastro global de tramado digital Dithering Bayer 4x4 adaptativo
+ * Aplicado al 100% de todas las páginas y secciones (incluido Trabajos Destacados / #work).
  */
 
 const BAYER_4X4 = [
@@ -52,8 +52,8 @@ export default function GlobalAdaptiveHalftoneTrail() {
     let cols = 0, rows = 0;
     
     const gridSize = 6;
-    const influenceRadius = 75;
-    const decay = 0.92;
+    const influenceRadius = 85;
+    const decay = 0.93;
 
     let activation: Float32Array | null = null;
     let dotColors: string[] = [];
@@ -81,17 +81,11 @@ export default function GlobalAdaptiveHalftoneTrail() {
       buildGrid();
     }
 
+    // Color contrastado garantizado visible en TODAS las secciones (incluyendo #work)
     function getContrastColorAt(px: number, py: number): string {
       try {
         const elem = document.elementFromPoint(px, py);
         if (elem) {
-          if (elem.closest('#work')) {
-            return '10, 10, 10';
-          }
-          if (elem.closest('#contact')) {
-            return '0, 0, 0';
-          }
-
           const style = window.getComputedStyle(elem);
           const bg = style.backgroundColor;
 
@@ -102,7 +96,7 @@ export default function GlobalAdaptiveHalftoneTrail() {
               const g = parseInt(match[1], 10);
               const b = parseInt(match[2], 10);
               const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-              if (lum > 130) {
+              if (lum > 160) {
                 return '10, 10, 10';
               }
             }
@@ -130,7 +124,7 @@ export default function GlobalAdaptiveHalftoneTrail() {
           if (d > influenceRadius) continue;
           const falloff = 1 - d / influenceRadius;
           const idx = iy * cols + ix;
-          const val = Math.pow(falloff, 1.3);
+          const val = Math.pow(falloff, 1.2);
           if (val > activation[idx]) {
             activation[idx] = val;
             dotColors[idx] = colorForPoint;
@@ -163,7 +157,7 @@ export default function GlobalAdaptiveHalftoneTrail() {
       last = p;
     }
 
-    function onEnd() {
+    function onLeave() {
       last = null;
     }
 
@@ -175,37 +169,36 @@ export default function GlobalAdaptiveHalftoneTrail() {
     }
 
     function frame() {
-      if (ctx && activation) {
-        ctx.clearRect(0, 0, W, H);
+      if (!ctx || !activation) return;
 
-        if (active.size > 0) {
-          for (const idx of Array.from(active)) {
-            let a = activation[idx] * decay;
-            if (a < 0.015) {
-              activation[idx] = 0;
-              active.delete(idx);
-              continue;
-            }
-            activation[idx] = a;
+      ctx.clearRect(0, 0, W, H);
 
-            const iy = (idx / cols) | 0;
-            const ix = idx % cols;
-            const gx = ix * gridSize, gy = iy * gridSize;
+      if (active.size > 0) {
+        for (const idx of Array.from(active)) {
+          activation[idx] *= decay;
 
-            // Dithering threshold por matriz Bayer 4x4
-            const threshold = BAYER_4X4[iy % 4][ix % 4];
-            if (a > threshold * 0.7) {
-              const pixelSize = Math.max(1.5, Math.min(gridSize - 0.5, (a - threshold * 0.3) * 4));
-              ctx.fillStyle = `rgb(${dotColors[idx] || '255, 255, 255'})`;
-              ctx.globalAlpha = Math.min(1, a * 1.5);
-              ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
-            }
+          if (activation[idx] < 0.015) {
+            activation[idx] = 0;
+            active.delete(idx);
+            continue;
           }
-          ctx.globalAlpha = 1;
-        } else {
-          isLooping = false;
-          return;
+
+          const a = activation[idx];
+          const iy = (idx / cols) | 0;
+          const ix = idx % cols;
+          const gx = ix * gridSize, gy = iy * gridSize;
+
+          const threshold = BAYER_4X4[iy % 4][ix % 4];
+
+          if (a > threshold * 0.3) {
+            const pixelSize = Math.max(1.8, (a - threshold * 0.1) * gridSize * 1.2);
+            ctx.fillStyle = `rgba(${dotColors[idx]}, ${Math.min(0.9, a * 1.6)})`;
+            ctx.fillRect(gx, gy, pixelSize, pixelSize);
+          }
         }
+      } else {
+        isLooping = false;
+        return;
       }
 
       raf = requestAnimationFrame(frame);
@@ -214,13 +207,13 @@ export default function GlobalAdaptiveHalftoneTrail() {
     resize();
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseleave', onEnd);
+    document.addEventListener('mouseleave', onLeave);
 
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseleave', onEnd);
+      document.removeEventListener('mouseleave', onLeave);
     };
   }, [isTouch]);
 
@@ -229,7 +222,14 @@ export default function GlobalAdaptiveHalftoneTrail() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full pointer-events-none z-[9995]"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        width: '100vw',
+        height: '100vh',
+        pointerEvents: 'none',
+        zIndex: 99,
+      }}
     />
   );
 }

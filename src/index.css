@@ -92,6 +92,22 @@
   background-size: 24px 24px;
 }
 
+/* Capa de Tramado Dithering Bayer 4x4 Global de Fondo para TODAS las páginas */
+.dither-bg-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.14;
+  background-image: 
+    radial-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px),
+    radial-gradient(rgba(255, 255, 255, 0.20) 1px, transparent 1px);
+  background-size: 8px 8px, 4px 4px;
+  background-position: 0 0, 2px 2px;
+}
+
 .grain-overlay {
   position: fixed;
   top: 0;
