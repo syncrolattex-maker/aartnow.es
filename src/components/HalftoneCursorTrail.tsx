@@ -3,17 +3,11 @@
 /**
  * HalftoneCursorTrail — Deformacion Integral de Imagen (Malla WebGL Deformable) + Bayer 4x4 Dithering
  *
- * 1. DEFORMACION DE SILUETA / MALLA COMPLETA (WebGL Mesh):
- *    - La imagen se renderiza como una malla de triangulos subdividida (48x32).
- *    - Cada vertice (incluidos los bordes exteriores) se desplaza segun la velocidad
- *      y direccion del cursor (vector dx, dy de movimiento reciente).
- *    - El canvas cuenta con un sangrado (BLEED = 70px) y el contenedor usa overflow: visible,
- *      de modo que al arrastrar la imagen, los bordes exteriores se estiran organicamente
- *      hacia afuera y dejan ver el fondo oscuro por el lado contrario.
- *    - Al cesar el movimiento, la malla relaja elasticamente volviendo a su posicion original.
- *
- * 2. TRAMA DITHERING BAYER 4x4 (Lama Lama):
- *    - Puntos de radio fijo (1.5px) con blend mode 'difference' sobre la superficie activa.
+ * Adaptado a Pantalla Completa:
+ * - Soporte automatico para object-fit: cover en cualquier relacion de aspecto.
+ * - Deformacion elastica de silueta y bordes exteriores sin recorte rigido.
+ * - Sangrado BLEED = 70px para estiramiento continuo hacia el fondo.
+ * - Trama Dithering Bayer 4x4 integrada a 60 FPS.
  */
 
 interface HalftoneCursorTrailProps {
@@ -81,8 +75,8 @@ export default function HalftoneCursorTrail({
   src,
   type = 'image',
   influenceRadius = 82,  // Radio de influencia del cursor
-  decay           = 0.89, // Decaimiento elastico
-  warpStrength    = 50,   // Fuerza de arrastre en la direccion del cursor
+  decay           = 0.89, // Decaimiento elastico suave
+  warpStrength    = 55,   // Fuerza de arrastre en la direccion del cursor
   className       = '',
   style           = {},
 }: HalftoneCursorTrailProps) {
@@ -120,7 +114,6 @@ export default function HalftoneCursorTrail({
     const ditherCanvas = ditherCanvasRef.current;
     if (!stage || !source || !glCanvas || !ditherCanvas) return;
 
-    // Inicializacion WebGL
     const gl = (glCanvas.getContext('webgl', { alpha: true, antialias: true, premultipliedAlpha: false }) ||
                 glCanvas.getContext('experimental-webgl', { alpha: true, antialias: true, premultipliedAlpha: false })) as WebGLRenderingContext | null;
     if (!gl) return;
@@ -235,18 +228,45 @@ export default function HalftoneCursorTrail({
       ditherCanvas.height = fullH * dpr;
       dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Calcular posiciones de reposo de la malla
+      // Calculo de UV con object-fit: cover automatico en pantalla completa
+      let imgW = W, imgH = H;
+      if (type === 'image') {
+        const img = source as HTMLImageElement;
+        imgW = img.naturalWidth || img.width || W;
+        imgH = img.naturalHeight || img.height || H;
+      } else {
+        const vid = source as HTMLVideoElement;
+        imgW = vid.videoWidth || W;
+        imgH = vid.videoHeight || H;
+      }
+
+      const imgAspect = imgW / imgH;
+      const containerAspect = W / H;
+
+      let scaleU = 1.0;
+      let scaleV = 1.0;
+
+      if (containerAspect > imgAspect) {
+        scaleV = imgAspect / containerAspect;
+      } else {
+        scaleU = containerAspect / imgAspect;
+      }
+
       for (let r = 0; r <= ROWS; r++) {
-        const v = r / ROWS;
+        const normV = r / ROWS;
+        const v = 0.5 + (normV - 0.5) * scaleV;
+
         for (let c = 0; c <= COLS; c++) {
-          const u = c / COLS;
+          const normU = c / COLS;
+          const u = 0.5 + (normU - 0.5) * scaleU;
+
           const i = r * (COLS + 1) + c;
-          restX[i] = BLEED + u * W;
-          restY[i] = BLEED + v * H;
+          restX[i] = BLEED + normU * W;
+          restY[i] = BLEED + normV * H;
           vertexData[i * 4 + 0] = restX[i] + dispX[i];
           vertexData[i * 4 + 1] = restY[i] + dispY[i];
-          vertexData[i * 4 + 2] = u;
-          vertexData[i * 4 + 3] = v;
+          vertexData[i * 4 + 2] = Math.max(0, Math.min(1, u));
+          vertexData[i * 4 + 3] = Math.max(0, Math.min(1, v));
         }
       }
 
@@ -269,14 +289,12 @@ export default function HalftoneCursorTrail({
       }
     }
 
-    // Inyeccion de fuerza segun la direccion/velocidad del cursor (dx, dy)
     function injectForce(mx: number, my: number, dx: number, dy: number) {
       const px = mx + BLEED;
       const py = my + BLEED;
       const speed = Math.hypot(dx, dy);
 
-      // Factor de arrastre proporcional a la velocidad
-      const forceScale = Math.min(1.4, 0.4 + speed * 0.035) * (warpStrength * 0.025);
+      const forceScale = Math.min(1.5, 0.4 + speed * 0.038) * (warpStrength * 0.025);
 
       for (let r = 0; r <= ROWS; r++) {
         for (let c = 0; c <= COLS; c++) {
@@ -286,16 +304,12 @@ export default function HalftoneCursorTrail({
           const d = Math.hypot(curX - px, curY - py);
           if (d > influenceRadius) continue;
 
-          // Caida suave del radio
           const falloff = Math.pow(1 - d / influenceRadius, 1.4);
-
-          // Desplazamiento en la direccion del cursor (vector dx, dy)
           velX[i] += dx * falloff * forceScale;
           velY[i] += dy * falloff * forceScale;
         }
       }
 
-      // Activacion Dither
       if (ditherActivation) {
         const ix0 = Math.max(0, Math.floor((mx - influenceRadius) / DITHER_GRID));
         const ix1 = Math.min(ditherCols - 1, Math.ceil((mx + influenceRadius) / DITHER_GRID));
@@ -362,18 +376,16 @@ export default function HalftoneCursorTrail({
       let maxActivity = 0;
       const maxBleed = BLEED - 6;
 
-      // 1. Fisica de relajacion de la malla WebGL
       for (let i = 0; i < numVertices; i++) {
         dispX[i] += velX[i];
         dispY[i] += velY[i];
 
-        velX[i] *= 0.74; // Amortiguacion de velocidad
+        velX[i] *= 0.74;
         velY[i] *= 0.74;
 
-        dispX[i] *= decay; // Relajacion elastica al reposo
+        dispX[i] *= decay;
         dispY[i] *= decay;
 
-        // Limitar dentro del sangrado del canvas
         if (dispX[i] > maxBleed) dispX[i] = maxBleed;
         else if (dispX[i] < -maxBleed) dispX[i] = -maxBleed;
 
@@ -390,9 +402,8 @@ export default function HalftoneCursorTrail({
         if (act > maxActivity) maxActivity = act;
       }
 
-      // Dibujar Malla WebGL
       gl.viewport(0, 0, glCanvas!.width, glCanvas!.height);
-      gl.clearColor(0, 0, 0, 0); // Fondo 100% transparente para ver detras
+      gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
 
       gl.useProgram(program);
@@ -404,7 +415,6 @@ export default function HalftoneCursorTrail({
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
       gl.drawElements(gl.TRIANGLES, numIndices, gl.UNSIGNED_SHORT, 0);
 
-      // 2. Dibujar Dither Bayer 4x4 (Canvas 2D con difference blend)
       const fullW = W + BLEED * 2;
       const fullH = H + BLEED * 2;
       dctx.clearRect(0, 0, fullW, fullH);
@@ -458,8 +468,7 @@ export default function HalftoneCursorTrail({
     stage.addEventListener('mouseleave', onLeave);
 
     const onLoaded = () => {
-      updateTexture();
-      renderFrame(true);
+      resize();
     };
 
     if (type === 'image') {
