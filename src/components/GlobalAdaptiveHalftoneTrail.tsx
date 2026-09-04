@@ -151,11 +151,12 @@ export default function GlobalAdaptiveHalftoneTrail() {
         return;
       }
 
-      // Un único save/restore para todo el pass — "difference" + blanco
-      // → puntos claros sobre oscuro, oscuros sobre claro (automático)
+      // Un único save/restore — difference + blanco — todos los puntos en 1 fill()
       ctx.save();
       ctx.globalCompositeOperation = 'difference';
       ctx.fillStyle = 'white';
+      ctx.globalAlpha = 0.88;
+      ctx.beginPath();
 
       for (const idx of Array.from(active)) {
         activation[idx] *= DECAY;
@@ -169,27 +170,16 @@ export default function GlobalAdaptiveHalftoneTrail() {
 
         const iy = (idx / cols) | 0;
         const ix = idx % cols;
-        const gx = ix * GRID_SIZE;
-        const gy = iy * GRID_SIZE;
-
-        // Ordered Dithering Bayer 4×4:
-        // punto ENCENDIDO si activación supera el threshold de su celda
         const threshold = BAYER_4X4[iy % 4][ix % 4];
         if (a <= threshold * THRESHOLD_K) continue;
 
-        // Punto de radio FIJO (no halftone) — solo la opacidad varía
-        // para una transición suave al aparecer/desaparecer
-        ctx.globalAlpha = Math.min(0.95, 0.5 + a * 0.5);
-        ctx.beginPath();
-        ctx.arc(
-          gx + GRID_SIZE * 0.5,
-          gy + GRID_SIZE * 0.5,
-          DOT_RADIUS,
-          0, Math.PI * 2
-        );
-        ctx.fill();
+        const cx = ix * GRID_SIZE + GRID_SIZE * 0.5;
+        const cy = iy * GRID_SIZE + GRID_SIZE * 0.5;
+        ctx.moveTo(cx + DOT_RADIUS, cy);
+        ctx.arc(cx, cy, DOT_RADIUS, 0, Math.PI * 2);
       }
 
+      ctx.fill(); // un solo fill para todos los puntos
       ctx.restore();
 
       raf = requestAnimationFrame(frame);
