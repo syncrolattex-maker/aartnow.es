@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import Header from './Header';
 import Cursor from './Cursor';
 import GlobalAdaptiveHalftoneTrail from './GlobalAdaptiveHalftoneTrail';
+import HalftoneCursorTrail from './HalftoneCursorTrail';
 import Scene from './WebGL/Scene';
 import GlitchText from './GlitchText';
 import PowerGlitchText from './PowerGlitchText';
@@ -88,12 +89,14 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
           </p>
         </div>
 
-        {/* Hero Image Container Nítida (Sin Efecto de Deformación) */}
+        {/* Hero Image Container: Fusión de Deformación Fluida Ksenia-K (jENEMjN) + Dithering Bayer 4x4 */}
         <div className="relative w-full aspect-video border border-white/15 overflow-hidden bg-neutral-900 shadow-2xl">
-          <img
+          <HalftoneCursorTrail
             src={caseItem.heroImage}
-            alt={caseItem.title}
-            className="w-full h-full object-cover"
+            warpStrength={35}
+            gridSize={9}
+            decay={0.93}
+            influenceRadius={130}
           />
         </div>
 
@@ -138,7 +141,7 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
           </div>
         </div>
 
-        {/* Interactive Case Gallery (Imágenes Nítidas sin Deformación) */}
+        {/* Interactive Case Gallery (Fusión Ksenia-K jENEMjN + Dithering Exclusivo en Imágenes) */}
         <div className="space-y-12 pt-8">
           <h2 className="text-2xl md:text-4xl font-bold uppercase text-white font-sans border-b border-white/15 pb-4">
             <GlitchText text="Galería del Proyecto" />
@@ -150,10 +153,12 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
                 key={i}
                 className="relative w-full aspect-[16/10] border border-white/15 overflow-hidden bg-neutral-900 shadow-2xl"
               >
-                <img
+                <HalftoneCursorTrail
                   src={imgUrl}
-                  alt={`${caseItem.title} - ${i + 1}`}
-                  className="w-full h-full object-cover"
+                  warpStrength={35}
+                  gridSize={9}
+                  decay={0.93}
+                  influenceRadius={130}
                 />
               </div>
             ))}
