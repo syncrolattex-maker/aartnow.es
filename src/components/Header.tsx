@@ -15,6 +15,21 @@ export default function Header() {
   const menuPanelRef = useRef<HTMLDivElement>(null);
   const menuTL = useRef<gsap.core.Timeline | null>(null);
 
+  // Al abrir el menú se oculta y desactiva todo el efecto Dithering
+  useEffect(() => {
+    if (isOpen) {
+      document.body.setAttribute('data-menu-open', 'true');
+      document.body.classList.add('menu-open');
+    } else {
+      document.body.setAttribute('data-menu-open', 'false');
+      document.body.classList.remove('menu-open');
+    }
+    return () => {
+      document.body.setAttribute('data-menu-open', 'false');
+      document.body.classList.remove('menu-open');
+    };
+  }, [isOpen]);
+
   // IntersectionObserver to track active section and update central header label dynamically
   useEffect(() => {
     const handleScroll = () => {
@@ -114,195 +129,209 @@ export default function Header() {
         }`}
       />
 
-      {/* Fixed Top Centered Header Capsule (Frosted Glass Effect) */}
-      <header className="fixed left-1/2 -translate-x-1/2 top-4 z-50 w-[calc(100vw-32px)] max-w-[580px] md:max-w-[640px] flex flex-col font-mono pointer-events-auto">
-        <div className="bg-black/50 backdrop-blur-2xl backdrop-saturate-150 border border-white/20 rounded-lg overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)] transition-all duration-300">
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8 pt-4 md:pt-6 font-mono pointer-events-none selection:bg-white selection:text-black">
+        
+        {/* Top Capsule Floating Bar */}
+        <div className="max-w-[1400px] mx-auto bg-black/90 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 shadow-2xl flex flex-col pointer-events-auto transition-colors duration-300">
           
-          {/* Header Bar */}
-          <div className="flex justify-between items-center h-12 px-3 relative cursor-pointer border-b border-white/10">
-            {/* Logo with 10x10 Matrix SVG */}
-            <a href="/" data-magnetic="true" data-cursor-text={t.homeTag} className="flex items-center gap-2 relative z-10 group">
-              <div className="w-6 h-6 rounded bg-neutral-900/80 border border-white/20 flex items-center justify-center p-1 group-hover:border-[#FFFFFF]">
-                <svg viewBox="0 0 10 10" fill="none" className="w-full h-full text-white group-hover:text-[#FFFFFF] transition-colors">
-                  <rect x="0" y="0" width="2" height="2" fill="currentColor" />
-                  <rect x="4" y="0" width="2" height="2" fill="currentColor" />
-                  <rect x="8" y="0" width="2" height="2" fill="currentColor" />
-                  <rect x="2" y="4" width="2" height="2" fill="currentColor" />
-                  <rect x="6" y="4" width="2" height="2" fill="currentColor" />
-                  <rect x="0" y="8" width="2" height="2" fill="currentColor" />
-                  <rect x="8" y="8" width="2" height="2" fill="currentColor" />
-                </svg>
-              </div>
-              <span className="text-xs font-bold uppercase tracking-wider text-white">
-                aartnow<span className="text-[#FFFFFF]">.es</span>
-              </span>
-            </a>
-
-            {/* Center Dynamic Label with GlitchText Effect on Section Scroll */}
-            <div className="text-[10px] uppercase text-[#FFFFFF] font-bold tracking-widest hidden sm:block">
-              [ <GlitchText key={activeSectionLabel} text={activeSectionLabel} /> ]
+          {/* Main Top Header Navigation Row */}
+          <div className="flex items-center justify-between w-full">
+            
+            {/* Left: Studio Logo */}
+            <div className="flex items-center gap-3">
+              <a 
+                href="/" 
+                onClick={closeMenu} 
+                className="flex items-center gap-2 group text-white hover:text-white/80 transition-colors"
+              >
+                <div className="w-2.5 h-2.5 bg-white rounded-none group-hover:scale-125 transition-transform" />
+                <span className="font-bold text-sm md:text-base tracking-tighter uppercase font-sans">
+                  AARTNOW<span className="text-white/40">.ES</span>
+                </span>
+              </a>
             </div>
 
-            {/* Menu Toggle Button */}
-            <button 
-              onClick={handleToggle}
-              className="flex flex-col gap-1 py-2 px-2 hover:opacity-75 transition-opacity cursor-pointer z-10"
-              aria-label="Toggle Navigation Menu"
-            >
-              <div className={`h-0.5 w-4 bg-white transition-transform duration-300 ${isOpen ? 'rotate-45 translate-y-1.5' : ''}`}></div>
-              <div className={`h-0.5 w-4 bg-white transition-opacity duration-300 ${isOpen ? 'opacity-0' : ''}`}></div>
-              <div className={`h-0.5 w-4 bg-white transition-transform duration-300 ${isOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></div>
-            </button>
+            {/* Center: Dynamic Active Section Tracker (Desktop only) */}
+            <div className="hidden md:flex items-center gap-2 text-xs uppercase tracking-widest text-white/50 border border-white/10 px-3 py-1 bg-white/5">
+              <span className="w-1.5 h-1.5 bg-white/60 animate-pulse" />
+              <span className="text-white font-bold tracking-wider">{activeSectionLabel}</span>
+            </div>
+
+            {/* Right: Actions & Hamburger Menu Trigger */}
+            <div className="flex items-center gap-3">
+              {/* Presupuesto Button */}
+              <a
+                href="/presupuesto"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 border border-white/30 text-[11px] font-bold uppercase tracking-wider text-white hover:bg-white hover:text-black transition-all shadow-sm"
+              >
+                <span>{t.budgetNavBtn}</span>
+                <span className="text-[9px]">↗</span>
+              </a>
+
+              {/* Menu Hamburger Toggle Trigger */}
+              <button
+                onClick={handleToggle}
+                className="flex items-center gap-2 px-3.5 py-1.5 border border-white/30 bg-white/10 hover:bg-white hover:text-black text-white text-xs uppercase font-bold tracking-widest transition-all cursor-pointer"
+                aria-label="Toggle Menu"
+              >
+                <span>{isOpen ? '[ CLOSE ]' : '[ MENU ]'}</span>
+              </button>
+            </div>
           </div>
 
-          {/* GSAP Orchestrated Expandable Menu Panel with GlitchText Menu Items (Frosted Glass Background) */}
+          {/* GSAP Expandable Menu Capsule Panel */}
           <div 
             ref={menuPanelRef}
-            className="overflow-hidden bg-black/70 backdrop-blur-2xl border-t border-white/15 text-white"
+            className="overflow-hidden opacity-0 h-0"
           >
-            <div className="flex flex-col text-xs uppercase font-mono py-2">
+            <div className="pt-6 pb-4 border-t border-white/15 mt-4 space-y-6">
               
-              {/* Nav Item: Work */}
-              <a 
-                href="#work" 
-                onClick={closeMenu} 
-                className="gsap-menu-item h-12 flex items-center px-4 border-b border-white/10 hover:bg-white/5 hover:text-[#FFFFFF] transition-colors relative group"
-              >
-                <span className="text-[#FFFFFF] mr-3">▪</span>
-                <span className="text-white font-bold">
-                  <GlitchText text={t.navWork} />
-                </span>
-              </a>
-
-              {/* Nav Item: What We Do (Dropdown) */}
-              <div className="gsap-menu-item">
-                <button 
-                  onClick={() => setShowWhatWeDo(!showWhatWeDo)}
-                  className="w-full h-12 flex items-center justify-between px-4 border-b border-white/10 hover:bg-white/5 hover:text-[#FFFFFF] transition-colors text-left"
+              {/* Navigation Links */}
+              <nav className="flex flex-col space-y-3 text-2xl md:text-4xl font-black uppercase font-sans">
+                <a 
+                  href="/" 
+                  onClick={closeMenu}
+                  className="gsap-menu-item text-white hover:text-white/60 transition-colors w-max"
                 >
-                  <div className="flex items-center">
-                    <span className="text-[#FFFFFF] mr-3">▪</span>
-                    <span className="text-white font-bold">
-                      <GlitchText text={t.navWhatWeDo} />
-                    </span>
-                  </div>
-                  <span className="text-white/40">{showWhatWeDo ? '−' : '+'}</span>
-                </button>
+                  <GlitchText text={`01. ${t.navHome}`} />
+                </a>
 
-                {showWhatWeDo && (
-                  <div className="bg-black/80 pl-8 border-b border-white/10">
-                    {['Branding', 'Diseño', '3D', 'Websites', 'Marketing'].map((sub, idx) => (
-                      <a 
-                        key={idx} 
-                        href="#about" 
-                        onClick={closeMenu}
-                        className="h-10 flex items-center text-[11px] text-white/70 hover:text-[#FFFFFF] border-b border-white/5 last:border-0"
-                      >
-                        <span className="text-[9px] text-[#FFFFFF] mr-2">›</span>
-                        <GlitchText text={sub} />
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
+                <a 
+                  href="/#work" 
+                  onClick={closeMenu}
+                  className="gsap-menu-item text-white hover:text-white/60 transition-colors w-max"
+                >
+                  <GlitchText text={`02. ${t.casesTitle}`} />
+                </a>
 
-              {/* Nav Item: About us */}
-              <a 
-                href="#about" 
-                onClick={closeMenu} 
-                className="gsap-menu-item h-12 flex items-center px-4 border-b border-white/10 hover:bg-white/5 hover:text-[#FFFFFF] transition-colors"
-              >
-                <span className="text-[#FFFFFF] mr-3">▪</span>
-                <span className="text-white font-bold">
-                  <GlitchText text={t.navAbout} />
-                </span>
-              </a>
+                {/* Submenu Trigger: What We Do */}
+                <div>
+                  <button 
+                    onClick={() => setShowWhatWeDo(!showWhatWeDo)}
+                    className="gsap-menu-item text-white hover:text-white/60 transition-colors w-max flex items-center gap-3 text-left cursor-pointer"
+                  >
+                    <GlitchText text={`03. ${t.navServices}`} />
+                    <span className="text-sm text-white/50">{showWhatWeDo ? '( − )' : '( + )'}</span>
+                  </button>
 
-              {/* Nav Item: Contact & Form Toggle */}
-              <button 
-                onClick={() => setShowForm(!showForm)} 
-                className="gsap-menu-item h-12 flex items-center justify-between px-4 border-b border-white/10 hover:bg-white/5 hover:text-[#FFFFFF] transition-colors text-left"
-              >
-                <div className="flex items-center">
-                  <span className="text-[#FFFFFF] mr-3">▪</span>
-                  <span className="text-white font-bold">
-                    <GlitchText text={t.navContact} />
-                  </span>
+                  {/* What We Do Services Submenu */}
+                  {showWhatWeDo && (
+                    <div className="pl-6 pt-3 pb-2 space-y-2 text-xs md:text-sm font-mono normal-case text-white/70 border-l border-white/20 mt-2">
+                      <div className="hover:text-white transition-colors cursor-pointer font-bold">· Web Design & Development (React, Vite, Three.js)</div>
+                      <div className="hover:text-white transition-colors cursor-pointer font-bold">· SEO Optimization & Technical Infrastructure</div>
+                      <div className="hover:text-white transition-colors cursor-pointer font-bold">· AI Platforms & Motion Systems</div>
+                      <div className="hover:text-white transition-colors cursor-pointer font-bold">· Custom Digital Branding & Graphic Engineering</div>
+                    </div>
+                  )}
                 </div>
-                <span className="text-[10px] bg-[#FFFFFF] text-black px-2 py-0.5 rounded font-bold">
-                  {showForm ? t.closeFormBtn : t.startProjectBtn}
-                </span>
-              </button>
 
-              {/* Integrated Pitchdeck & Inquiry Form (GSAP Menu Footer) */}
-              <div className="gsap-menu-footer">
-                {showForm ? (
-                  <div className="p-4 bg-[#000000] border-b border-white/10 space-y-4">
-                    {formSubmitted ? (
-                      <div className="p-4 bg-white/5 border border-[#FFFFFF] rounded text-center">
-                        <p className="text-[#FFFFFF] font-bold text-xs mb-1">{t.successTitle}</p>
-                        <p className="text-[10px] text-white/60">{t.successDesc}</p>
-                      </div>
-                    ) : (
-                      <form onSubmit={(e) => { e.preventDefault(); setFormSubmitted(true); }} className="space-y-3">
-                        <p className="text-[10px] text-white/50 font-bold uppercase">{t.questionProject}</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {['Branding', 'Diseño', '3D', 'Websites', 'Marketing'].map((type) => {
-                            const isSelected = projectTypes.includes(type);
-                            return (
-                              <button
-                                type="button"
-                                key={type}
-                                onClick={() => toggleProjectType(type)}
-                                className={`px-2.5 py-1 rounded text-[10px] transition-all ${
-                                  isSelected 
-                                    ? 'bg-[#FFFFFF] text-black font-bold' 
-                                    : 'bg-white/5 text-white/60 border border-white/10'
-                                }`}
-                              >
-                                {type}
-                              </button>
-                            );
-                          })}
+                <a 
+                  href="/presupuesto" 
+                  onClick={closeMenu}
+                  className="gsap-menu-item text-white hover:text-white/60 transition-colors w-max"
+                >
+                  <GlitchText text={`04. ${t.budgetNavBtn}`} />
+                </a>
+
+                {/* Submenu Trigger: Start Project Form */}
+                <div>
+                  <button 
+                    onClick={() => setShowForm(!showForm)}
+                    className="gsap-menu-item text-white/90 hover:text-white transition-colors w-max flex items-center gap-3 text-left cursor-pointer"
+                  >
+                    <GlitchText text={`05. ${t.navContact}`} />
+                    <span className="text-sm text-white/50">{showForm ? '( − )' : '( + )'}</span>
+                  </button>
+
+                  {/* Start Project Form Submenu */}
+                  {showForm && (
+                    <div className="mt-4 p-4 md:p-6 bg-neutral-900/90 border border-white/20 text-xs font-mono space-y-4 max-w-xl">
+                      {formSubmitted ? (
+                        <div className="p-4 bg-white/10 text-white font-bold text-center border border-white/20 space-y-2">
+                          <p>✓ ¡Mensaje recibido correctamente!</p>
+                          <p className="text-[10px] text-white/70 font-normal">Te responderemos en menos de 24 horas.</p>
                         </div>
-
-                        <input 
-                          type="text" 
-                          required 
-                          placeholder={t.nameLabel}
-                          className="w-full bg-[#111111] border border-white/10 rounded px-3 py-2 text-[11px] text-white outline-none focus:border-[#FFFFFF]"
-                        />
-                        <input 
-                          type="email" 
-                          required 
-                          placeholder={t.emailLabel} 
-                          className="w-full bg-[#111111] border border-white/10 rounded px-3 py-2 text-[11px] text-white outline-none focus:border-[#FFFFFF]"
-                        />
-                        <textarea 
-                          rows={2} 
-                          placeholder={t.messageLabel} 
-                          className="w-full bg-[#111111] border border-white/10 rounded px-3 py-2 text-[11px] text-white outline-none focus:border-[#FFFFFF]"
-                        />
-
-                        <button 
-                          type="submit" 
-                          className="w-full py-2.5 bg-[#FFFFFF] text-black font-bold uppercase text-xs rounded hover:bg-white transition-colors"
+                      ) : (
+                        <form 
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            setFormSubmitted(true);
+                          }}
+                          className="space-y-4"
                         >
-                          {t.submitBtn} →
-                        </button>
-                      </form>
-                    )}
-                  </div>
-                ) : (
-                  <div className="p-3">
-                    <button 
-                      onClick={() => setShowForm(true)}
-                      className="w-full h-11 bg-white/10 hover:bg-[#FFFFFF] hover:text-black border border-white/15 rounded flex items-center justify-center font-bold text-xs uppercase transition-all duration-300"
-                    >
-                      <GlitchText text={t.pitchdeckBtn} />
-                    </button>
-                  </div>
-                )}
+                          <div className="space-y-1">
+                            <label className="text-white/60 uppercase block text-[10px] font-bold">[ Tu Nombre / Empresa ]</label>
+                            <input 
+                              required
+                              type="text" 
+                              placeholder="Ej. Laura Gómez / Studio 88" 
+                              className="w-full px-3 py-2 bg-black border border-white/20 text-white text-xs focus:outline-none focus:border-white"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-white/60 uppercase block text-[10px] font-bold">[ Email de Contacto ]</label>
+                            <input 
+                              required
+                              type="email" 
+                              placeholder="laura@empresa.com" 
+                              className="w-full px-3 py-2 bg-black border border-white/20 text-white text-xs focus:outline-none focus:border-white"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-white/60 uppercase block text-[10px] font-bold">[ Tipo de Proyecto ]</label>
+                            <div className="flex flex-wrap gap-2 pt-1">
+                              {['Website', 'SEO', 'AI / WebGL', 'Branding'].map((type) => (
+                                <button
+                                  key={type}
+                                  type="button"
+                                  onClick={() => toggleProjectType(type)}
+                                  className={`px-2.5 py-1 text-[10px] uppercase font-bold border transition-colors ${
+                                    projectTypes.includes(type)
+                                      ? 'bg-white text-black border-white'
+                                      : 'bg-black text-white/70 border-white/20 hover:border-white'
+                                  }`}
+                                >
+                                  {type}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-white/60 uppercase block text-[10px] font-bold">[ Detalles / Mensaje ]</label>
+                            <textarea 
+                              rows={3}
+                              placeholder="Cuéntanos un poco sobre tu proyecto y objetivos..."
+                              className="w-full px-3 py-2 bg-black border border-white/20 text-white text-xs focus:outline-none focus:border-white resize-none"
+                            />
+                          </div>
+
+                          <button
+                            type="submit"
+                            className="w-full py-2.5 bg-white text-black font-sans font-black uppercase text-xs hover:bg-neutral-200 transition-colors cursor-pointer"
+                          >
+                            ENVIAR CONSULTA ↗
+                          </button>
+                        </form>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </nav>
+
+              {/* Menu Footer Contact Info */}
+              <div className="gsap-menu-footer pt-4 border-t border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs text-white/50">
+                <div>
+                  <span className="text-white font-bold block">AARTNOW.ES Studio</span>
+                  <span>Madrid / Barcelona / Online</span>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <a href="mailto:info@aartnow.es" className="text-white hover:underline font-bold">info@aartnow.es</a>
+                  <a href="tel:+34900000000" className="hover:text-white transition-colors">+34 900 000 000</a>
+                </div>
               </div>
 
             </div>
@@ -310,20 +339,6 @@ export default function Header() {
 
         </div>
       </header>
-
-      {/* Floating Top-Right Contact Card (Frosted Glass Effect) */}
-      <a 
-        href="#contact" 
-        data-magnetic="true"
-        data-cursor-text={t.getInTouchBtn}
-        className="fixed right-4 top-4 z-40 hidden md:flex items-center gap-3 px-3.5 py-2.5 bg-black/50 backdrop-blur-2xl backdrop-saturate-150 border border-white/20 rounded-lg text-xs font-mono uppercase text-white hover:border-[#FFFFFF] transition-all group shadow-[0_8px_32px_rgba(0,0,0,0.5)] pointer-events-auto"
-      >
-        <div className="w-6 h-6 rounded-full overflow-hidden bg-[#FFFFFF] flex items-center justify-center font-bold text-black text-[10px]">
-          VL
-        </div>
-        <span className="group-hover:text-[#FFFFFF] transition-colors">{t.getInTouchBtn}</span>
-        <span className="text-[#FFFFFF]">→</span>
-      </a>
     </>
   );
 }

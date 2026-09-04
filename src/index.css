@@ -101,11 +101,19 @@
   pointer-events: none;
   z-index: 2;
   opacity: 0.14;
+  transition: opacity 0.35s ease;
   background-image: 
     radial-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px),
     radial-gradient(rgba(255, 255, 255, 0.20) 1px, transparent 1px);
   background-size: 8px 8px, 4px 4px;
   background-position: 0 0, 2px 2px;
+}
+
+/* Oculta la textura Dithering al abrir el menú de navegación */
+body[data-menu-open="true"] .dither-bg-overlay,
+body.menu-open .dither-bg-overlay {
+  opacity: 0 !important;
+  pointer-events: none;
 }
 
 .grain-overlay {

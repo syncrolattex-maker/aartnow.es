@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 /**
  * GlobalAdaptiveHalftoneTrail
  * Rastro global de tramado digital Dithering Bayer 4x4 adaptativo
- * Aplicado al 100% de todas las páginas y secciones (incluido Trabajos Destacados / #work).
+ * Aplicado al 100% de todas las páginas y secciones.
+ * Al desplegar el menú de navegación se oculta y desactiva completamente.
  */
 
 const BAYER_4X4 = [
@@ -81,7 +82,6 @@ export default function GlobalAdaptiveHalftoneTrail() {
       buildGrid();
     }
 
-    // Color contrastado garantizado visible en TODAS las secciones (incluyendo #work)
     function getContrastColorAt(px: number, py: number): string {
       try {
         const elem = document.elementFromPoint(px, py);
@@ -110,6 +110,8 @@ export default function GlobalAdaptiveHalftoneTrail() {
 
     function excite(px: number, py: number) {
       if (!activation) return;
+      if (document.body.getAttribute('data-menu-open') === 'true' || document.body.classList.contains('menu-open')) return;
+
       const colorForPoint = getContrastColorAt(px, py);
 
       const ix0 = Math.max(0, Math.floor((px - influenceRadius) / gridSize));
@@ -143,6 +145,9 @@ export default function GlobalAdaptiveHalftoneTrail() {
     let last: { x: number; y: number } | null = null;
 
     function onMove(e: MouseEvent) {
+      if (document.body.getAttribute('data-menu-open') === 'true' || document.body.classList.contains('menu-open')) {
+        return;
+      }
       const p = pointerPos(e);
       if (last) {
         const dist = Math.hypot(p.x - last.x, p.y - last.y);
@@ -170,6 +175,12 @@ export default function GlobalAdaptiveHalftoneTrail() {
 
     function frame() {
       if (!ctx || !activation) return;
+
+      if (document.body.getAttribute('data-menu-open') === 'true' || document.body.classList.contains('menu-open')) {
+        ctx.clearRect(0, 0, W, H);
+        isLooping = false;
+        return;
+      }
 
       ctx.clearRect(0, 0, W, H);
 
