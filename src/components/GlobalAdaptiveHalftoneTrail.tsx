@@ -82,11 +82,24 @@ export default function GlobalAdaptiveHalftoneTrail() {
       buildGrid();
     }
 
-    function isPointInMenu(px: number, py: number): boolean {
+    let cachedMenuRects: { left: number; right: number; top: number; bottom: number }[] = [];
+
+    function updateMenuRects() {
       const menuEls = document.querySelectorAll('header, nav, footer, [data-is-menu="true"], [data-no-cursor-trail="true"], .fixed.bottom-0');
+      const rects: { left: number; right: number; top: number; bottom: number }[] = [];
       for (let i = 0; i < menuEls.length; i++) {
-        const rect = menuEls[i].getBoundingClientRect();
-        if (rect.width > 0 && rect.height > 0 && px >= rect.left && px <= rect.right && py >= rect.top && py <= rect.bottom) {
+        const r = menuEls[i].getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) {
+          rects.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom });
+        }
+      }
+      cachedMenuRects = rects;
+    }
+
+    function isPointInMenu(px: number, py: number): boolean {
+      for (let i = 0; i < cachedMenuRects.length; i++) {
+        const r = cachedMenuRects[i];
+        if (px >= r.left && px <= r.right && py >= r.top && py <= r.bottom) {
           return true;
         }
       }
@@ -212,13 +225,20 @@ export default function GlobalAdaptiveHalftoneTrail() {
     }
 
     resize();
-    window.addEventListener('resize', resize);
+    updateMenuRects();
+
+    window.addEventListener('resize', () => {
+      resize();
+      updateMenuRects();
+    });
+    window.addEventListener('scroll', updateMenuRects, { passive: true });
     window.addEventListener('mousemove', onMove);
     document.addEventListener('mouseleave', onLeave);
 
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
+      window.removeEventListener('scroll', updateMenuRects);
       window.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseleave', onLeave);
     };
