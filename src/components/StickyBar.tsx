@@ -27,7 +27,7 @@ export default function StickyBar() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 px-6 py-3.5 bg-black/60 backdrop-blur-2xl backdrop-saturate-150 border-t border-white/15 text-[11px] font-sans font-normal uppercase text-white/80 flex justify-between items-center pointer-events-auto shadow-[0_-8px_32px_rgba(0,0,0,0.5)]">
+    <div data-is-menu="true" className="fixed bottom-0 left-0 right-0 z-40 px-6 py-3.5 bg-black/60 backdrop-blur-2xl backdrop-saturate-150 border-t border-white/15 text-[11px] font-sans font-normal uppercase text-white/80 flex justify-between items-center pointer-events-auto shadow-[0_-8px_32px_rgba(0,0,0,0.5)]">
       {/* Left Meta Info */}
       <div className="flex items-center gap-6">
         <span className="hidden md:inline-block text-white/50">{t.stickyFreaks}</span>

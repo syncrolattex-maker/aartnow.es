@@ -188,7 +188,7 @@ export default function Header() {
       />
 
       {/* Fixed Top Centered Header Capsule / Card (Matches screenshot CSS) */}
-      <header className="fixed left-1/2 -translate-x-1/2 top-4 z-50 w-[calc(100vw-32px)] max-w-[480px] flex flex-col font-sans pointer-events-auto">
+      <header data-is-menu="true" className="fixed left-1/2 -translate-x-1/2 top-4 z-50 w-[calc(100vw-32px)] max-w-[480px] flex flex-col font-sans pointer-events-auto">
         <div className="bg-[#000000] border border-white/15 rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.85)] transition-all duration-300">
           
           {/* Header Bar */}
@@ -467,6 +467,7 @@ export default function Header() {
         onClick={(e) => handleNavClick('/contact', e)}
         data-magnetic="true"
         data-cursor-text={t.getInTouchBtn}
+        data-is-menu="true"
         className="fixed right-4 top-4 z-40 hidden md:flex items-center gap-3 px-3.5 py-2.5 bg-black/60 backdrop-blur-2xl border border-white/15 rounded-lg text-xs font-sans font-normal uppercase text-white hover:border-white/40 transition-all group shadow-[0_8px_32px_rgba(0,0,0,0.5)] pointer-events-auto cursor-pointer"
       >
         <div className="w-5 h-5 rounded-full overflow-hidden bg-[#FFFFFF] flex items-center justify-center font-normal text-black text-[10px]">

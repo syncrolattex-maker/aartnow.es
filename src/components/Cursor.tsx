@@ -54,9 +54,30 @@ export default function Cursor() {
       }
     };
 
+    const isMenuElement = (el: HTMLElement | null) => {
+      if (!el) return false;
+      return !!el.closest('header, nav, footer, [data-is-menu="true"], [data-no-cursor-trail="true"], .fixed.bottom-0');
+    };
+
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       
+      // Disable special cursor morphing/pull if inside top menu, subfooter or navigation bar
+      if (isMenuElement(target)) {
+        if (currentMagneticTarget.current) {
+          gsap.to(currentMagneticTarget.current, {
+            x: 0,
+            y: 0,
+            duration: 0.3,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+          currentMagneticTarget.current = null;
+        }
+        setCursorText('');
+        return;
+      }
+
       // Check for magnetic targets
       const magEl = target.closest('[data-magnetic="true"]') as HTMLElement;
       if (magEl && magEl !== currentMagneticTarget.current) {
@@ -91,7 +112,7 @@ export default function Cursor() {
       }
 
       const textEl = target.closest('[data-cursor-text]');
-      if (!textEl) {
+      if (!textEl || isMenuElement(target)) {
         setCursorText('');
       }
     };

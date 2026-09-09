@@ -82,9 +82,21 @@ export default function GlobalAdaptiveHalftoneTrail() {
       buildGrid();
     }
 
+    function isPointInMenu(px: number, py: number): boolean {
+      const menuEls = document.querySelectorAll('header, nav, footer, [data-is-menu="true"], [data-no-cursor-trail="true"], .fixed.bottom-0');
+      for (let i = 0; i < menuEls.length; i++) {
+        const rect = menuEls[i].getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0 && px >= rect.left && px <= rect.right && py >= rect.top && py <= rect.bottom) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     function excite(px: number, py: number) {
       if (!activation) return;
       if (document.body.getAttribute('data-menu-open') === 'true') return;
+      if (isPointInMenu(px, py)) return;
 
       const ix0 = Math.max(0, Math.floor((px - INFLUENCE_R) / GRID_SIZE));
       const ix1 = Math.min(cols - 1, Math.ceil((px + INFLUENCE_R) / GRID_SIZE));
@@ -94,6 +106,7 @@ export default function GlobalAdaptiveHalftoneTrail() {
       for (let iy = iy0; iy <= iy1; iy++) {
         for (let ix = ix0; ix <= ix1; ix++) {
           const gx = ix * GRID_SIZE, gy = iy * GRID_SIZE;
+          if (isPointInMenu(gx, gy)) continue;
           const dist = Math.hypot(gx - px, gy - py);
           if (dist > INFLUENCE_R) continue;
           // Falloff cuadrático suave: 1 en el cursor, 0 en el borde
@@ -112,7 +125,17 @@ export default function GlobalAdaptiveHalftoneTrail() {
 
     function onMove(e: MouseEvent) {
       if (document.body.getAttribute('data-menu-open') === 'true') return;
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('header, nav, footer, [data-is-menu="true"], [data-no-cursor-trail="true"], .fixed.bottom-0')) {
+        last = null;
+        return;
+      }
       const p = { x: e.clientX, y: e.clientY };
+      if (isPointInMenu(p.x, p.y)) {
+        last = null;
+        return;
+      }
+
       if (last) {
         const dist  = Math.hypot(p.x - last.x, p.y - last.y);
         const steps = Math.max(1, Math.floor(dist / (GRID_SIZE * 1.5)));
@@ -170,11 +193,14 @@ export default function GlobalAdaptiveHalftoneTrail() {
 
         const iy = (idx / cols) | 0;
         const ix = idx % cols;
-        const threshold = BAYER_4X4[iy % 4][ix % 4];
-        if (a <= threshold * THRESHOLD_K) continue;
 
         const cx = ix * GRID_SIZE + GRID_SIZE * 0.5;
         const cy = iy * GRID_SIZE + GRID_SIZE * 0.5;
+        if (isPointInMenu(cx, cy)) continue;
+
+        const threshold = BAYER_4X4[iy % 4][ix % 4];
+        if (a <= threshold * THRESHOLD_K) continue;
+
         ctx.moveTo(cx + DOT_RADIUS, cy);
         ctx.arc(cx, cy, DOT_RADIUS, 0, Math.PI * 2);
       }
