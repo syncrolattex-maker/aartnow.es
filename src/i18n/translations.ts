@@ -105,11 +105,16 @@ export const translations = {
       { text: 'donde la estética visual y el rendimiento técnico' },
       { text: 'deben ir siempre de la mano.' },
 
+      { text: 'Y cuando no estoy frente a la pantalla,' },
+      { text: 'es muy probable que me encuentres' },
+      { text: 'desconectando sobre la bicicleta o ensayando con mi tabal.' },
+
       { text: 'Para dar forma a la dirección de arte,' },
       { text: 'mi ecosistema natural es Adobe' },
       { text: '(Photoshop, Illustrator, InDesign, After Effects).' },
       { text: 'Cuando el proyecto exige dar el salto al volumen y al fotorrealismo,' },
       { text: 'construyo los entornos en Cinema 4D o Autodesk 3ds Max,' },
+      { text: 'simulo tejidos con Marvelous Design y CLO Standalone,' },
       { text: 'creo materiales complejos con Substance 3D (Designer y Sampler)' },
       { text: 'y exprimo la iluminación con el motor de render que mejor pida la escena,' },
       { text: 'ya sea Corona, V-Ray, Octane, Arnold o Keyshot.' },
@@ -123,11 +128,6 @@ export const translations = {
       { text: 'y las conexiones a servidores con herramientas como FileZilla y CyberDuck.' },
       { text: 'Disfruto teniendo el control de cada detalle,' },
       { text: 'desde el primer boceto y render, hasta el último commit en Vercel.' },
-
-      { text: 'Y cuando no estoy texturizando escenas 3D,' },
-      { text: 'diseñando interfaces o picando código,' },
-      { text: 'es muy probable que me encuentres' },
-      { text: 'desconectando sobre la bicicleta o ensayando con mi tabal' },
     ],
     aboutExplosiveLines: [
       'DIRECCIÓN DE ARTE & 3D',
@@ -263,11 +263,16 @@ export const translations = {
       { text: "on l'estètica visual i el rendiment tècnic" },
       { text: "han d'anar sempre de la mà." },
 
+      { text: 'I quan no estic davant de la pantalla,' },
+      { text: 'és molt probable que em trobes' },
+      { text: 'desconnectant sobre la bicicleta o assajant amb el meu tabal.' },
+
       { text: "Per a donar forma a la direcció d'art," },
       { text: 'el meu ecosistema natural és Adobe' },
       { text: '(Photoshop, Illustrator, InDesign, After Effects).' },
       { text: 'Quan el projecte exigeix fer el salt al volum i al fotorealisme,' },
       { text: 'construïsc els entorns en Cinema 4D o Autodesk 3ds Max,' },
+      { text: 'simule teixits amb Marvelous Design i CLO Standalone,' },
       { text: 'cree materials complexos amb Substance 3D (Designer i Sampler)' },
       { text: "i espremc la il·luminació amb el motor de render que millor demane l'escena," },
       { text: 'ja siga Corona, V-Ray, Octane, Arnold o Keyshot.' },
@@ -281,11 +286,6 @@ export const translations = {
       { text: 'i les connexions a servidors amb ferramentes com FileZilla i CyberDuck.' },
       { text: 'Gaudeixo tenint el control de cada detall,' },
       { text: "des del primer esbós i render, fins a l'últim commit a Vercel." },
-
-      { text: 'I quan no estic texturitzant escenes 3D,' },
-      { text: 'dissenyant interfícies o picant codi,' },
-      { text: 'és molt probable que em trobes' },
-      { text: 'desconnectant sobre la bicicleta o assajant amb el meu tabal' },
     ],
     aboutExplosiveLines: [
       'DIRECCIÓ D’ART I 3D',
@@ -421,11 +421,16 @@ export const translations = {
       { text: 'where visual aesthetics and technical performance' },
       { text: 'must always go hand in hand.' },
 
+      { text: 'And when I am away from the screen,' },
+      { text: 'you will most likely find me' },
+      { text: 'unwinding on my bicycle or practicing with my tabal drum.' },
+
       { text: 'To shape the art direction,' },
       { text: 'my natural ecosystem is Adobe' },
       { text: '(Photoshop, Illustrator, InDesign, After Effects).' },
       { text: 'When the project demands the leap to volume and photorealism,' },
       { text: 'I build the environments in Cinema 4D or Autodesk 3ds Max,' },
+      { text: 'simulate fabrics with Marvelous Design and CLO Standalone,' },
       { text: 'craft complex materials with Substance 3D (Designer and Sampler)' },
       { text: 'and push lighting with the render engine that best suits the scene,' },
       { text: 'whether it is Corona, V-Ray, Octane, Arnold or Keyshot.' },
@@ -439,11 +444,6 @@ export const translations = {
       { text: 'and server connections with tools like FileZilla and CyberDuck.' },
       { text: 'I enjoy having full control over every single detail,' },
       { text: 'from the initial sketch and render, to the final commit on Vercel.' },
-
-      { text: 'And when I am not texturing 3D scenes,' },
-      { text: 'designing interfaces or writing code,' },
-      { text: 'you will most likely find me' },
-      { text: 'unwinding on my bicycle or practicing with my tabal drum' },
     ],
     aboutExplosiveLines: [
       'ART DIRECTION & 3D',
