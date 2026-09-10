@@ -50,8 +50,8 @@ export default function AboutPage() {
         <main className="w-full flex-1 pt-[34vh] relative z-10 flex flex-col items-center justify-center">
           <ExplosiveList items={t.aboutBioLines} />
 
-          {/* Bloque final a pie de página: Contacto e Ilustración al final de la página encima del subfooter */}
-          <section className="w-full min-h-[calc(100vh-112px)] mt-[14vh] flex flex-col items-center justify-between px-6 sm:px-10 md:px-16 text-center pb-16 sm:pb-20">
+          {/* Bloque final a pie de página: Contacto e Ilustración haciendo tope en el subfooter */}
+          <section className="w-full min-h-[calc(100vh-45px)] mt-[14vh] flex flex-col items-center justify-between px-6 sm:px-10 md:px-16 text-center pb-[45px]">
             <div className="w-full max-w-[1240px] mx-auto space-y-8 text-center flex flex-col items-center justify-center my-auto pt-8">
               
               {/* Enlaces de contacto (Email, LinkedIn, Instagram) */}
@@ -113,12 +113,12 @@ export default function AboutPage() {
               </div>
             </div>
 
-            {/* Ilustración al final de la página encima del subfooter */}
-            <div className="relative flex items-end justify-center select-none pointer-events-none mt-10 sm:mt-14">
+            {/* Ilustración al final de la página haciendo tope con el subfooter */}
+            <div className="w-full flex items-end justify-center select-none pointer-events-none mt-8 sm:mt-12 leading-none">
               <img
-                src="/images/about-portrait-open.jpg"
+                src="/images/about-portrait-open.png"
                 alt="Aaron Primo Almarche - Mente creativa"
-                className="w-auto h-[260px] sm:h-[340px] md:h-[400px] lg:h-[460px] aspect-[764/1024] object-contain pointer-events-none drop-shadow-[0_0_50px_rgba(255,255,255,0.07)]"
+                className="w-auto h-[320px] sm:h-[420px] md:h-[500px] lg:h-[580px] xl:h-[660px] aspect-[764/1024] object-contain object-bottom pointer-events-none block"
                 loading="eager"
                 decoding="async"
               />
