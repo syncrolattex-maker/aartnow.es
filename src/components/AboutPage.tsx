@@ -1,11 +1,14 @@
 import React, { useEffect } from 'react';
 import Header from './Header';
+import StickyBar from './StickyBar';
 import Cursor from './Cursor';
 import GlobalAdaptiveHalftoneTrail from './GlobalAdaptiveHalftoneTrail';
 import ExplosiveList, { ExplosiveLineItem } from './ExplosiveList';
 import SmoothScroll from './SmoothScroll';
+import { useLanguage } from '../context/LanguageContext';
+import { useDitherTransition } from '../context/DitherTransitionContext';
 
-// Líneas individuales rítmicas para que el efecto actúe estrictamente línea a línea
+// Líneas individuales rítmicas para que el efecto actúe estrictamente línea a línea con interlineado 100% uniforme
 const ABOUT_LINE_ITEMS: ExplosiveLineItem[] = [
   // Nombre del autor en negrita (Bold) antes del texto
   { text: 'Aaron Primo Almarche', isBold: true },
@@ -46,9 +49,31 @@ const ABOUT_LINE_ITEMS: ExplosiveLineItem[] = [
 ];
 
 export default function AboutPage() {
+  const { t } = useLanguage();
+  const { triggerTransition } = useDitherTransition();
+
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    // Asegurar registro de Cal.com para el botón de programar llamada
+    const w = window as any;
+    if (w.Cal && w.Cal.ns && w.Cal.ns['15min']) {
+      try {
+        w.Cal.ns['15min']('ui', { hideEventTypeDetails: false, layout: 'month_view' });
+      } catch {
+        // silent
+      }
+    }
   }, []);
+
+  const handleNavClick = (path: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    triggerTransition(() => {
+      window.history.pushState({}, '', path);
+      window.dispatchEvent(new Event('popstate'));
+      window.scrollTo(0, 0);
+    }, { x: e.clientX, y: e.clientY });
+  };
 
   return (
     <SmoothScroll>
@@ -58,44 +83,127 @@ export default function AboutPage() {
         <Cursor />
         <GlobalAdaptiveHalftoneTrail />
 
-        {/* Floating Menu */}
+        {/* Floating Menu & Sticky Bar */}
         <Header />
+        <StickyBar />
 
         {/* Fullwidth Line-by-Line Explosive Experience */}
-        <main className="w-full flex-1 pt-[34vh] pb-[38vh] relative z-10 flex flex-col items-center justify-center">
+        <main className="w-full flex-1 pt-[34vh] pb-16 relative z-10 flex flex-col items-center justify-center">
           <ExplosiveList items={ABOUT_LINE_ITEMS} />
 
-          {/* Información de contacto al final del texto */}
-          <div className="w-full max-w-[1240px] mx-auto px-6 sm:px-10 md:px-16 pt-8 sm:pt-10 flex flex-wrap items-center justify-center gap-5 sm:gap-8 text-base sm:text-lg md:text-xl font-light text-white/80 text-center">
-            <a
-              href="mailto:prologmac@gmail.com"
-              data-cursor-text="EMAIL"
-              className="text-white hover:text-white/60 transition-colors underline underline-offset-4 decoration-white/30"
-            >
-              info@aartnow.es
-            </a>
-            <span className="text-white/25 hidden sm:inline">/</span>
-            <a
-              href="https://www.linkedin.com/in/aaron-almarche-457a6b55/"
-              target="_blank"
-              rel="noreferrer"
-              data-cursor-text="LINKEDIN"
-              className="text-white/80 hover:text-white transition-colors"
-            >
-              LinkedIn ↗
-            </a>
-            <span className="text-white/25 hidden sm:inline">/</span>
-            <a
-              href="https://www.instagram.com/aaron_primdesign/"
-              target="_blank"
-              rel="noreferrer"
-              data-cursor-text="INSTAGRAM"
-              className="text-white/80 hover:text-white transition-colors"
-            >
-              Instagram ↗
-            </a>
+          {/* Bloque final: Enlaces de contacto y los 2 botones de acción */}
+          <div className="w-full max-w-[1240px] mx-auto px-6 sm:px-10 md:px-16 pt-10 sm:pt-14 space-y-8 text-center">
+            
+            {/* Enlaces de contacto (Email, LinkedIn, Instagram) */}
+            <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8 text-base sm:text-lg md:text-xl font-light text-white/80">
+              <a
+                href="mailto:prologmac@gmail.com"
+                data-cursor-text="EMAIL"
+                className="text-white hover:text-white/60 transition-colors underline underline-offset-4 decoration-white/30"
+              >
+                info@aartnow.es
+              </a>
+              <span className="text-white/25 hidden sm:inline">/</span>
+              <a
+                href="https://www.linkedin.com/in/aaron-almarche-457a6b55/"
+                target="_blank"
+                rel="noreferrer"
+                data-cursor-text="LINKEDIN"
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                LinkedIn ↗
+              </a>
+              <span className="text-white/25 hidden sm:inline">/</span>
+              <a
+                href="https://www.instagram.com/aaron_primdesign/"
+                target="_blank"
+                rel="noreferrer"
+                data-cursor-text="INSTAGRAM"
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                Instagram ↗
+              </a>
+            </div>
+
+            {/* Los 2 botones de Contact */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 w-full max-w-md mx-auto pt-2">
+              {/* 1. Programar una llamada (Cal.com popup) */}
+              <button
+                type="button"
+                data-cal-link="aaron-primo-jacnmp/15min"
+                data-cal-namespace="15min"
+                data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+                data-magnetic="true"
+                data-cursor-text="CAL.COM"
+                className="w-full sm:w-1/2 min-h-[52px] px-6 py-3.5 bg-[#F5F2EB] hover:bg-white text-black text-xs font-mono font-normal uppercase tracking-wider rounded-md transition-colors text-center cursor-pointer shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+              >
+                {t.scheduleCallBtn}
+              </button>
+
+              {/* 2. Comenzar un proyecto */}
+              <button
+                type="button"
+                onClick={(e) => handleNavClick('/contact', e)}
+                data-magnetic="true"
+                data-cursor-text="CONTACT"
+                className="w-full sm:w-1/2 min-h-[52px] px-6 py-3.5 bg-black hover:bg-white/10 text-white border border-white/25 hover:border-white text-xs font-mono font-normal uppercase tracking-wider rounded-md transition-all text-center cursor-pointer"
+              >
+                {t.startProjectBtn}
+              </button>
+            </div>
           </div>
         </main>
+
+        {/* Minimalist Studio Footer al final del scroll */}
+        <footer className="py-24 px-6 md:px-16 bg-black text-white flex flex-col justify-between border-t border-white/10 mt-16 relative z-10 pb-20 sm:pb-24">
+          <div className="max-w-[1400px] w-full mx-auto space-y-16">
+            
+            {/* Large Text Reveal */}
+            <div className="border-b border-white/10 pb-16 space-y-4">
+              <span className="text-xs uppercase tracking-widest text-white/50">
+                {t.footerConnect}
+              </span>
+              <a
+                href="/contact"
+                onClick={(e) => handleNavClick('/contact', e)}
+                className="block group cursor-pointer"
+              >
+                <h2 className="text-6xl md:text-9xl font-black uppercase tracking-tight text-white group-hover:text-white/80 transition-colors leading-none font-sans">
+                  {t.footerTitle}<span className="text-white/40 group-hover:text-white">.</span>
+                </h2>
+              </a>
+            </div>
+
+            {/* Footer Meta Details */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-xs text-white/50 border-b border-white/10 pb-12">
+              <div>
+                <span className="text-white text-sm font-normal uppercase block mb-2 font-sans">{t.footerLocation}</span>
+                <p className="text-white font-normal">Online</p>
+                <p className="font-light">{t.footerAddress}</p>
+              </div>
+
+              <div>
+                <span className="text-white text-sm font-normal uppercase block mb-2 font-sans">{t.navContact}</span>
+                <a href="mailto:prologmac@gmail.com" className="text-white font-normal text-sm hover:underline block">info@aartnow.es</a>
+              </div>
+
+              <div>
+                <span className="text-white text-sm font-normal uppercase block mb-2 font-sans">Connect</span>
+                <div className="flex gap-4 font-light">
+                  <a href="https://www.instagram.com/aaron_primdesign/" target="_blank" rel="noreferrer" className="hover:text-white/60 transition-colors">Instagram ↗</a>
+                  <a href="https://www.linkedin.com/in/aaron-almarche-457a6b55/" target="_blank" rel="noreferrer" className="hover:text-white/60 transition-colors">LinkedIn ↗</a>
+                </div>
+              </div>
+            </div>
+
+            {/* Copyright Line */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-white/30 uppercase tracking-widest">
+              <span>{t.footerRights}</span>
+              <span>{t.footerAgency}</span>
+            </div>
+
+          </div>
+        </footer>
       </div>
     </SmoothScroll>
   );
