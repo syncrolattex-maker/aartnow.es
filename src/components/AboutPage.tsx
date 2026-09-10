@@ -56,7 +56,7 @@ export default function AboutPage() {
         <Header />
 
         {/* Fullwidth Explosive Text Experience - ONLY effect and menu */}
-        <main className="w-full flex-1 pt-[28vh] pb-[40vh] relative z-10 flex flex-col justify-center">
+        <main className="w-full flex-1 pt-[32vh] pb-[40vh] relative z-10 flex flex-col justify-center">
           <ExplosiveList paragraphs={ABOUT_PARAGRAPHS} />
         </main>
       </div>
