@@ -8,6 +8,7 @@ import AdminLeads from './components/AdminLeads';
 import BudgetEstimator from './components/BudgetEstimator';
 import CaseStudyPage from './components/CaseStudyPage';
 import ContactPage from './components/ContactPage';
+import AboutPage from './components/AboutPage';
 import SmoothScroll from './components/SmoothScroll';
 import Cursor from './components/Cursor';
 import GlobalAdaptiveHalftoneTrail from './components/GlobalAdaptiveHalftoneTrail';
@@ -59,7 +60,7 @@ function AppContent() {
   const { t } = useLanguage();
   const { triggerTransition } = useDitherTransition();
   const [loading, setLoading] = useState(true);
-  const [currentRoute, setCurrentRoute] = useState<'home' | 'admin' | 'presupuesto' | 'case' | 'contact'>('home');
+  const [currentRoute, setCurrentRoute] = useState<'home' | 'admin' | 'presupuesto' | 'case' | 'contact' | 'about'>('home');
   const [caseSlug, setCaseSlug] = useState<string>('jack-and-ai');
 
   // Failsafe absoluto para que jamás se quede congelado en pantalla negra
@@ -82,6 +83,8 @@ function AppContent() {
         setCaseSlug(path.replace('/cases/', '').replace(/\/$/, ''));
       } else if (path.startsWith('/contact') || path.startsWith('/contacto')) {
         setCurrentRoute('contact');
+      } else if (path.startsWith('/about') || path.startsWith('/sobre-mi')) {
+        setCurrentRoute('about');
       } else {
         setCurrentRoute('home');
       }
@@ -105,6 +108,10 @@ function AppContent() {
 
   if (currentRoute === 'contact') {
     return <ContactPage />;
+  }
+
+  if (currentRoute === 'about') {
+    return <AboutPage />;
   }
 
   return (

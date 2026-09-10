@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { useLanguage } from '../context/LanguageContext';
+import { useDitherTransition } from '../context/DitherTransitionContext';
 import GlitchText from './GlitchText';
 
 export default function Hero() {
   const { t } = useLanguage();
+  const { triggerTransition } = useDitherTransition();
   const containerRef = useRef<HTMLDivElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
 
@@ -76,10 +78,17 @@ export default function Hero() {
             {t.heroSubtitle}
           </h4>
 
-          {/* Interactive Showreel Trigger */}
+          {/* Interactive Showreel / About Trigger */}
           <div 
+            onClick={(e) => {
+              triggerTransition(() => {
+                window.history.pushState({}, '', '/about');
+                window.dispatchEvent(new Event('popstate'));
+                window.scrollTo(0, 0);
+              }, { x: e.clientX, y: e.clientY });
+            }}
             data-magnetic="true"
-            data-cursor-text="PLAY SHOWREEL"
+            data-cursor-text={t.navAbout}
             className="hero-reveal inline-flex items-center gap-3.5 pt-2 group cursor-pointer"
           >
             <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-normal text-xs group-hover:scale-110 transition-transform">

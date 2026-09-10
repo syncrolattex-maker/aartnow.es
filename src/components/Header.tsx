@@ -327,8 +327,8 @@ export default function Header() {
 
               {/* Nav Item: Sobre mí / About us */}
               <a 
-                href="#about" 
-                onClick={(e) => handleNavClick('#about', e)} 
+                href="/about" 
+                onClick={(e) => handleNavClick('/about', e)} 
                 className="gsap-menu-item h-14 flex items-center justify-between px-6 border-b border-white/10 hover:bg-white/[0.04] transition-colors"
               >
                 <span className="text-base sm:text-lg font-normal tracking-tight font-sans text-white">
