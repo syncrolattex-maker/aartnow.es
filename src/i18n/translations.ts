@@ -108,10 +108,6 @@ export const translations = {
       { text: 'Y cuando no estoy frente a la pantalla,' },
       { text: 'es muy probable que me encuentres' },
       { text: 'desconectando sobre la bicicleta o ensayando con mi tabal.' },
-
-      { text: 'Diseño & Motion: Ps, Ai, Id, Ae.' },
-      { text: '3D & Render: C4D, 3ds Max, Substance, V-Ray, Corona, Octane, Marvelous Design, CLO Standalone.' },
-      { text: 'Dev & Data: React, Next.js, Tailwind, IntelliJ, DataGrip, Vercel.' },
     ],
     aboutProgramsTitle: 'PROGRAMAS & HERRAMIENTAS QUE UTILIZO',
     progDesignMotionLabel: 'Diseño & Motion',
@@ -254,10 +250,6 @@ export const translations = {
       { text: 'I quan no estic davant de la pantalla,' },
       { text: 'és molt probable que em trobes' },
       { text: 'desconnectant sobre la bicicleta o assajant amb el meu tabal.' },
-
-      { text: 'Disseny & Motion: Ps, Ai, Id, Ae.' },
-      { text: '3D & Render: C4D, 3ds Max, Substance, V-Ray, Corona, Octane, Marvelous Design, CLO Standalone.' },
-      { text: 'Dev & Data: React, Next.js, Tailwind, IntelliJ, DataGrip, Vercel.' },
     ],
     aboutProgramsTitle: 'PROGRAMES I FERRAMENTES QUE UTILITZE',
     progDesignMotionLabel: 'Disseny & Motion',
@@ -400,10 +392,6 @@ export const translations = {
       { text: 'And when I am away from the screen,' },
       { text: 'you will most likely find me' },
       { text: 'unwinding on my bicycle or practicing with my tabal drum.' },
-
-      { text: 'Design & Motion: Ps, Ai, Id, Ae.' },
-      { text: '3D & Render: C4D, 3ds Max, Substance, V-Ray, Corona, Octane, Marvelous Design, CLO Standalone.' },
-      { text: 'Dev & Data: React, Next.js, Tailwind, IntelliJ, DataGrip, Vercel.' },
     ],
     aboutProgramsTitle: 'SOFTWARE & TOOLS I USE',
     progDesignMotionLabel: 'Design & Motion',
