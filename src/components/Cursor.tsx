@@ -82,6 +82,15 @@ export default function Cursor() {
       const magEl = target.closest('[data-magnetic="true"]') as HTMLElement;
       if (magEl && magEl !== currentMagneticTarget.current) {
         currentMagneticTarget.current = magEl;
+      } else if (!magEl && currentMagneticTarget.current) {
+        gsap.to(currentMagneticTarget.current, {
+          x: 0,
+          y: 0,
+          duration: 0.3,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+        currentMagneticTarget.current = null;
       }
 
       // Check EXCLUSIVELY for Explicit Contextual Morphing Targets (data-cursor-text)
@@ -162,11 +171,12 @@ export default function Cursor() {
   return (
     <div 
       ref={cursorRef} 
-      className="ll-cursor-main hidden lg:block"
+      className="ll-cursor-main hidden lg:block fixed top-0 left-0 pointer-events-none z-[9999]"
+      style={{ willChange: 'transform' }}
     >
       <div 
         ref={ballRef}
-        className="ll-cursor-ball shadow-xl overflow-hidden font-sans text-[9px] font-normal uppercase tracking-wider text-black whitespace-nowrap"
+        className="ll-cursor-ball pointer-events-none shadow-xl overflow-hidden font-sans text-[9px] font-normal uppercase tracking-wider text-black bg-white whitespace-nowrap flex items-center justify-center"
       >
         {cursorText && (
           <span ref={textRef} className="inline-block leading-none">

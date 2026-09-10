@@ -137,19 +137,18 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
               ref={(el) => {
                 if (el) lineRefs.current[lineIndex] = el;
               }}
-              data-cursor-text="EXPLODE"
-              className={`explosive-line w-full text-center select-none relative transition-colors m-0 p-0 ${
+              className={`explosive-line w-full text-center select-none pointer-events-none relative m-0 p-0 ${
                 isBold
                   ? 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl italic font-bold tracking-tight text-white leading-tight font-sans'
-                  : 'text-base sm:text-lg md:text-xl lg:text-2xl font-light sm:font-normal tracking-tight text-white/85 hover:text-white leading-[1.35] sm:leading-[1.4] font-sans'
+                  : 'text-base sm:text-lg md:text-xl lg:text-2xl font-light sm:font-normal tracking-tight text-white/85 leading-[1.35] sm:leading-[1.4] font-sans'
               }`}
             >
               {words.map((word, wordIdx) => (
-                <span key={wordIdx} className="inline-block whitespace-nowrap mr-[0.28em] last:mr-0">
+                <span key={wordIdx} className="inline-block whitespace-nowrap mr-[0.28em] last:mr-0 pointer-events-none">
                   {word.split('').map((char, charIdx) => (
                     <span
                       key={charIdx}
-                      className="char inline-block will-change-transform transform-gpu"
+                      className="char inline-block will-change-transform transform-gpu pointer-events-none"
                       style={{ 
                         transformOrigin: 'center center',
                         backfaceVisibility: 'hidden',
