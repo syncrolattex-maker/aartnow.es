@@ -128,7 +128,14 @@ export const translations = {
       { text: 'y las conexiones a servidores con herramientas como FileZilla y CyberDuck.' },
       { text: 'Disfruto teniendo el control de cada detalle,' },
       { text: 'desde el primer boceto y render, hasta el último commit en Vercel.' },
+
+      { text: 'Programas que utilizo:' },
+      { text: 'Cinema 4D · 3ds Max · Marvelous Design · CLO Standalone' },
+      { text: 'Corona Renderer · V-Ray · Octane · Substance 3D' },
+      { text: 'Photoshop · Illustrator · InDesign · After Effects' },
+      { text: 'React · Next.js · Tailwind · IntelliJ · DataGrip' },
     ],
+    aboutProgramsTitle: 'PROGRAMAS & HERRAMIENTAS QUE UTILIZO',
     aboutExplosiveLines: [
       'DIRECCIÓN DE ARTE & 3D',
       'ESCULTURA DIGITAL Y FORMA',
@@ -286,7 +293,14 @@ export const translations = {
       { text: 'i les connexions a servidors amb ferramentes com FileZilla i CyberDuck.' },
       { text: 'Gaudeixo tenint el control de cada detall,' },
       { text: "des del primer esbós i render, fins a l'últim commit a Vercel." },
+
+      { text: 'Programes que utilitze:' },
+      { text: 'Cinema 4D · 3ds Max · Marvelous Design · CLO Standalone' },
+      { text: 'Corona Renderer · V-Ray · Octane · Substance 3D' },
+      { text: 'Photoshop · Illustrator · InDesign · After Effects' },
+      { text: 'React · Next.js · Tailwind · IntelliJ · DataGrip' },
     ],
+    aboutProgramsTitle: 'PROGRAMES I FERRAMENTES QUE UTILITZE',
     aboutExplosiveLines: [
       'DIRECCIÓ D’ART I 3D',
       'ESCULTURA DIGITAL I FORMA',
@@ -444,7 +458,14 @@ export const translations = {
       { text: 'and server connections with tools like FileZilla and CyberDuck.' },
       { text: 'I enjoy having full control over every single detail,' },
       { text: 'from the initial sketch and render, to the final commit on Vercel.' },
+
+      { text: 'Software & tools I use:' },
+      { text: 'Cinema 4D · 3ds Max · Marvelous Design · CLO Standalone' },
+      { text: 'Corona Renderer · V-Ray · Octane · Substance 3D' },
+      { text: 'Photoshop · Illustrator · InDesign · After Effects' },
+      { text: 'React · Next.js · Tailwind · IntelliJ · DataGrip' },
     ],
+    aboutProgramsTitle: 'SOFTWARE & TOOLS I USE',
     aboutExplosiveLines: [
       'ART DIRECTION & 3D',
       'DIGITAL SCULPTURE & FORM',
