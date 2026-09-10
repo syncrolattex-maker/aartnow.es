@@ -137,32 +137,33 @@ export default function Cursor() {
     };
   }, []);
 
-  // 3. GSAP Morphing Effect: No Distracting Oversized Circles
+  // 3. GSAP Morphing Effect: Only visible when data-cursor-text exists, NO dot at rest!
   useEffect(() => {
     if (!ballRef.current) return;
 
     if (cursorText) {
       // Morph ONLY to Compact Monospace Tag Badge when data-cursor-text exists
       gsap.to(ballRef.current, {
+        opacity: 1,
+        scale: 1,
         width: 'auto',
         height: '26px',
         borderRadius: '5px',
         paddingLeft: '9px',
         paddingRight: '9px',
-        scale: 1,
-        duration: 0.12,
+        duration: 0.15,
         ease: 'power2.out',
       });
     } else {
-      // Sleek, Unobtrusive Base Rest Circle (10px x 10px) - No Enlargement
+      // Completely hidden when no cursorText - ZERO dot on the cursor
       gsap.to(ballRef.current, {
-        width: '10px',
-        height: '10px',
-        borderRadius: '50%',
+        opacity: 0,
+        scale: 0,
+        width: '0px',
+        height: '0px',
         paddingLeft: '0px',
         paddingRight: '0px',
-        scale: 1,
-        duration: 0.12,
+        duration: 0.15,
         ease: 'power2.out',
       });
     }
@@ -176,7 +177,7 @@ export default function Cursor() {
     >
       <div 
         ref={ballRef}
-        className="ll-cursor-ball pointer-events-none shadow-xl overflow-hidden font-sans text-[9px] font-normal uppercase tracking-wider text-black bg-white whitespace-nowrap flex items-center justify-center"
+        className="ll-cursor-ball pointer-events-none shadow-xl overflow-hidden font-sans text-[9px] font-normal uppercase tracking-wider text-black bg-white whitespace-nowrap flex items-center justify-center opacity-0 scale-0"
       >
         {cursorText && (
           <span ref={textRef} className="inline-block leading-none">
