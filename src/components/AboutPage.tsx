@@ -8,29 +8,6 @@ import SmoothScroll from './SmoothScroll';
 import { useLanguage } from '../context/LanguageContext';
 import { useDitherTransition } from '../context/DitherTransitionContext';
 
-const ABOUT_PROGRAMS = [
-  'Marvelous Design',
-  'CLO Standalone',
-  'Cinema 4D',
-  'Autodesk 3ds Max',
-  'Substance 3D',
-  'Corona Renderer',
-  'V-Ray',
-  'Octane',
-  'Photoshop',
-  'Illustrator',
-  'After Effects',
-  'InDesign',
-  'React',
-  'Next.js',
-  'Tailwind CSS',
-  'IntelliJ',
-  'DataGrip',
-  'FileZilla',
-  'CyberDuck',
-  'Vercel',
-];
-
 export default function AboutPage() {
   const { t } = useLanguage();
   const { triggerTransition } = useDitherTransition();
@@ -77,20 +54,25 @@ export default function AboutPage() {
           <section className="w-full min-h-[calc(100vh-45px)] mt-[10vh] sm:mt-[14vh] flex flex-col items-center justify-between px-4 sm:px-10 md:px-16 text-center pb-[45px]">
             <div className="w-full max-w-[1240px] mx-auto space-y-8 sm:space-y-10 text-center flex flex-col items-center justify-center my-auto pt-6 sm:pt-8">
               
-              {/* Lista destacada de programas que utilizo */}
-              <div className="w-full max-w-2xl mx-auto space-y-4">
-                <span className="text-[11px] sm:text-xs font-mono uppercase tracking-widest text-white/50 block">
+              {/* Lista destacada de programas categorizada */}
+              <div className="w-full max-w-3xl mx-auto space-y-3 sm:space-y-3.5 text-center font-mono">
+                <span className="text-[11px] sm:text-xs uppercase tracking-widest text-white/40 block pb-1">
                   [ {t.aboutProgramsTitle} ]
                 </span>
-                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
-                  {ABOUT_PROGRAMS.map((prog) => (
-                    <span
-                      key={prog}
-                      className="px-3 py-1.5 bg-white/[0.04] hover:bg-white/[0.09] border border-white/15 rounded-md text-xs sm:text-sm font-mono text-white/90 transition-colors cursor-default"
-                    >
-                      {prog}
-                    </span>
-                  ))}
+                
+                <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm sm:text-base md:text-lg text-white/90">
+                  <span className="text-white/40 font-light">{t.progDesignMotionLabel}:</span>
+                  <span className="text-white font-normal">Ps, Ai, Id, Ae.</span>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm sm:text-base md:text-lg text-white/90">
+                  <span className="text-white/40 font-light">{t.prog3DRenderLabel}:</span>
+                  <span className="text-white font-normal">C4D, 3ds Max, Substance, V-Ray, Corona, Octane, Marvelous Design, CLO Standalone.</span>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm sm:text-base md:text-lg text-white/90">
+                  <span className="text-white/40 font-light">{t.progDevDataLabel}:</span>
+                  <span className="text-white font-normal">React, Next.js, Tailwind, IntelliJ, DataGrip, Vercel.</span>
                 </div>
               </div>
 
