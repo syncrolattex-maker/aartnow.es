@@ -85,14 +85,49 @@ export default function GlobalAdaptiveHalftoneTrail() {
     let cachedMenuRects: { left: number; right: number; top: number; bottom: number }[] = [];
 
     function updateMenuRects() {
-      const menuEls = document.querySelectorAll('header, nav, footer, [data-is-menu="true"], [data-no-cursor-trail="true"], .fixed.bottom-0');
       const rects: { left: number; right: number; top: number; bottom: number }[] = [];
-      for (let i = 0; i < menuEls.length; i++) {
-        const r = menuEls[i].getBoundingClientRect();
+
+      // 1. Top Header Bar: ONLY the visible bar itself (56px) - never the space below it!
+      const menuBar = document.querySelector('[data-menu-bar="true"]');
+      if (menuBar) {
+        const r = menuBar.getBoundingClientRect();
         if (r.width > 0 && r.height > 0) {
           rects.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom });
         }
       }
+
+      // 2. Only if the menu is actually open, exclude the expanded menu panel
+      const isMenuOpen = document.body.getAttribute('data-menu-open') === 'true';
+      if (isMenuOpen) {
+        const menuPanel = document.querySelector('[data-menu-panel="true"]');
+        if (menuPanel) {
+          const r = menuPanel.getBoundingClientRect();
+          if (r.width > 0 && r.height > 0) {
+            rects.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom });
+          }
+        }
+      }
+
+      // 3. Bottom Sticky Bar
+      const stickyBar = document.querySelector('[data-sticky-bar="true"], .fixed.bottom-0');
+      if (stickyBar) {
+        const r = stickyBar.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) {
+          rects.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom });
+        }
+      }
+
+      // 4. Any elements explicitly marked with data-no-cursor-trail="true"
+      const otherEls = document.querySelectorAll('[data-no-cursor-trail="true"]');
+      for (let i = 0; i < otherEls.length; i++) {
+        const el = otherEls[i];
+        if (el === menuBar) continue;
+        const r = el.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) {
+          rects.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom });
+        }
+      }
+
       cachedMenuRects = rects;
     }
 
@@ -138,8 +173,12 @@ export default function GlobalAdaptiveHalftoneTrail() {
 
     function onMove(e: MouseEvent) {
       if (document.body.getAttribute('data-menu-open') === 'true') return;
+
+      // Update exclusion rects to always match real-time state
+      updateMenuRects();
+
       const target = e.target as HTMLElement | null;
-      if (target?.closest('header, nav, footer, [data-is-menu="true"], [data-no-cursor-trail="true"], .fixed.bottom-0')) {
+      if (target?.closest('[data-menu-bar="true"], [data-sticky-bar="true"], [data-no-cursor-trail="true"]')) {
         last = null;
         return;
       }
