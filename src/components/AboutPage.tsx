@@ -87,70 +87,71 @@ export default function AboutPage() {
         <Header />
 
         {/* Fullwidth Line-by-Line Explosive Experience */}
-        <main className="w-full flex-1 pt-[34vh] pb-28 sm:pb-36 relative z-10 flex flex-col items-center justify-center">
+        <main className="w-full flex-1 pt-[34vh] relative z-10 flex flex-col items-center justify-center">
           <ExplosiveList items={ABOUT_LINE_ITEMS} />
 
-          {/* Bloque final: Enlaces de contacto y los 2 botones de acción */}
-          <div className="w-full max-w-[1240px] mx-auto px-6 sm:px-10 md:px-16 pt-10 sm:pt-14 space-y-8 text-center">
-            
-            {/* Enlaces de contacto (Email, LinkedIn, Instagram) */}
-            <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8 text-base sm:text-lg md:text-xl font-light text-white/80">
-              <a
-                href="mailto:prologmac@gmail.com"
-                data-cursor-text="EMAIL"
-                className="text-white hover:text-white/60 transition-colors underline underline-offset-4 decoration-white/30"
-              >
-                info@aartnow.es
-              </a>
-              <span className="text-white/25 hidden sm:inline">/</span>
-              <a
-                href="https://www.linkedin.com/in/aaron-almarche-457a6b55/"
-                target="_blank"
-                rel="noreferrer"
-                data-cursor-text="LINKEDIN"
-                className="text-white/80 hover:text-white transition-colors"
-              >
-                LinkedIn ↗
-              </a>
-              <span className="text-white/25 hidden sm:inline">/</span>
-              <a
-                href="https://www.instagram.com/aaron_primdesign/"
-                target="_blank"
-                rel="noreferrer"
-                data-cursor-text="INSTAGRAM"
-                className="text-white/80 hover:text-white transition-colors"
-              >
-                Instagram ↗
-              </a>
-            </div>
+          {/* Bloque final centrado en pantalla sin el párrafo anterior */}
+          <section className="w-full min-h-[calc(100vh-112px)] mt-[20vh] flex flex-col items-center justify-center px-6 sm:px-10 md:px-16 text-center space-y-8 pb-12">
+            <div className="w-full max-w-[1240px] mx-auto space-y-8 text-center flex flex-col items-center justify-center">
+              {/* Enlaces de contacto (Email, LinkedIn, Instagram) */}
+              <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8 text-base sm:text-lg md:text-xl font-light text-white/80">
+                <a
+                  href="mailto:prologmac@gmail.com"
+                  data-cursor-text="EMAIL"
+                  className="text-white hover:text-white/60 transition-colors underline underline-offset-4 decoration-white/30"
+                >
+                  info@aartnow.es
+                </a>
+                <span className="text-white/25 hidden sm:inline">/</span>
+                <a
+                  href="https://www.linkedin.com/in/aaron-almarche-457a6b55/"
+                  target="_blank"
+                  rel="noreferrer"
+                  data-cursor-text="LINKEDIN"
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  LinkedIn ↗
+                </a>
+                <span className="text-white/25 hidden sm:inline">/</span>
+                <a
+                  href="https://www.instagram.com/aaron_primdesign/"
+                  target="_blank"
+                  rel="noreferrer"
+                  data-cursor-text="INSTAGRAM"
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  Instagram ↗
+                </a>
+              </div>
 
-            {/* Los 2 botones de Contact */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 w-full max-w-md mx-auto pt-2">
-              {/* 1. Programar una llamada (Cal.com popup) */}
-              <button
-                type="button"
-                data-cal-link="aaron-primo-jacnmp/15min"
-                data-cal-namespace="15min"
-                data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
-                data-magnetic="true"
-                data-cursor-text="CAL.COM"
-                className="w-full sm:w-1/2 min-h-[52px] px-6 py-3.5 bg-[#F5F2EB] hover:bg-white text-black text-xs font-mono font-normal uppercase tracking-wider rounded-md transition-colors text-center cursor-pointer shadow-[0_0_30px_rgba(255,255,255,0.15)]"
-              >
-                {t.scheduleCallBtn}
-              </button>
+              {/* Los 2 botones de Contact */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 w-full max-w-md mx-auto pt-2">
+                {/* 1. Programar una llamada (Cal.com popup) */}
+                <button
+                  type="button"
+                  data-cal-link="aaron-primo-jacnmp/15min"
+                  data-cal-namespace="15min"
+                  data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+                  data-magnetic="true"
+                  data-cursor-text="CAL.COM"
+                  className="w-full sm:w-1/2 min-h-[52px] px-6 py-3.5 bg-[#F5F2EB] hover:bg-white text-black text-xs font-mono font-normal uppercase tracking-wider rounded-md transition-colors text-center cursor-pointer shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+                >
+                  {t.scheduleCallBtn}
+                </button>
 
-              {/* 2. Comenzar un proyecto */}
-              <button
-                type="button"
-                onClick={(e) => handleNavClick('/contact', e)}
-                data-magnetic="true"
-                data-cursor-text="CONTACT"
-                className="w-full sm:w-1/2 min-h-[52px] px-6 py-3.5 bg-black hover:bg-white/10 text-white border border-white/25 hover:border-white text-xs font-mono font-normal uppercase tracking-wider rounded-md transition-all text-center cursor-pointer"
-              >
-                {t.startProjectBtn}
-              </button>
+                {/* 2. Comenzar un proyecto */}
+                <button
+                  type="button"
+                  onClick={(e) => handleNavClick('/contact', e)}
+                  data-magnetic="true"
+                  data-cursor-text="CONTACT"
+                  className="w-full sm:w-1/2 min-h-[52px] px-6 py-3.5 bg-black hover:bg-white/10 text-white border border-white/25 hover:border-white text-xs font-mono font-normal uppercase tracking-wider rounded-md transition-all text-center cursor-pointer"
+                >
+                  {t.startProjectBtn}
+                </button>
+              </div>
             </div>
-          </div>
+          </section>
         </main>
 
         {/* Subfooter inferior estándar (StickyBar con idiomas y reloj) */}
