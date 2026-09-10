@@ -12,7 +12,24 @@ export default function Header() {
   const [showForm, setShowForm] = useState(false);
   const [projectTypes, setProjectTypes] = useState<string[]>(['Website']);
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [activeSectionLabel, setActiveSectionLabel] = useState('01 HOME');
+  const [activeSectionLabel, setActiveSectionLabel] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      if (path.startsWith('/about') || path.startsWith('/sobre-mi')) {
+        return t.navAbout.toUpperCase();
+      }
+      if (path.startsWith('/contact') || path.startsWith('/contacto')) {
+        return t.navContact.toUpperCase();
+      }
+      if (path.startsWith('/cases/')) {
+        return 'CASE STUDY';
+      }
+      if (path.startsWith('/presupuesto') || path.startsWith('/estimador')) {
+        return 'ESTIMADOR';
+      }
+    }
+    return `01 ${t.studioStatus}`;
+  });
 
   const menuPanelRef = useRef<HTMLDivElement>(null);
   const menuTL = useRef<gsap.core.Timeline | null>(null);
@@ -32,9 +49,27 @@ export default function Header() {
     };
   }, [isOpen]);
 
-  // IntersectionObserver to track active section and update central header label dynamically
+  // IntersectionObserver / scroll listener to track active section and update central header label dynamically
   useEffect(() => {
     const handleScroll = () => {
+      const path = window.location.pathname;
+      if (path.startsWith('/about') || path.startsWith('/sobre-mi')) {
+        setActiveSectionLabel(t.navAbout.toUpperCase());
+        return;
+      }
+      if (path.startsWith('/contact') || path.startsWith('/contacto')) {
+        setActiveSectionLabel(t.navContact.toUpperCase());
+        return;
+      }
+      if (path.startsWith('/cases/')) {
+        setActiveSectionLabel('CASE STUDY');
+        return;
+      }
+      if (path.startsWith('/presupuesto') || path.startsWith('/estimador')) {
+        setActiveSectionLabel('ESTIMADOR');
+        return;
+      }
+
       const scrollPos = window.scrollY + 200;
       const workEl = document.getElementById('work');
       const aboutEl = document.getElementById('about');
@@ -52,10 +87,14 @@ export default function Header() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('popstate', handleScroll);
     handleScroll();
 
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [t.studioStatus]);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('popstate', handleScroll);
+    };
+  }, [t.studioStatus, t.navAbout, t.navContact]);
 
   // Asegurar registro de Cal.com cuando el menú se abre o conmuta
   useEffect(() => {
