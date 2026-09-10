@@ -9,18 +9,14 @@ import SmoothScroll from './SmoothScroll';
 // Líneas individuales rítmicas para que el efecto actúe estrictamente línea a línea
 const ABOUT_LINE_ITEMS: ExplosiveLineItem[] = [
   // Nombre del autor en negrita (Bold) antes del texto
-  { 
-    text: 'Aaron Primo Almarche', 
-    isBold: true, 
-    isParagraphBreak: true 
-  },
+  { text: 'Aaron Primo Almarche', isBold: true },
 
   // Párrafo 1 (Tipografía Light / Regular)
   { text: 'Diseñador gráfico, desarrollador web' },
   { text: 'y creador de experiencias digitales con base en Alcàsser.' },
   { text: 'Entiendo cada proyecto como un todo' },
   { text: 'donde la estética visual y el rendimiento técnico' },
-  { text: 'deben ir siempre de la mano.', isParagraphBreak: true },
+  { text: 'deben ir siempre de la mano.' },
 
   // Párrafo 2 (Tipografía Light / Regular)
   { text: 'Para dar forma a la dirección de arte,' },
@@ -30,7 +26,7 @@ const ABOUT_LINE_ITEMS: ExplosiveLineItem[] = [
   { text: 'construyo los entornos en Cinema 4D o Autodesk 3ds Max,' },
   { text: 'creo materiales complejos con Substance 3D (Designer y Sampler)' },
   { text: 'y exprimo la iluminación con el motor de render que mejor pida la escena,' },
-  { text: 'ya sea Corona, V-Ray, Octane, Arnold o Keyshot.', isParagraphBreak: true },
+  { text: 'ya sea Corona, V-Ray, Octane, Arnold o Keyshot.' },
 
   // Párrafo 3 (Tipografía Light / Regular)
   { text: 'En el lado del desarrollo, traduzco todo ese diseño' },
@@ -41,7 +37,7 @@ const ABOUT_LINE_ITEMS: ExplosiveLineItem[] = [
   { text: 'controlando ágilmente los despliegues' },
   { text: 'y las conexiones a servidores con herramientas como FileZilla y CyberDuck.' },
   { text: 'Disfruto teniendo el control de cada detalle,' },
-  { text: 'desde el primer boceto y render, hasta el último commit en Vercel.', isParagraphBreak: true },
+  { text: 'desde el primer boceto y render, hasta el último commit en Vercel.' },
 
   // Párrafo 4 (Tipografía Light / Regular)
   { text: 'Y cuando no estoy texturizando escenas 3D,' },

@@ -123,11 +123,10 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
 
   return (
     <div ref={containerRef} className={`w-full py-8 md:py-16 relative ${className}`}>
-      <div className="w-full max-w-[1240px] mx-auto px-6 sm:px-10 md:px-16 flex flex-col items-center justify-center space-y-4 sm:space-y-6 md:space-y-7">
+      <div className="w-full max-w-[1240px] mx-auto px-6 sm:px-10 md:px-16 flex flex-col items-center justify-center gap-y-3 sm:gap-y-4 md:gap-y-5">
         {normalizedItems.map((item, lineIndex) => {
           const words = item.text.split(' ');
           const isBold = !!item.isBold;
-          const isParagraphBreak = !!item.isParagraphBreak;
 
           return (
             <p
@@ -136,11 +135,11 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
                 if (el) lineRefs.current[lineIndex] = el;
               }}
               data-cursor-text="EXPLODE"
-              className={`explosive-line w-full text-center select-none relative transition-colors font-sans ${
+              className={`explosive-line w-full text-center select-none relative transition-colors font-sans text-base sm:text-lg md:text-xl lg:text-2xl leading-[1.35] sm:leading-[1.4] m-0 p-0 ${
                 isBold
-                  ? 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight'
-                  : 'text-base sm:text-lg md:text-xl lg:text-2xl font-light sm:font-normal tracking-tight text-white/85 hover:text-white leading-[1.45] sm:leading-[1.5]'
-              } ${isParagraphBreak ? 'mb-10 sm:mb-14 md:mb-16' : ''}`}
+                  ? 'font-bold text-white'
+                  : 'font-light sm:font-normal text-white/85 hover:text-white'
+              }`}
             >
               {words.map((word, wordIdx) => (
                 <span key={wordIdx} className="inline-block whitespace-nowrap mr-[0.28em] last:mr-0">
