@@ -50,21 +50,10 @@ export default function AboutPage() {
         <main className="w-full flex-1 pt-[34vh] relative z-10 flex flex-col items-center justify-center">
           <ExplosiveList items={t.aboutBioLines} />
 
-          {/* Bloque final a pie de página: Ilustración de la mente abierta con elementos y contacto */}
-          <section className="w-full min-h-[calc(100vh-112px)] mt-[14vh] flex flex-col items-center justify-center px-6 sm:px-10 md:px-16 text-center space-y-8 pb-16">
-            <div className="w-full max-w-[1240px] mx-auto space-y-8 text-center flex flex-col items-center justify-center">
+          {/* Bloque final a pie de página: Contacto e Ilustración al final de la página encima del subfooter */}
+          <section className="w-full min-h-[calc(100vh-112px)] mt-[14vh] flex flex-col items-center justify-between px-6 sm:px-10 md:px-16 text-center pb-16 sm:pb-20">
+            <div className="w-full max-w-[1240px] mx-auto space-y-8 text-center flex flex-col items-center justify-center my-auto pt-8">
               
-              {/* Ilustración a pie de página: La mente abierta con los elementos creativos (tabal, bici, portátil, etc.) */}
-              <div className="relative flex items-center justify-center select-none pointer-events-none">
-                <img
-                  src="/images/about-portrait-open.jpg"
-                  alt="Aaron Primo Almarche - Mente creativa"
-                  className="w-auto h-[260px] sm:h-[340px] md:h-[420px] lg:h-[460px] aspect-[764/1024] object-contain pointer-events-none drop-shadow-[0_0_50px_rgba(255,255,255,0.07)]"
-                  loading="eager"
-                  decoding="async"
-                />
-              </div>
-
               {/* Enlaces de contacto (Email, LinkedIn, Instagram) */}
               <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8 text-base sm:text-lg md:text-xl font-light text-white/80">
                 <a
@@ -122,6 +111,17 @@ export default function AboutPage() {
                   {t.startProjectBtn}
                 </button>
               </div>
+            </div>
+
+            {/* Ilustración al final de la página encima del subfooter */}
+            <div className="relative flex items-end justify-center select-none pointer-events-none mt-10 sm:mt-14">
+              <img
+                src="/images/about-portrait-open.jpg"
+                alt="Aaron Primo Almarche - Mente creativa"
+                className="w-auto h-[260px] sm:h-[340px] md:h-[400px] lg:h-[460px] aspect-[764/1024] object-contain pointer-events-none drop-shadow-[0_0_50px_rgba(255,255,255,0.07)]"
+                loading="eager"
+                decoding="async"
+              />
             </div>
           </section>
         </main>
