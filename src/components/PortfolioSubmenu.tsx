@@ -16,14 +16,13 @@ interface PortfolioSubmenuProps {
   activeCategory: PortfolioCategory;
   onSelectCategory: (cat: PortfolioCategory) => void;
   isVisible: boolean;
-  categoryCounts: Record<PortfolioCategory, number>;
+  categoryCounts?: Record<PortfolioCategory, number>;
 }
 
 export default function PortfolioSubmenu({
   activeCategory,
   onSelectCategory,
   isVisible,
-  categoryCounts,
 }: PortfolioSubmenuProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -59,25 +58,17 @@ export default function PortfolioSubmenu({
           <div className="bg-black/85 backdrop-blur-2xl backdrop-saturate-150 border border-white/20 rounded-full px-3 py-1.5 shadow-[0_16px_48px_rgba(0,0,0,0.85),0_0_24px_rgba(255,255,255,0.06)] flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
             {PORTFOLIO_CATEGORIES.map((cat) => {
               const isSelected = activeCategory === cat.id;
-              const count = categoryCounts[cat.id] ?? 0;
               return (
                 <button
                   key={cat.id}
                   onClick={() => handleCategoryClick(cat.id)}
-                  className={`px-3 py-1.5 rounded-full text-[11px] md:text-xs font-sans font-normal uppercase tracking-wider transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-full text-[11px] md:text-xs font-sans font-normal uppercase tracking-wider transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                     isSelected
                       ? 'bg-white text-black shadow-md scale-[1.02]'
                       : 'text-white/60 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  <span>{cat.label}</span>
-                  <span
-                    className={`text-[9px] md:text-[10px] px-1 py-0.2 rounded font-sans ${
-                      isSelected ? 'text-black/70 bg-black/10 font-normal' : 'text-white/40 bg-white/5'
-                    }`}
-                  >
-                    {count}
-                  </span>
+                  {cat.label}
                 </button>
               );
             })}
