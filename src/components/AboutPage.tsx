@@ -8,13 +8,11 @@ import ExplosiveList from './ExplosiveList';
 import SmoothScroll from './SmoothScroll';
 import { useLanguage } from '../context/LanguageContext';
 import { useDitherTransition } from '../context/DitherTransitionContext';
-import { useDecryptText } from './DecryptText';
+import DecryptText from './DecryptText';
 
 export default function AboutPage() {
   const { t } = useLanguage();
   const { triggerTransition } = useDitherTransition();
-
-  const heroTitle = useDecryptText(t.aboutHeroTitle || 'Aaron Almarche');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -53,7 +51,7 @@ export default function AboutPage() {
 
               <div className="space-y-4">
                 <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black uppercase tracking-tighter text-white leading-none font-sans">
-                  {heroTitle}
+                  <DecryptText text={t.aboutHeroTitle || 'Aaron Almarche'} />
                 </h1>
                 <p className="text-lg sm:text-xl md:text-2xl text-white/70 font-normal tracking-tight font-sans">
                   {t.aboutHeroRole}

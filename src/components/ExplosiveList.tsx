@@ -10,6 +10,16 @@ interface ExplosiveListProps {
 }
 
 export default function ExplosiveList({ lines, className = '' }: ExplosiveListProps) {
+  const safeLines = lines && lines.length > 0 ? lines : [
+    'DIRECCIÓN DE ARTE & 3D',
+    'ESCULTURA DIGITAL Y FORMA',
+    'CINEMA 4D · 3DS MAX · CORONA · V-RAY',
+    'FOTORREALISMO RADICAL Y LUZ',
+    'TRANSFORMANDO ESPACIOS EN EMOCIÓN',
+    'CAOS CONTROLADO · PRECISIÓN VISUAL',
+    'DESDE VALENCIA PARA EL MUNDO'
+  ];
+
   const containerRef = useRef<HTMLDivElement>(null);
   const lineRefs = useRef<(HTMLParagraphElement | null)[]>([]);
 
@@ -86,12 +96,12 @@ export default function ExplosiveList({ lines, className = '' }: ExplosiveListPr
       ctx.revert();
       triggers.forEach((st) => st?.kill());
     };
-  }, [lines]);
+  }, [safeLines]);
 
   return (
     <div ref={containerRef} className={`w-full py-16 md:py-24 relative ${className}`}>
       <div className="max-w-6xl mx-auto px-4 flex flex-col items-center justify-center space-y-10 sm:space-y-12 md:space-y-16">
-        {lines.map((line, lineIndex) => {
+        {safeLines.map((line, lineIndex) => {
           // Split line into words, then words into characters to preserve formatting
           const words = line.split(' ');
 
