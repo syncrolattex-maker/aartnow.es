@@ -51,7 +51,6 @@ const ABOUT_LINE_ITEMS: ExplosiveLineItem[] = [
 export default function AboutPage() {
   const { t } = useLanguage();
   const { triggerTransition } = useDitherTransition();
-  const [showSubfooter, setShowSubfooter] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -65,30 +64,6 @@ export default function AboutPage() {
         // silent
       }
     }
-
-    // Detectar cuando el scroll llega al fondo absoluto (al tope de abajo) de forma eficiente
-    let ticking = false;
-    const checkScrollBottom = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const scrollPos = window.scrollY + window.innerHeight;
-          const docHeight = document.documentElement.scrollHeight;
-          // Aparece únicamente cuando se llega al fondo de la página (dentro de los últimos 70px)
-          setShowSubfooter(scrollPos >= docHeight - 70);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', checkScrollBottom, { passive: true });
-    window.addEventListener('resize', checkScrollBottom, { passive: true });
-    checkScrollBottom();
-
-    return () => {
-      window.removeEventListener('scroll', checkScrollBottom);
-      window.removeEventListener('resize', checkScrollBottom);
-    };
   }, []);
 
   const handleNavClick = (path: string, e: React.MouseEvent) => {
@@ -178,8 +153,8 @@ export default function AboutPage() {
           </div>
         </main>
 
-        {/* Subfooter inferior (StickyBar con idiomas y reloj) que aparece SOLO al llegar al tope de abajo */}
-        <StickyBar isVisible={showSubfooter} />
+        {/* Subfooter inferior estándar (StickyBar con idiomas y reloj) */}
+        <StickyBar />
       </div>
     </SmoothScroll>
   );
