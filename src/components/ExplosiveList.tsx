@@ -60,15 +60,18 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
         const totalChars = charEls.length;
         const centerIndex = (totalChars - 1) / 2;
 
+        // Ensure 100% clean pristine state before setting trigger
+        gsap.set(charEls, { x: 0, y: 0, opacity: 1, rotation: 0, scale: 1 });
+
         // Individual ScrollTrigger per LINE (strictly line-by-line, never whole paragraphs!)
-        // start: 'top 34%' guarantees that when the page is at scrollY = 0 (top at ~34vh),
-        // the top lines are 100% assembled, crisp, and readable.
+        // start: 'top 22%' guarantees that when the page is at scrollY = 0 (top at ~34vh),
+        // the top lines are 100% assembled, crisp, and readable on mobile and desktop alike.
         // The explosion begins ONLY when the user scrolls the line up toward the top of the screen.
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: lineEl,
-            start: 'top 34%',
-            end: 'top 6%',
+            start: 'top 22%',
+            end: 'top 4%',
             scrub: 0.15,
             invalidateOnRefresh: true,
           },

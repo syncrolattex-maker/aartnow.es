@@ -47,7 +47,7 @@ export default function AboutPage() {
         <Header />
 
         {/* Fullwidth Line-by-Line Explosive Experience con textos dinámicos multi-idioma (ES / VAL / EN) */}
-        <main className="w-full flex-1 pt-[24vh] sm:pt-[30vh] md:pt-[34vh] relative z-10 flex flex-col items-center justify-center">
+        <main className="w-full flex-1 pt-[34vh] relative z-10 flex flex-col items-center justify-center">
           <ExplosiveList items={t.aboutBioLines} />
 
           {/* Bloque final a pie de página: Contacto e Ilustración haciendo tope en el subfooter */}
