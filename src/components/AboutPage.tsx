@@ -47,15 +47,15 @@ export default function AboutPage() {
         <Header />
 
         {/* Fullwidth Line-by-Line Explosive Experience con textos dinámicos multi-idioma (ES / VAL / EN) */}
-        <main className="w-full flex-1 pt-[34vh] relative z-10 flex flex-col items-center justify-center">
+        <main className="w-full flex-1 pt-[24vh] sm:pt-[30vh] md:pt-[34vh] relative z-10 flex flex-col items-center justify-center">
           <ExplosiveList items={t.aboutBioLines} />
 
           {/* Bloque final a pie de página: Contacto e Ilustración haciendo tope en el subfooter */}
-          <section className="w-full min-h-[calc(100vh-45px)] mt-[14vh] flex flex-col items-center justify-between px-6 sm:px-10 md:px-16 text-center pb-[45px]">
-            <div className="w-full max-w-[1240px] mx-auto space-y-8 text-center flex flex-col items-center justify-center my-auto pt-8">
+          <section className="w-full min-h-[calc(100vh-45px)] mt-[10vh] sm:mt-[14vh] flex flex-col items-center justify-between px-4 sm:px-10 md:px-16 text-center pb-[45px]">
+            <div className="w-full max-w-[1240px] mx-auto space-y-6 sm:space-y-8 text-center flex flex-col items-center justify-center my-auto pt-6 sm:pt-8">
               
               {/* Enlaces de contacto (Email, LinkedIn, Instagram) */}
-              <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8 text-base sm:text-lg md:text-xl font-light text-white/80">
+              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 md:gap-8 text-sm sm:text-lg md:text-xl font-light text-white/80">
                 <a
                   href="mailto:prologmac@gmail.com"
                   data-cursor-text="EMAIL"
@@ -86,7 +86,7 @@ export default function AboutPage() {
               </div>
 
               {/* Los 2 botones de Contact */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 w-full max-w-md mx-auto pt-2">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 w-full max-w-xs sm:max-w-md mx-auto pt-2">
                 {/* 1. Programar una llamada (Cal.com popup) */}
                 <button
                   type="button"
@@ -95,7 +95,7 @@ export default function AboutPage() {
                   data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
                   data-magnetic="true"
                   data-cursor-text="CAL.COM"
-                  className="w-full sm:w-1/2 min-h-[52px] px-6 py-3.5 bg-[#F5F2EB] hover:bg-white text-black text-xs font-mono font-normal uppercase tracking-wider rounded-md transition-colors text-center cursor-pointer shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+                  className="w-full sm:w-1/2 min-h-[50px] sm:min-h-[52px] px-5 sm:px-6 py-3 sm:py-3.5 bg-[#F5F2EB] hover:bg-white text-black text-xs font-mono font-normal uppercase tracking-wider rounded-md transition-colors text-center cursor-pointer shadow-[0_0_30px_rgba(255,255,255,0.15)]"
                 >
                   {t.scheduleCallBtn}
                 </button>
@@ -106,7 +106,7 @@ export default function AboutPage() {
                   onClick={(e) => handleNavClick('/contact', e)}
                   data-magnetic="true"
                   data-cursor-text="CONTACT"
-                  className="w-full sm:w-1/2 min-h-[52px] px-6 py-3.5 bg-black hover:bg-white/10 text-white border border-white/25 hover:border-white text-xs font-mono font-normal uppercase tracking-wider rounded-md transition-all text-center cursor-pointer"
+                  className="w-full sm:w-1/2 min-h-[50px] sm:min-h-[52px] px-5 sm:px-6 py-3 sm:py-3.5 bg-black hover:bg-white/10 text-white border border-white/25 hover:border-white text-xs font-mono font-normal uppercase tracking-wider rounded-md transition-all text-center cursor-pointer"
                 >
                   {t.startProjectBtn}
                 </button>
@@ -114,7 +114,7 @@ export default function AboutPage() {
             </div>
 
             {/* Ilustración al final de la página haciendo tope con el subfooter */}
-            <div className="w-full flex items-end justify-center select-none pointer-events-none mt-8 sm:mt-12 leading-none">
+            <div className="w-full flex items-end justify-center select-none pointer-events-none mt-6 sm:mt-12 leading-none">
               <img
                 src="/images/about-portrait-open.png"
                 alt="Aaron Primo Almarche - Mente creativa"
