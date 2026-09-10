@@ -99,7 +99,6 @@ export const translations = {
     aboutManifestoTag: '[ 02 · MANIFIESTO VISUAL ]',
     aboutManifestoHint: 'Desliza para detonar el manifiesto',
     aboutBioLines: [
-      { text: 'Aaron Primo Almarche', isBold: true },
       { text: 'Diseñador gráfico, desarrollador web' },
       { text: 'y creador de experiencias digitales con base en Alcàsser.' },
       { text: 'Entiendo cada proyecto como un todo' },
@@ -258,7 +257,6 @@ export const translations = {
     aboutManifestoTag: '[ 02 · MANIFEST VISUAL ]',
     aboutManifestoHint: 'Llisca per detonar el manifest',
     aboutBioLines: [
-      { text: 'Aaron Primo Almarche', isBold: true },
       { text: 'Dissenyador gràfic, desenvolupador web' },
       { text: "i creador d'experiències digitals amb base a Alcàsser." },
       { text: 'Entenc cada projecte com un tot' },
@@ -417,7 +415,6 @@ export const translations = {
     aboutManifestoTag: '[ 02 · VISUAL MANIFESTO ]',
     aboutManifestoHint: 'Scroll to detonate the manifesto',
     aboutBioLines: [
-      { text: 'Aaron Primo Almarche', isBold: true },
       { text: 'Graphic designer, web developer' },
       { text: 'and digital experience creator based in Alcàsser.' },
       { text: 'I approach every project as a whole' },
