@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import StickyBar from './StickyBar';
 import Cursor from './Cursor';
@@ -51,6 +51,7 @@ const ABOUT_LINE_ITEMS: ExplosiveLineItem[] = [
 export default function AboutPage() {
   const { t } = useLanguage();
   const { triggerTransition } = useDitherTransition();
+  const [showSubfooter, setShowSubfooter] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -64,6 +65,23 @@ export default function AboutPage() {
         // silent
       }
     }
+
+    // Detectar cuando el scroll llega al fondo absoluto (al tope de abajo)
+    const checkScrollBottom = () => {
+      const scrollPos = window.scrollY + window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      // Aparece únicamente cuando se llega al fondo de la página (dentro de los últimos 70px)
+      setShowSubfooter(scrollPos >= docHeight - 70);
+    };
+
+    window.addEventListener('scroll', checkScrollBottom, { passive: true });
+    window.addEventListener('resize', checkScrollBottom, { passive: true });
+    checkScrollBottom();
+
+    return () => {
+      window.removeEventListener('scroll', checkScrollBottom);
+      window.removeEventListener('resize', checkScrollBottom);
+    };
   }, []);
 
   const handleNavClick = (path: string, e: React.MouseEvent) => {
@@ -83,12 +101,11 @@ export default function AboutPage() {
         <Cursor />
         <GlobalAdaptiveHalftoneTrail />
 
-        {/* Floating Menu & Sticky Bar */}
+        {/* Floating Menu */}
         <Header />
-        <StickyBar />
 
         {/* Fullwidth Line-by-Line Explosive Experience */}
-        <main className="w-full flex-1 pt-[34vh] pb-16 relative z-10 flex flex-col items-center justify-center">
+        <main className="w-full flex-1 pt-[34vh] pb-28 sm:pb-36 relative z-10 flex flex-col items-center justify-center">
           <ExplosiveList items={ABOUT_LINE_ITEMS} />
 
           {/* Bloque final: Enlaces de contacto y los 2 botones de acción */}
@@ -154,56 +171,8 @@ export default function AboutPage() {
           </div>
         </main>
 
-        {/* Minimalist Studio Footer al final del scroll */}
-        <footer className="py-24 px-6 md:px-16 bg-black text-white flex flex-col justify-between border-t border-white/10 mt-16 relative z-10 pb-20 sm:pb-24">
-          <div className="max-w-[1400px] w-full mx-auto space-y-16">
-            
-            {/* Large Text Reveal */}
-            <div className="border-b border-white/10 pb-16 space-y-4">
-              <span className="text-xs uppercase tracking-widest text-white/50">
-                {t.footerConnect}
-              </span>
-              <a
-                href="/contact"
-                onClick={(e) => handleNavClick('/contact', e)}
-                className="block group cursor-pointer"
-              >
-                <h2 className="text-6xl md:text-9xl font-black uppercase tracking-tight text-white group-hover:text-white/80 transition-colors leading-none font-sans">
-                  {t.footerTitle}<span className="text-white/40 group-hover:text-white">.</span>
-                </h2>
-              </a>
-            </div>
-
-            {/* Footer Meta Details */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-xs text-white/50 border-b border-white/10 pb-12">
-              <div>
-                <span className="text-white text-sm font-normal uppercase block mb-2 font-sans">{t.footerLocation}</span>
-                <p className="text-white font-normal">Online</p>
-                <p className="font-light">{t.footerAddress}</p>
-              </div>
-
-              <div>
-                <span className="text-white text-sm font-normal uppercase block mb-2 font-sans">{t.navContact}</span>
-                <a href="mailto:prologmac@gmail.com" className="text-white font-normal text-sm hover:underline block">info@aartnow.es</a>
-              </div>
-
-              <div>
-                <span className="text-white text-sm font-normal uppercase block mb-2 font-sans">Connect</span>
-                <div className="flex gap-4 font-light">
-                  <a href="https://www.instagram.com/aaron_primdesign/" target="_blank" rel="noreferrer" className="hover:text-white/60 transition-colors">Instagram ↗</a>
-                  <a href="https://www.linkedin.com/in/aaron-almarche-457a6b55/" target="_blank" rel="noreferrer" className="hover:text-white/60 transition-colors">LinkedIn ↗</a>
-                </div>
-              </div>
-            </div>
-
-            {/* Copyright Line */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-white/30 uppercase tracking-widest">
-              <span>{t.footerRights}</span>
-              <span>{t.footerAgency}</span>
-            </div>
-
-          </div>
-        </footer>
+        {/* Subfooter inferior (StickyBar con idiomas y reloj) que aparece SOLO al llegar al tope de abajo */}
+        <StickyBar isVisible={showSubfooter} />
       </div>
     </SmoothScroll>
   );

@@ -2,7 +2,12 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Language } from '../i18n/translations';
 
-export default function StickyBar() {
+interface StickyBarProps {
+  isVisible?: boolean;
+  className?: string;
+}
+
+export default function StickyBar({ isVisible = true, className = '' }: StickyBarProps) {
   const { lang, setLang, t } = useLanguage();
   const [time, setTime] = useState<string>('');
 
@@ -27,7 +32,13 @@ export default function StickyBar() {
   ];
 
   return (
-    <div data-sticky-bar="true" data-no-cursor-trail="true" className="fixed bottom-0 left-0 right-0 z-40 px-6 py-3.5 bg-black/60 backdrop-blur-2xl backdrop-saturate-150 border-t border-white/15 text-[11px] font-sans font-normal uppercase text-white/80 flex justify-between items-center pointer-events-auto shadow-[0_-8px_32px_rgba(0,0,0,0.5)]">
+    <div 
+      data-sticky-bar="true" 
+      data-no-cursor-trail="true" 
+      className={`fixed bottom-0 left-0 right-0 z-40 px-6 py-3.5 bg-black/80 backdrop-blur-2xl backdrop-saturate-150 border-t border-white/15 text-[11px] font-sans font-normal uppercase text-white/80 flex justify-between items-center shadow-[0_-8px_32px_rgba(0,0,0,0.5)] transition-transform duration-500 ease-out ${
+        isVisible ? 'translate-y-0 pointer-events-auto' : 'translate-y-full pointer-events-none'
+      } ${className}`}
+    >
       {/* Left Meta Info */}
       <div className="flex items-center gap-6">
         <span className="hidden md:inline-block text-white/50">{t.stickyFreaks}</span>
