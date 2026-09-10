@@ -138,10 +138,10 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
                 if (el) lineRefs.current[lineIndex] = el;
               }}
               data-cursor-text="EXPLODE"
-              className={`explosive-line w-full text-center select-none relative transition-colors font-sans text-base sm:text-lg md:text-xl lg:text-2xl leading-[1.35] sm:leading-[1.4] m-0 p-0 ${
+              className={`explosive-line w-full text-center select-none relative transition-colors m-0 p-0 ${
                 isBold
-                  ? 'font-bold text-white'
-                  : 'font-light sm:font-normal text-white/85 hover:text-white'
+                  ? 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl italic font-bold tracking-tight text-white leading-tight font-sans'
+                  : 'text-base sm:text-lg md:text-xl lg:text-2xl font-light sm:font-normal tracking-tight text-white/85 hover:text-white leading-[1.35] sm:leading-[1.4] font-sans'
               }`}
             >
               {words.map((word, wordIdx) => (
