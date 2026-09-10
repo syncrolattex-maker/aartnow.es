@@ -61,12 +61,15 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
         // start: 'top 32%' guarantees that when the page is at scrollY = 0 (top at ~34vh),
         // the top lines are 100% assembled, crisp, and readable.
         // The explosion begins ONLY when the user scrolls the line up toward the top of the screen.
+        // Direct, instantaneous scrub without compounded lag:
+        // Lenis already provides smooth scroll momentum. Using scrub: 0.15 with ease: 'none'
+        // eliminates the 700ms reversal delay and makes the letters track the scroll in real-time.
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: lineEl,
-            start: 'top 32%',
-            end: 'top 8%',
-            scrub: 0.7,
+            start: 'top 34%',
+            end: 'top 6%',
+            scrub: 0.15,
             invalidateOnRefresh: true,
           },
         });
@@ -101,7 +104,7 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
               rotation: targetRotate,
               opacity: 0,
               scale: targetScale,
-              ease: 'power1.inOut',
+              ease: 'none',
               duration: 1,
             },
             0
@@ -147,7 +150,11 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
                     <span
                       key={charIdx}
                       className="char inline-block will-change-transform transform-gpu"
-                      style={{ transformOrigin: 'center center' }}
+                      style={{ 
+                        transformOrigin: 'center center',
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden',
+                      }}
                     >
                       {char}
                     </span>
