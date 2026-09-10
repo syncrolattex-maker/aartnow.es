@@ -217,7 +217,7 @@ export default function Header() {
               </div>
               {!isOpen && (
                 <span className="text-xs font-normal uppercase tracking-wider text-white">
-                  aartnow<span className="text-white/40">.es</span>
+                  aartnow
                 </span>
               )}
             </a>
