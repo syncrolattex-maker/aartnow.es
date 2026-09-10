@@ -58,18 +58,18 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
         const centerIndex = (totalChars - 1) / 2;
 
         // Individual ScrollTrigger per LINE (strictly line-by-line, never whole paragraphs!)
-        // start: 'top 32%' guarantees that when the page is at scrollY = 0 (top at ~34vh),
+        // start: 'top 34%' guarantees that when the page is at scrollY = 0 (top at ~34vh),
         // the top lines are 100% assembled, crisp, and readable.
-        // The explosion begins ONLY when the user scrolls the line up toward the top of the screen.
-        // Direct, instantaneous scrub without compounded lag:
-        // Lenis already provides smooth scroll momentum. Using scrub: 0.15 with ease: 'none'
-        // eliminates the 700ms reversal delay and makes the letters track the scroll in real-time.
+        // Direct, ultra-lightweight scrub: true linked 1:1 to Lenis smooth scroll:
+        // Eliminates conflicting inertia delays and rubber-banding during rapid up/down scroll.
+        // fastScrollEnd ensures instant recovery when flicking or scrolling very fast.
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: lineEl,
             start: 'top 34%',
             end: 'top 6%',
-            scrub: 0.15,
+            scrub: true,
+            fastScrollEnd: true,
             invalidateOnRefresh: true,
           },
         });
@@ -93,8 +93,7 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
           const spreadFactor = isMobile ? 70 : 150;
           const targetX = distFromCenter * spreadFactor + r1 * (isMobile ? 35 : 70);
           const targetY = (r2 - 0.5) * (isMobile ? 80 : 130);
-          const targetRotate = (r3 - 0.5) * 60; // -30deg to +30deg
-          const targetScale = 0.92 + Math.abs(r1) * 0.25;
+          const targetRotate = (r3 - 0.5) * 50; // -25deg to +25deg
 
           tl.to(
             charEl,
@@ -103,8 +102,9 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
               y: targetY,
               rotation: targetRotate,
               opacity: 0,
-              scale: targetScale,
               ease: 'none',
+              force3D: true,
+              lazy: true,
               duration: 1,
             },
             0
@@ -148,7 +148,7 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
                   {word.split('').map((char, charIdx) => (
                     <span
                       key={charIdx}
-                      className="char inline-block will-change-transform transform-gpu pointer-events-none"
+                      className="char inline-block pointer-events-none"
                       style={{ 
                         transformOrigin: 'center center',
                         backfaceVisibility: 'hidden',

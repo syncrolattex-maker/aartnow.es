@@ -66,12 +66,19 @@ export default function AboutPage() {
       }
     }
 
-    // Detectar cuando el scroll llega al fondo absoluto (al tope de abajo)
+    // Detectar cuando el scroll llega al fondo absoluto (al tope de abajo) de forma eficiente
+    let ticking = false;
     const checkScrollBottom = () => {
-      const scrollPos = window.scrollY + window.innerHeight;
-      const docHeight = document.documentElement.scrollHeight;
-      // Aparece únicamente cuando se llega al fondo de la página (dentro de los últimos 70px)
-      setShowSubfooter(scrollPos >= docHeight - 70);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollPos = window.scrollY + window.innerHeight;
+          const docHeight = document.documentElement.scrollHeight;
+          // Aparece únicamente cuando se llega al fondo de la página (dentro de los últimos 70px)
+          setShowSubfooter(scrollPos >= docHeight - 70);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     window.addEventListener('scroll', checkScrollBottom, { passive: true });

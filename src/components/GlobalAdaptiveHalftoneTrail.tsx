@@ -270,14 +270,12 @@ export default function GlobalAdaptiveHalftoneTrail() {
       resize();
       updateMenuRects();
     });
-    window.addEventListener('scroll', updateMenuRects, { passive: true });
     window.addEventListener('mousemove', onMove);
     document.addEventListener('mouseleave', onLeave);
 
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
-      window.removeEventListener('scroll', updateMenuRects);
       window.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseleave', onLeave);
     };
