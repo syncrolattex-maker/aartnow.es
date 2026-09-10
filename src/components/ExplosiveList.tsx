@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -18,25 +18,28 @@ interface ExplosiveListProps {
 }
 
 export default function ExplosiveList({ items, lines, paragraphs, className = '' }: ExplosiveListProps) {
-  // Normalize incoming data into a flat list of line items
-  let normalizedItems: ExplosiveLineItem[] = [];
-
-  if (items && items.length > 0) {
-    normalizedItems = items.map((item) =>
-      typeof item === 'string' ? { text: item } : item
-    );
-  } else if (paragraphs && paragraphs.length > 0) {
-    paragraphs.forEach((pGroup, pIdx) => {
-      pGroup.forEach((lineText, lIdx) => {
-        normalizedItems.push({
-          text: lineText,
-          isParagraphBreak: lIdx === pGroup.length - 1 && pIdx < paragraphs.length - 1,
+  // Normalize incoming data into a flat list of line items with memoization
+  const normalizedItems: ExplosiveLineItem[] = useMemo(() => {
+    if (items && items.length > 0) {
+      return items.map((item) =>
+        typeof item === 'string' ? { text: item } : item
+      );
+    } else if (paragraphs && paragraphs.length > 0) {
+      const result: ExplosiveLineItem[] = [];
+      paragraphs.forEach((pGroup, pIdx) => {
+        pGroup.forEach((lineText, lIdx) => {
+          result.push({
+            text: lineText,
+            isParagraphBreak: lIdx === pGroup.length - 1 && pIdx < paragraphs.length - 1,
+          });
         });
       });
-    });
-  } else if (lines && lines.length > 0) {
-    normalizedItems = lines.map((text) => ({ text }));
-  }
+      return result;
+    } else if (lines && lines.length > 0) {
+      return lines.map((text) => ({ text }));
+    }
+    return [];
+  }, [items, lines, paragraphs]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const lineRefs = useRef<HTMLParagraphElement[]>([]);

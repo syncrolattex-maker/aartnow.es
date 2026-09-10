@@ -8,46 +8,6 @@ import SmoothScroll from './SmoothScroll';
 import { useLanguage } from '../context/LanguageContext';
 import { useDitherTransition } from '../context/DitherTransitionContext';
 
-// Líneas individuales rítmicas para que el efecto actúe estrictamente línea a línea con interlineado 100% uniforme
-const ABOUT_LINE_ITEMS: ExplosiveLineItem[] = [
-  // Nombre del autor en negrita (Bold) antes del texto
-  { text: 'Aaron Primo Almarche', isBold: true },
-
-  // Párrafo 1 (Tipografía Light / Regular)
-  { text: 'Diseñador gráfico, desarrollador web' },
-  { text: 'y creador de experiencias digitales con base en Alcàsser.' },
-  { text: 'Entiendo cada proyecto como un todo' },
-  { text: 'donde la estética visual y el rendimiento técnico' },
-  { text: 'deben ir siempre de la mano.' },
-
-  // Párrafo 2 (Tipografía Light / Regular)
-  { text: 'Para dar forma a la dirección de arte,' },
-  { text: 'mi ecosistema natural es Adobe' },
-  { text: '(Photoshop, Illustrator, InDesign, After Effects).' },
-  { text: 'Cuando el proyecto exige dar el salto al volumen y al fotorrealismo,' },
-  { text: 'construyo los entornos en Cinema 4D o Autodesk 3ds Max,' },
-  { text: 'creo materiales complejos con Substance 3D (Designer y Sampler)' },
-  { text: 'y exprimo la iluminación con el motor de render que mejor pida la escena,' },
-  { text: 'ya sea Corona, V-Ray, Octane, Arnold o Keyshot.' },
-
-  // Párrafo 3 (Tipografía Light / Regular)
-  { text: 'En el lado del desarrollo, traduzco todo ese diseño' },
-  { text: 'a código limpio y eficiente (React, Next.js, Tailwind).' },
-  { text: 'Para ello, me apoyo en entornos de trabajo robustos' },
-  { text: 'como IntelliJ para la programación' },
-  { text: 'y DataGrip para la gestión de bases de datos,' },
-  { text: 'controlando ágilmente los despliegues' },
-  { text: 'y las conexiones a servidores con herramientas como FileZilla y CyberDuck.' },
-  { text: 'Disfruto teniendo el control de cada detalle,' },
-  { text: 'desde el primer boceto y render, hasta el último commit en Vercel.' },
-
-  // Párrafo 4 (Tipografía Light / Regular)
-  { text: 'Y cuando no estoy texturizando escenas 3D,' },
-  { text: 'diseñando interfaces o picando código,' },
-  { text: 'es muy probable que me encuentres' },
-  { text: 'desconectando sobre la bicicleta o ensayando con mi tabal' },
-];
-
 export default function AboutPage() {
   const { t } = useLanguage();
   const { triggerTransition } = useDitherTransition();
@@ -86,9 +46,9 @@ export default function AboutPage() {
         {/* Floating Menu */}
         <Header />
 
-        {/* Fullwidth Line-by-Line Explosive Experience */}
+        {/* Fullwidth Line-by-Line Explosive Experience con textos dinámicos multi-idioma (ES / VAL / EN) */}
         <main className="w-full flex-1 pt-[34vh] relative z-10 flex flex-col items-center justify-center">
-          <ExplosiveList items={ABOUT_LINE_ITEMS} />
+          <ExplosiveList items={t.aboutBioLines} />
 
           {/* Bloque final centrado en pantalla sin el párrafo anterior */}
           <section className="w-full min-h-[calc(100vh-112px)] mt-[20vh] flex flex-col items-center justify-center px-6 sm:px-10 md:px-16 text-center space-y-8 pb-12">
