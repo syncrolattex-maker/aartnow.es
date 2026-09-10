@@ -57,20 +57,37 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
         const totalChars = charEls.length;
         const centerIndex = (totalChars - 1) / 2;
 
-        // Individual ScrollTrigger per LINE (strictly line-by-line, never whole paragraphs!)
-        // start: 'top 34%' guarantees that when the page is at scrollY = 0 (top at ~34vh),
-        // the top lines are 100% assembled, crisp, and readable.
-        // Direct, ultra-lightweight scrub: true linked 1:1 to Lenis smooth scroll:
-        // Eliminates conflicting inertia delays and rubber-banding during rapid up/down scroll.
-        // fastScrollEnd ensures instant recovery when flicking or scrolling very fast.
+        const isMobile = window.innerWidth < 768;
+        const spreadFactor = isMobile ? 70 : 150;
+        const spreadOffset = isMobile ? 35 : 70;
+        const ySpread = isMobile ? 80 : 130;
+
+        // Precompute all target coordinates and rotations into fast typed arrays
+        // so NO trigonometric calculations run during scroll ticks:
+        const xTargets = new Float32Array(totalChars);
+        const yTargets = new Float32Array(totalChars);
+        const rTargets = new Float32Array(totalChars);
+
+        for (let charIdx = 0; charIdx < totalChars; charIdx++) {
+          const distFromCenter = centerIndex > 0 ? (charIdx - centerIndex) / centerIndex : 0;
+          const seed = (charIdx + 1) * 41 + (lineIdx + 1) * 97;
+          const r1 = ((Math.sin(seed * 1.13) * 10000) % 1);
+          const r2 = ((Math.cos(seed * 2.27) * 10000) % 1);
+          const r3 = ((Math.sin(seed * 3.61) * 10000) % 1);
+
+          xTargets[charIdx] = distFromCenter * spreadFactor + r1 * spreadOffset;
+          yTargets[charIdx] = (r2 - 0.5) * ySpread;
+          rTargets[charIdx] = (r3 - 0.5) * 50;
+        }
+
+        // Individual ScrollTrigger per line:
+        // scrub: 0.35 provides silky-smooth fluid momentum, eliminating wheel stepping and hitching
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: lineEl,
             start: 'top 34%',
             end: 'top 6%',
-            scrub: true,
-            fastScrollEnd: true,
-            invalidateOnRefresh: true,
+            scrub: 0.35,
           },
         });
 
@@ -78,38 +95,19 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
           triggers.push(tl.scrollTrigger);
         }
 
-        charEls.forEach((charEl, charIdx) => {
-          // Normalized distance from center (-1 to 1)
-          const distFromCenter = centerIndex > 0 ? (charIdx - centerIndex) / centerIndex : 0;
-
-          // Deterministic pseudo-random seed based on character and line indices
-          const seed = (charIdx + 1) * 41 + (lineIdx + 1) * 97;
-          const r1 = ((Math.sin(seed * 1.13) * 10000) % 1);
-          const r2 = ((Math.cos(seed * 2.27) * 10000) % 1);
-          const r3 = ((Math.sin(seed * 3.61) * 10000) % 1);
-
-          // Proportional particle dispersion tailored for clean, light/medium lines
-          const isMobile = window.innerWidth < 768;
-          const spreadFactor = isMobile ? 70 : 150;
-          const targetX = distFromCenter * spreadFactor + r1 * (isMobile ? 35 : 70);
-          const targetY = (r2 - 0.5) * (isMobile ? 80 : 130);
-          const targetRotate = (r3 - 0.5) * 50; // -25deg to +25deg
-
-          tl.to(
-            charEl,
-            {
-              x: targetX,
-              y: targetY,
-              rotation: targetRotate,
-              opacity: 0,
-              ease: 'none',
-              force3D: true,
-              lazy: true,
-              duration: 1,
-            },
-            0
-          );
-        });
+        // Single tween for all characters in the line
+        tl.to(
+          Array.from(charEls),
+          {
+            x: (i: number) => xTargets[i],
+            y: (i: number) => yTargets[i],
+            rotation: (i: number) => rTargets[i],
+            opacity: 0,
+            ease: 'none',
+            duration: 1,
+          },
+          0
+        );
       });
     }, containerRef);
 
@@ -148,7 +146,7 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
                   {word.split('').map((char, charIdx) => (
                     <span
                       key={charIdx}
-                      className="char inline-block pointer-events-none"
+                      className="char inline-block will-change-transform transform-gpu pointer-events-none"
                       style={{ 
                         transformOrigin: 'center center',
                         backfaceVisibility: 'hidden',

@@ -30,7 +30,7 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
     };
 
     gsap.ticker.add(tickerCallback);
-    gsap.ticker.lagSmoothing(500, 33);
+    gsap.ticker.lagSmoothing(0);
 
     return () => {
       gsap.ticker.remove(tickerCallback);
