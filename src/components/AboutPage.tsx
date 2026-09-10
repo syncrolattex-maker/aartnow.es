@@ -4,6 +4,7 @@ import StickyBar from './StickyBar';
 import Cursor from './Cursor';
 import GlobalAdaptiveHalftoneTrail from './GlobalAdaptiveHalftoneTrail';
 import ExplosiveList, { ExplosiveLineItem } from './ExplosiveList';
+import AboutIllustration from './AboutIllustration';
 import SmoothScroll from './SmoothScroll';
 import { useLanguage } from '../context/LanguageContext';
 import { useDitherTransition } from '../context/DitherTransitionContext';
@@ -51,8 +52,12 @@ export default function AboutPage() {
           <ExplosiveList items={t.aboutBioLines} />
 
           {/* Bloque final centrado en pantalla sin el párrafo anterior */}
-          <section className="w-full min-h-[calc(100vh-112px)] mt-[20vh] flex flex-col items-center justify-center px-6 sm:px-10 md:px-16 text-center space-y-8 pb-12">
+          <section className="w-full min-h-[calc(100vh-112px)] mt-[14vh] flex flex-col items-center justify-center px-6 sm:px-10 md:px-16 text-center space-y-8 pb-16">
             <div className="w-full max-w-[1240px] mx-auto space-y-8 text-center flex flex-col items-center justify-center">
+              
+              {/* Animación Interactiva de Ilustraciones (Cuerpo entero -> Gorra se levanta y emergen los elementos) */}
+              <AboutIllustration />
+
               {/* Enlaces de contacto (Email, LinkedIn, Instagram) */}
               <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8 text-base sm:text-lg md:text-xl font-light text-white/80">
                 <a
