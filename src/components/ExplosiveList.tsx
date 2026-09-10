@@ -126,7 +126,7 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
 
   return (
     <div ref={containerRef} className={`w-full py-8 md:py-16 relative ${className}`}>
-      <div className="w-full max-w-[1240px] mx-auto px-6 sm:px-10 md:px-16 flex flex-col items-center justify-center gap-y-3 sm:gap-y-4 md:gap-y-5">
+      <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 flex flex-col items-center justify-center gap-y-3 sm:gap-y-4 md:gap-y-5 lg:gap-y-6 xl:gap-y-7">
         {normalizedItems.map((item, lineIndex) => {
           const words = item.text.split(' ');
           const isBold = !!item.isBold;
@@ -139,8 +139,8 @@ export default function ExplosiveList({ items, lines, paragraphs, className = ''
               }}
               className={`explosive-line w-full text-center select-none pointer-events-none relative m-0 p-0 ${
                 isBold
-                  ? 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl italic font-bold tracking-tight text-white leading-tight font-sans'
-                  : 'text-base sm:text-lg md:text-xl lg:text-2xl font-light sm:font-normal tracking-tight text-white/85 leading-[1.35] sm:leading-[1.4] font-sans'
+                  ? 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl italic font-bold tracking-tight text-white leading-tight font-sans mb-3 sm:mb-5 lg:mb-8'
+                  : 'text-base sm:text-lg md:text-xl lg:text-3xl xl:text-[34px] 2xl:text-4xl font-light sm:font-normal tracking-tight text-white/90 leading-[1.35] sm:leading-[1.4] lg:leading-[1.3] font-sans'
               }`}
             >
               {words.map((word, wordIdx) => (
