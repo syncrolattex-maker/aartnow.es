@@ -76,11 +76,11 @@ export default function Header() {
       const contactEl = document.getElementById('contact');
 
       if (contactEl && scrollPos >= contactEl.offsetTop) {
-        setActiveSectionLabel('04 CONTACT');
+        setActiveSectionLabel(`04 ${t.navContact.toUpperCase()}`);
       } else if (aboutEl && scrollPos >= aboutEl.offsetTop) {
-        setActiveSectionLabel('03 SERVICES');
+        setActiveSectionLabel(`03 ${t.navWhatWeDo.toUpperCase()}`);
       } else if (workEl && scrollPos >= workEl.offsetTop) {
-        setActiveSectionLabel('02 FEATURED WORK');
+        setActiveSectionLabel(`02 ${t.navWork.toUpperCase()}`);
       } else {
         setActiveSectionLabel(`01 ${t.studioStatus}`);
       }
@@ -349,7 +349,7 @@ export default function Header() {
 
                 {showWhatWeDo && (
                   <div className="bg-[#0a0a0a] pl-10 pr-6 py-2 border-b border-white/10 space-y-1">
-                    {['Branding', 'Diseño', '3D', 'Websites', 'Marketing'].map((sub, idx) => (
+                    {[t.catBranding, t.catDesign, t.cat3D, t.catWebsites, t.catMarketing].map((sub, idx) => (
                       <a 
                         key={idx} 
                         href="#about" 
@@ -415,7 +415,7 @@ export default function Header() {
                           </button>
                         </div>
                         <div className="flex flex-wrap gap-1.5">
-                          {['Branding', 'Diseño', '3D', 'Websites', 'Marketing'].map((type) => {
+                          {[t.catBranding, t.catDesign, t.cat3D, t.catWebsites, t.catMarketing].map((type) => {
                             const isSelected = projectTypes.includes(type);
                             return (
                               <button

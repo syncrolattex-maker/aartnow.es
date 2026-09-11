@@ -32,7 +32,7 @@ export default function ServicesAccordion() {
       code: '(001)',
       num: '01',
       title: t.s01Title,
-      subtitle: 'ESTRATEGIA VISUAL & SISTEMAS DE IDENTIDAD',
+      subtitle: t.s01Subtitle || 'ESTRATEGIA VISUAL & SISTEMAS DE IDENTIDAD',
       description: t.s01Desc,
       tag: 'BRANDING & STRATEGY',
       capabilities: ['Brand Strategy', 'Visual Identity', 'Tone of Voice', 'Design Systems', 'Packaging & Print']
@@ -42,7 +42,7 @@ export default function ServicesAccordion() {
       code: '(002)',
       num: '02',
       title: t.s02Title,
-      subtitle: 'EXPERIENCIA DE USUARIO & ARQUITECTURA DE PRODUCTO',
+      subtitle: t.s02Subtitle || 'EXPERIENCIA DE USUARIO & ARQUITECTURA DE PRODUCTO',
       description: t.s02Desc,
       tag: 'UX / UI & PRODUCT',
       capabilities: ['UX / UI Architecture', 'Product Design', 'Design Systems', 'Interactive Mockups', 'Design Tokens']
@@ -52,7 +52,7 @@ export default function ServicesAccordion() {
       code: '(003)',
       num: '03',
       title: t.s03Title,
-      subtitle: 'COMPUTACIÓN GRÁFICA & EXPERIENCIAS ESPACIALES',
+      subtitle: t.s03Subtitle || 'COMPUTACIÓN GRÁFICA & EXPERIENCIAS ESPACIALES',
       description: t.s03Desc,
       tag: 'WEBGL & 3D MOTION',
       capabilities: ['WebGL & Shaders', 'Three.js Motion', '3D Asset Modeling', 'Interactive Scenes', 'Real-Time Graphics']
@@ -62,7 +62,7 @@ export default function ServicesAccordion() {
       code: '(004)',
       num: '04',
       title: t.s04Title,
-      subtitle: 'DESARROLLO WEB DE ALTO RENDIMIENTO & CÓDIGO CREATIVO',
+      subtitle: t.s04Subtitle || 'DESARROLLO WEB DE ALTO RENDIMIENTO & CÓDIGO CREATIVO',
       description: t.s04Desc,
       tag: 'CREATIVE FRONTEND',
       capabilities: ['Creative Frontend', 'React / Next.js', 'Headless CMS', 'Performance Audit', 'Shopify E-Commerce']
@@ -72,7 +72,7 @@ export default function ServicesAccordion() {
       code: '(005)',
       num: '05',
       title: t.s05Title,
-      subtitle: 'CRECIMIENTO DIGITAL & ACTIVOS DE CONVERSIÓN',
+      subtitle: t.s05Subtitle || 'CRECIMIENTO DIGITAL & ACTIVOS DE CONVERSIÓN',
       description: t.s05Desc,
       tag: 'GROWTH & MARKETING',
       capabilities: ['Digital Strategy', 'Social Content', 'Performance Campaigns', 'Growth Marketing', 'Analytics & SEO']

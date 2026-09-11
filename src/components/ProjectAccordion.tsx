@@ -234,7 +234,7 @@ function ProjectRow({ project, isOpen, onToggle }: ProjectRowProps) {
                       onClick={handleCaseClick}
                       className="px-6 py-3.5 bg-white text-black text-xs font-normal uppercase text-center hover:bg-neutral-200 transition-colors shadow-lg active:scale-95 touch-manipulation cursor-pointer"
                     >
-                      {t.viewCaseBtn} ↗
+                      {t.viewCaseBtn}
                     </a>
                   )}
                   {siteUrl && (

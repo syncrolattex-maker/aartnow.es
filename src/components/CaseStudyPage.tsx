@@ -8,12 +8,14 @@ import GlitchText from './GlitchText';
 import PowerGlitchText from './PowerGlitchText';
 import { casesData } from '../data/casesData';
 import { useDitherTransition } from '../context/DitherTransitionContext';
+import { useLanguage } from '../context/LanguageContext';
 
 interface CaseStudyPageProps {
   slug: string;
 }
 
 export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
+  const { t } = useLanguage();
   const { triggerTransition } = useDitherTransition();
   // Buscar datos del caso o fallback seguro a jack-and-ai
   const caseItem = casesData[slug] || casesData["jack-and-ai"];
@@ -54,13 +56,13 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
             className="text-xs text-white/60 hover:text-white uppercase font-normal tracking-widest transition-colors flex items-center gap-2 cursor-pointer group"
           >
             <span className="group-hover:-translate-x-1 transition-transform">←</span>
-            <span>VOLVER A TRABAJOS DESTACADOS</span>
+            <span>{t.caseBackToFeatured || 'VOLVER A TRABAJOS DESTACADOS'}</span>
           </a>
 
           <div className="flex flex-wrap items-center gap-3 text-xs text-white/50 font-normal uppercase">
-            <span>[ CLIENT: {caseItem.client} ]</span>
+            <span>[ {t.caseClientLabel || 'CLIENT'}: {caseItem.client} ]</span>
             <span>·</span>
-            <span>[ YEAR: {caseItem.year} ]</span>
+            <span>[ {t.caseYearLabel || 'YEAR'}: {caseItem.year} ]</span>
           </div>
         </div>
 
@@ -91,7 +93,7 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
                     rel="noreferrer"
                     className="px-8 py-4 bg-white text-black font-sans font-normal uppercase text-xs md:text-sm tracking-wider hover:bg-neutral-200 transition-all shadow-2xl inline-flex items-center gap-3 group"
                   >
-                    <span>VISITAR WEBSITE</span>
+                    <span>{t.caseVisitWebsite || 'VISITAR WEBSITE'}</span>
                     <span className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗</span>
                   </a>
                 </div>
@@ -100,19 +102,19 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
               {/* Ficha técnica resumida en Columna 1 */}
               <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/15 text-xs uppercase tracking-wider font-normal">
                 <div>
-                  <span className="text-white/40 block mb-1 font-light">[ CLIENTE ]</span>
+                  <span className="text-white/40 block mb-1 font-light">[ {t.caseClientLabel || 'CLIENTE'} ]</span>
                   <span className="font-normal text-white text-sm">{caseItem.client}</span>
                 </div>
                 <div>
-                  <span className="text-white/40 block mb-1 font-light">[ AÑO ]</span>
+                  <span className="text-white/40 block mb-1 font-light">[ {t.caseYearLabel || 'AÑO'} ]</span>
                   <span className="font-normal text-white text-sm">{caseItem.year}</span>
                 </div>
                 <div>
-                  <span className="text-white/40 block mb-1 font-light">[ SERVICIOS ]</span>
+                  <span className="text-white/40 block mb-1 font-light">[ {t.caseServicesLabel || 'SERVICIOS'} ]</span>
                   <span className="font-normal text-white text-xs leading-relaxed">{(caseItem.services || []).join(" / ")}</span>
                 </div>
                 <div>
-                  <span className="text-white/40 block mb-1 font-light">[ PLATAFORMA ]</span>
+                  <span className="text-white/40 block mb-1 font-light">[ {t.casePlatformLabel || 'PLATAFORMA'} ]</span>
                   <span className="font-normal text-white text-xs">{caseItem.category}</span>
                 </div>
               </div>
@@ -178,10 +180,10 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
         <section className="w-full px-6 md:px-12 lg:px-16 space-y-10 border-t border-white/15 pt-16">
           <div className="flex justify-between items-end">
             <h2 className="text-3xl md:text-5xl font-black uppercase text-white font-sans">
-              <GlitchText text="Galería del Proyecto" />
+              <GlitchText text={t.caseGalleryTitle || "Galería del Proyecto"} />
             </h2>
             <span className="text-xs text-white/40 uppercase font-sans tracking-widest hidden sm:block font-normal">
-              [ {galleryList.length} PIEZAS DE GALERÍA ]
+              [ {galleryList.length} {t.caseGalleryTitle ? t.caseGalleryTitle.toUpperCase() : 'PIEZAS'} ]
             </span>
           </div>
 
@@ -200,7 +202,7 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
         <section className="w-full px-6 md:px-12 lg:px-16 pt-16 border-t border-white/15">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end justify-between">
             <div className="lg:col-span-8 space-y-3">
-              <span className="text-xs text-white/40 uppercase block tracking-widest font-normal">[ SIGUIENTE CASO ]</span>
+              <span className="text-xs text-white/40 uppercase block tracking-widest font-normal">[ {t.navWork ? t.navWork.toUpperCase() : 'SIGUIENTE CASO'} ]</span>
               <a
                 href={`/cases/${caseItem.nextSlug}`}
                 onClick={(e) => navigateTo(`/cases/${caseItem.nextSlug}`, e)}
@@ -216,7 +218,7 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
                 onClick={(e) => navigateTo('/', e)}
                 className="px-8 py-4 border border-white/30 text-white text-xs font-normal uppercase tracking-widest hover:bg-white hover:text-black transition-colors cursor-pointer inline-block"
               >
-                VER TODOS LOS TRABAJOS
+                {t.caseViewAll || 'VER TODOS LOS TRABAJOS'}
               </a>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useLanguage } from '../context/LanguageContext';
 
 export type PortfolioCategory = 'TODO' | 'BRANDING' | 'CARTELES' | 'COMMERCE' | 'CORPORATE' | 'LOGO';
 
@@ -24,6 +25,7 @@ export default function PortfolioSubmenu({
   onSelectCategory,
   isVisible,
 }: PortfolioSubmenuProps) {
+  const { t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Escuchar si el menu hamburguesa esta abierto para no solapar
@@ -42,6 +44,12 @@ export default function PortfolioSubmenu({
   const handleCategoryClick = (catId: PortfolioCategory) => {
     if (catId === activeCategory) return;
     onSelectCategory(catId);
+  };
+
+  const getCategoryLabel = (cat: { id: PortfolioCategory; label: string }) => {
+    if (cat.id === 'TODO') return t.portfolioCatAll || 'TODO';
+    if (cat.id === 'CARTELES') return t.portfolioCatPosters || 'CARTELES';
+    return cat.label;
   };
 
   return (
@@ -68,7 +76,7 @@ export default function PortfolioSubmenu({
                       : 'text-white/60 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  {cat.label}
+                  {getCategoryLabel(cat)}
                 </button>
               );
             })}

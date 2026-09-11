@@ -9,7 +9,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useDitherTransition } from '../context/DitherTransitionContext';
 
 export default function AboutPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { triggerTransition } = useDitherTransition();
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function AboutPage() {
 
         {/* Fullwidth Line-by-Line Explosive Experience con textos dinámicos multi-idioma (ES / VAL / EN) */}
         <main className="w-full flex-1 pt-[34vh] relative z-10 flex flex-col items-center justify-center">
-          <ExplosiveList items={t.aboutBioLines} />
+          <ExplosiveList key={lang} items={t.aboutBioLines} />
 
           {/* Bloque final a pie de página: Contacto e Ilustración haciendo tope en el subfooter */}
           <section className="w-full min-h-[calc(100vh-45px)] mt-[10vh] sm:mt-[14vh] flex flex-col items-center justify-between px-4 sm:px-10 md:px-16 text-center pb-[45px]">
@@ -139,7 +139,7 @@ export default function AboutPage() {
             <div className="w-full flex items-end justify-center select-none pointer-events-none mt-6 sm:mt-12 leading-none">
               <img
                 src="/images/about-portrait-open.png"
-                alt="Aaron Primo Almarche - Mente creativa"
+                alt={t.aboutPortraitAlt || "Aaron Primo Almarche - Mente creativa"}
                 className="w-auto h-[365px] sm:h-[420px] md:h-[500px] lg:h-[580px] xl:h-[660px] aspect-[764/1024] object-contain object-bottom pointer-events-none block"
                 loading="eager"
                 decoding="async"

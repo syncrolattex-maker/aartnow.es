@@ -57,8 +57,8 @@ export default function ContactPage() {
             {/* Columna Izquierda (40%): Letras Grandes */}
             <div className="w-full lg:w-[40%] shrink-0">
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[4.6vw] xl:text-[5vw] font-black uppercase tracking-tighter text-white leading-[0.90] font-sans break-words">
-                Infórmanos<br />
-                de algo<span className="text-white/40">.</span>
+                {t.contactPageTitle1}<br />
+                {t.contactPageTitle2}<span className="text-white/40">.</span>
               </h1>
             </div>
 
@@ -68,10 +68,10 @@ export default function ContactPage() {
               {/* Arriba: Ponte en contacto */}
               <div className="space-y-2">
                 <span className="text-xs md:text-sm uppercase tracking-widest text-white/50 font-normal font-sans block">
-                  Ponte en contacto
+                  {t.contactPageSubtitle}
                 </span>
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold uppercase tracking-tight text-white font-sans">
-                  Hablemos de tu próximo proyecto.
+                  {t.contactPageHeading}
                 </h2>
               </div>
 
@@ -80,10 +80,10 @@ export default function ContactPage() {
               {/* 1. Estudio digital online */}
               <div className="space-y-1.5">
                 <p className="text-base sm:text-lg font-normal text-white font-sans">
-                  Estudio digital online
+                  {t.contactStudioType}
                 </p>
                 <p className="text-xs text-white/60 font-light font-sans leading-relaxed">
-                  Colaboración directa y remota · Valencia / Global
+                  {t.contactStudioCollab}
                 </p>
               </div>
 
@@ -96,7 +96,7 @@ export default function ContactPage() {
                   info@aartnow.es
                 </a>
                 <p className="text-xs text-white/60 font-light font-sans">
-                  Respuesta en 24h laborables
+                  {t.contactResponseTimeDetail}
                 </p>
               </div>
 
@@ -191,7 +191,7 @@ export default function ContactPage() {
                       </div>
 
                       <div className="flex flex-wrap gap-2">
-                        {['Branding', 'Diseño', '3D', 'Websites', 'Marketing'].map((type) => {
+                        {[t.catBranding, t.catDesign, t.cat3D, t.catWebsites, t.catMarketing].map((type) => {
                           const isSelected = projectTypes.includes(type);
                           return (
                             <button

@@ -8,7 +8,7 @@ export const translations = {
     navWhatWeDo: 'Lo que hago',
     navAbout: 'Sobre mí',
     navContact: 'Contacto',
-    pitchdeckBtn: 'El meu Dossier',
+    pitchdeckBtn: 'Mi Dossier',
     scheduleCallBtn: 'Programar una llamada',
     startProjectBtn: 'Comenzar un proyecto',
     getInTouchBtn: 'Contactar',
@@ -165,6 +165,39 @@ export const translations = {
     aboutCtaSubtitle: 'Hablemos de cómo el 3D y el diseño interactivo pueden elevar tu marca al siguiente nivel.',
     aboutCtaContactBtn: 'Iniciar un Proyecto ↗',
     aboutCtaBudgetBtn: 'Calcular Presupuesto Online ↗',
+    aboutPortraitAlt: 'Aaron Primo Almarche - Mente creativa',
+
+    // Contact Page Exclusive
+    contactPageTitle1: 'Infórmanos',
+    contactPageTitle2: 'de algo',
+    contactPageSubtitle: 'Ponte en contacto',
+    contactPageHeading: 'Hablemos de tu próximo proyecto.',
+    contactStudioType: 'Estudio digital online',
+    contactStudioCollab: 'Colaboración directa y remota · Valencia / Global',
+    contactResponseTimeDetail: 'Respuesta en 24h laborables',
+    contactConnect: 'Conectar',
+
+    // Case Study Page
+    caseBackToFeatured: 'VOLVER A TRABAJOS DESTACADOS',
+    caseClientLabel: 'CLIENTE',
+    caseYearLabel: 'AÑO',
+    caseServicesLabel: 'SERVICIOS',
+    casePlatformLabel: 'PLATAFORMA',
+    caseVisitWebsite: 'VISITAR WEBSITE',
+    caseGalleryTitle: 'Galería del Proyecto',
+    caseViewAll: 'VER TODOS LOS TRABAJOS',
+
+    // Portfolio & Services
+    portfolioCatAll: 'TODO',
+    portfolioCatPosters: 'CARTELES',
+    s01Subtitle: 'ESTRATEGIA VISUAL & SISTEMAS DE IDENTIDAD',
+    s02Subtitle: 'EXPERIENCIA DE USUARIO & ARQUITECTURA DE PRODUCTO',
+    s03Subtitle: 'COMPUTACIÓN GRÁFICA & EXPERIENCIAS ESPACIALES',
+    s04Subtitle: 'DESARROLLO WEB DE ALTO RENDIMIENTO & CÓDIGO CREATIVO',
+    s05Subtitle: 'CRECIMIENTO DIGITAL & ACTIVOS DE CONVERSIÓN',
+    p6Desc: 'Serie experimental de cartelería serigráfica y gráficos tipográficos de gran formato para festivales de arte contemporáneo.',
+    p7Desc: 'Catálogo de marcas vectoriales, monogramas geométricos y símbolos de identidad para startups de inteligencia artificial.',
+    tag3DDesign: 'Diseño 3D',
   },
 
   val: {
@@ -331,6 +364,39 @@ export const translations = {
     aboutCtaSubtitle: 'Parlem de com el 3D i el disseny interactiu poden elevar la teua marca al següent nivell.',
     aboutCtaContactBtn: 'Començar un Projecte ↗',
     aboutCtaBudgetBtn: 'Calcular Pressupost Online ↗',
+    aboutPortraitAlt: 'Aaron Primo Almarche - Ment creativa',
+
+    // Contact Page Exclusive
+    contactPageTitle1: 'Informa’ns',
+    contactPageTitle2: 'd’alguna cosa',
+    contactPageSubtitle: 'Posa’t en contacte',
+    contactPageHeading: 'Parlem del teu pròxim projecte.',
+    contactStudioType: 'Estudi digital online',
+    contactStudioCollab: 'Col·laboració directa i remota · València / Global',
+    contactResponseTimeDetail: 'Resposta en 24h laborables',
+    contactConnect: 'Connectar',
+
+    // Case Study Page
+    caseBackToFeatured: 'TORNAR A TREBALLS DESTACATS',
+    caseClientLabel: 'CLIENT',
+    caseYearLabel: 'ANY',
+    caseServicesLabel: 'SERVEIS',
+    casePlatformLabel: 'PLATAFORMA',
+    caseVisitWebsite: 'VISITAR WEB',
+    caseGalleryTitle: 'Galeria del Projecte',
+    caseViewAll: 'VEURE TOTS ELS TREBALLS',
+
+    // Portfolio & Services
+    portfolioCatAll: 'TOT',
+    portfolioCatPosters: 'CARTELLS',
+    s01Subtitle: 'ESTRATÈGIA VISUAL & SISTEMES D’IDENTITAT',
+    s02Subtitle: 'EXPERIÈNCIA D’USUARI & ARQUITECTURA DE PRODUCTE',
+    s03Subtitle: 'COMPUTACIÓ GRÀFICA & EXPERIÈNCIES ESPACIALS',
+    s04Subtitle: 'DESENVOLUPAMENT WEB D’ALT RENDIMENT & CODI CREATIU',
+    s05Subtitle: 'CREIXEMENT DIGITAL & ACTIUS DE CONVERSIÓ',
+    p6Desc: 'Sèrie experimental de cartelleria serigràfica i gràfics tipogràfics de gran format per a festivals d’art contemporani.',
+    p7Desc: 'Catàleg de marques vectorials, monogrames geomètrics i símbols d’identitat per a startups d’intel·ligència artificial.',
+    tag3DDesign: 'Disseny 3D',
   },
 
   en: {
@@ -497,5 +563,38 @@ export const translations = {
     aboutCtaSubtitle: "Let's explore how 3D artistry and interactive design can propel your brand forward.",
     aboutCtaContactBtn: 'Start a Project ↗',
     aboutCtaBudgetBtn: 'Calculate Budget Online ↗',
+    aboutPortraitAlt: 'Aaron Primo Almarche - Creative mind',
+
+    // Contact Page Exclusive
+    contactPageTitle1: 'Let’s talk',
+    contactPageTitle2: 'about something',
+    contactPageSubtitle: 'Get in touch',
+    contactPageHeading: 'Let’s talk about your next project.',
+    contactStudioType: 'Online digital studio',
+    contactStudioCollab: 'Direct and remote collaboration · Valencia / Global',
+    contactResponseTimeDetail: 'Response within 24 business hours',
+    contactConnect: 'Connect',
+
+    // Case Study Page
+    caseBackToFeatured: 'BACK TO FEATURED WORK',
+    caseClientLabel: 'CLIENT',
+    caseYearLabel: 'YEAR',
+    caseServicesLabel: 'SERVICES',
+    casePlatformLabel: 'PLATFORM',
+    caseVisitWebsite: 'VISIT WEBSITE',
+    caseGalleryTitle: 'Project Gallery',
+    caseViewAll: 'VIEW ALL WORK',
+
+    // Portfolio & Services
+    portfolioCatAll: 'ALL',
+    portfolioCatPosters: 'POSTERS',
+    s01Subtitle: 'VISUAL STRATEGY & IDENTITY SYSTEMS',
+    s02Subtitle: 'USER EXPERIENCE & PRODUCT ARCHITECTURE',
+    s03Subtitle: 'GRAPHIC COMPUTING & SPATIAL EXPERIENCES',
+    s04Subtitle: 'HIGH-PERFORMANCE WEB DEVELOPMENT & CREATIVE CODE',
+    s05Subtitle: 'DIGITAL GROWTH & CONVERSION ASSETS',
+    p6Desc: 'Experimental series of silkscreen posters and large-scale typographic graphics for contemporary art festivals.',
+    p7Desc: 'Catalog of vector trademarks, geometric monograms, and identity symbols for AI startups.',
+    tag3DDesign: '3D Design',
   }
 };

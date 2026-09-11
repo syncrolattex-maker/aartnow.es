@@ -12,7 +12,7 @@ export default function ProjectList() {
   const projectsData: ProjectItem[] = [
     {
       title: "3D Kinetic Sculpture",
-      tags: ["Diseño 3D", "Cinema 4D / 3ds Max", "Corona & V-Ray"],
+      tags: [t.tag3DDesign || "Diseño 3D", "Cinema 4D / 3ds Max", "Corona & V-Ray"],
       categories: ['3D', 'BRANDING', 'CARTELES'],
       description: t.p1Desc,
       caseUrl: "/cases/jack-and-ai",
@@ -94,7 +94,7 @@ export default function ProjectList() {
       title: "Poster Lab · Vol. II",
       tags: ["Print & Poster", "Typography", "CARTELES"],
       categories: ['CARTELES', 'BRANDING'],
-      description: "Serie experimental de carteleria serigrafica y graficos tipograficos de gran formato para festivales de arte contemporaneo.",
+      description: t.p6Desc || "Serie experimental de cartelería serigráfica y gráficos tipográficos de gran formato para festivales de arte contemporáneo.",
       caseUrl: "/cases/refraction-house",
       siteUrl: "#contact",
       thumbnails: [
@@ -110,7 +110,7 @@ export default function ProjectList() {
       title: "Logofolio 2026",
       tags: ["Identity System", "Logos", "LOGO"],
       categories: ['LOGO', 'BRANDING'],
-      description: "Catalogo de marcas vectoriales, monogramas geometricos y simbolos de identidad para startups de inteligencia artificial.",
+      description: t.p7Desc || "Catálogo de marcas vectoriales, monogramas geométricos y símbolos de identidad para startups de inteligencia artificial.",
       caseUrl: "/cases/jack-and-ai",
       siteUrl: "#contact",
       thumbnails: [
