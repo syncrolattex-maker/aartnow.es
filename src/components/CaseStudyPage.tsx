@@ -79,14 +79,24 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
                 <span className="px-3.5 py-1.5 bg-white/10 text-white border border-white/20 text-xs font-normal uppercase tracking-widest inline-block">
                   {caseItem.category}
                 </span>
-                <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[4.2vw] font-black uppercase text-white font-sans tracking-tight leading-[0.92]">
-                  <PowerGlitchText text={caseItem.title} as="span" />
-                </h1>
+                <GooeyLiquidText
+                  key={`${slug}-title`}
+                  text={caseItem.title}
+                  as="h1"
+                  className="text-4xl sm:text-6xl md:text-7xl lg:text-[4.2vw] font-black uppercase text-white font-sans tracking-tight leading-[0.92] block"
+                  autoPlayOnLoad={true}
+                  delay={0.1}
+                />
               </div>
 
-              <p className="text-sm md:text-base text-white/80 leading-relaxed font-light">
-                {caseItem.subtitle || caseItem.overview}
-              </p>
+              <GooeyLiquidText
+                key={`${slug}-sub`}
+                text={caseItem.subtitle || caseItem.overview}
+                as="p"
+                className="text-sm md:text-base text-white/80 leading-relaxed font-light block"
+                autoPlayOnLoad={true}
+                delay={0.3}
+              />
 
               {websiteUrl && (
                 <div>
@@ -142,13 +152,21 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
             {/* Columna 1: El Desafío y Métricas de Impacto */}
             <div className="space-y-8">
               <div className="space-y-4">
-                <h3 className="text-xl md:text-2xl font-normal uppercase text-white font-sans tracking-wide flex items-center gap-3">
+                <div className="flex items-center gap-3">
                   <span className="w-2 h-2 bg-white inline-block"></span>
-                  <GlitchText text="El Desafío" />
-                </h3>
-                <p className="text-sm md:text-base text-white/70 leading-relaxed max-w-xl font-light">
-                  {caseItem.challenge}
-                </p>
+                  <GooeyLiquidText
+                    key={`${slug}-challenge-title`}
+                    text="El Desafío"
+                    as="h3"
+                    className="text-xl md:text-2xl font-normal uppercase text-white font-sans tracking-wide inline-block"
+                  />
+                </div>
+                <GooeyLiquidText
+                  key={`${slug}-challenge-desc`}
+                  text={caseItem.challenge}
+                  as="p"
+                  className="text-sm md:text-base text-white/70 leading-relaxed max-w-xl font-light block"
+                />
               </div>
 
               {caseItem.metrics && caseItem.metrics.length > 0 && (
@@ -166,13 +184,21 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
             {/* Columna 2: La Solución */}
             <div className="space-y-8">
               <div className="space-y-4">
-                <h3 className="text-xl md:text-2xl font-normal uppercase text-white font-sans tracking-wide flex items-center gap-3">
+                <div className="flex items-center gap-3">
                   <span className="w-2 h-2 bg-white inline-block"></span>
-                  <GlitchText text="La Solución" />
-                </h3>
-                <p className="text-sm md:text-base text-white/70 leading-relaxed max-w-xl font-light">
-                  {caseItem.solution}
-                </p>
+                  <GooeyLiquidText
+                    key={`${slug}-solution-title`}
+                    text="La Solución"
+                    as="h3"
+                    className="text-xl md:text-2xl font-normal uppercase text-white font-sans tracking-wide inline-block"
+                  />
+                </div>
+                <GooeyLiquidText
+                  key={`${slug}-solution-desc`}
+                  text={caseItem.solution}
+                  as="p"
+                  className="text-sm md:text-base text-white/70 leading-relaxed max-w-xl font-light block"
+                />
               </div>
             </div>
 

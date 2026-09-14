@@ -5,12 +5,16 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 interface GooeyLiquidTextProps {
-  text: string;
-  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'div' | 'span';
+  text?: string;
+  children?: React.ReactNode;
+  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'div' | 'span' | 'p';
   className?: string;
   innerClassName?: string;
   scrollStart?: string;
   scrollEnd?: string;
+  delay?: number;        // Retardo para animaciones al cargar
+  duration?: number;     // Duración de la animación de entrada si no requiere scroll
+  autoPlayOnLoad?: boolean; // Forzar animación de entrada al cargar
   textBlur?: number;     // Blur CSS inicial en 'em'
   svgBlur?: number;      // stdDeviation inicial en px
   alphaMult?: number;    // Multiplicador de contraste alfa
@@ -20,11 +24,15 @@ interface GooeyLiquidTextProps {
 
 export default function GooeyLiquidText({
   text,
+  children,
   as: Component = 'h2',
   className = '',
   innerClassName = '',
   scrollStart = 'top 92%',
   scrollEnd = 'center 60%',
+  delay = 0,
+  duration = 1.3,
+  autoPlayOnLoad = false,
   textBlur = 0.32,
   svgBlur = 14,
   alphaMult = 380,
@@ -55,7 +63,7 @@ export default function GooeyLiquidText({
       if (!wrapper) return;
       const computedFont = parseFloat(window.getComputedStyle(wrapper).fontSize);
       if (computedFont && !isNaN(computedFont)) {
-        blurScale = Math.max(0.35, Math.min(2.0, computedFont / refFontSize));
+        blurScale = Math.max(0.25, Math.min(2.2, computedFont / refFontSize));
       }
     };
 
@@ -110,28 +118,52 @@ export default function GooeyLiquidText({
       );
     };
 
-    // Objeto animable por GSAP
     const state = { progress: 0 };
     render(0);
 
-    const tween = gsap.to(state, {
-      progress: 1,
-      ease: 'none',
-      onUpdate: () => render(state.progress),
-      scrollTrigger: {
-        trigger: wrapper,
-        start: scrollStart,
-        end: scrollEnd,
-        scrub: true,
-      },
-    });
+    let tween: gsap.core.Tween | null = null;
+
+    // Pequeño retardo para evaluar la posición en el viewport tras el render inicial
+    const initTimer = setTimeout(() => {
+      if (!wrapper) return;
+      const rect = wrapper.getBoundingClientRect();
+      const isAlreadyInViewport = rect.top < window.innerHeight * 0.85 && rect.bottom > 0;
+      const cannotScroll = document.documentElement.scrollHeight <= window.innerHeight + 50;
+
+      // Si ya está visible en pantalla al cargar o la página no tiene scroll suficiente:
+      if (autoPlayOnLoad || isAlreadyInViewport || cannotScroll) {
+        tween = gsap.to(state, {
+          progress: 1,
+          duration,
+          delay,
+          ease: 'power2.out',
+          onUpdate: () => render(state.progress),
+        });
+      } else {
+        // Si está más abajo en la página, se revela al scrollear
+        tween = gsap.to(state, {
+          progress: 1,
+          ease: 'none',
+          onUpdate: () => render(state.progress),
+          scrollTrigger: {
+            trigger: wrapper,
+            start: scrollStart,
+            end: scrollEnd,
+            scrub: true,
+          },
+        });
+      }
+    }, 40);
 
     return () => {
+      clearTimeout(initTimer);
       ScrollTrigger.removeEventListener('refreshInit', updateBlurScale);
-      if (tween.scrollTrigger) {
-        tween.scrollTrigger.kill();
+      if (tween) {
+        if (tween.scrollTrigger) {
+          tween.scrollTrigger.kill();
+        }
+        tween.kill();
       }
-      tween.kill();
       if (wrapper) {
         wrapper.style.filter = 'none';
       }
@@ -141,7 +173,7 @@ export default function GooeyLiquidText({
         inner.style.visibility = 'visible';
       }
     };
-  }, [filterId, scrollStart, scrollEnd, textBlur, svgBlur, alphaMult, alphaShift, refFontSize]);
+  }, [filterId, scrollStart, scrollEnd, delay, duration, autoPlayOnLoad, textBlur, svgBlur, alphaMult, alphaShift, refFontSize]);
 
   return (
     <>
@@ -167,14 +199,14 @@ export default function GooeyLiquidText({
       {/* Elemento de texto con wrapper exterior (recibe el filtro SVG) e inner span (recibe el blur CSS) */}
       <Component
         ref={wrapperRef as any}
-        className={`relative inline-block will-change-[filter] ${className}`}
+        className={`relative will-change-[filter] ${className}`}
       >
         <span
           ref={innerRef}
           className={`block will-change-[filter,opacity] ${innerClassName}`}
           style={{ visibility: 'hidden', opacity: 0 }}
         >
-          {text}
+          {children !== undefined ? children : text}
         </span>
       </Component>
     </>
