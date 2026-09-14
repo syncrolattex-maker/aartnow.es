@@ -6,6 +6,8 @@ import HalftoneCursorTrail from './HalftoneCursorTrail';
 import Scene from './WebGL/Scene';
 import GlitchText from './GlitchText';
 import PowerGlitchText from './PowerGlitchText';
+import GooeyLiquidText from './GooeyLiquidText';
+import SmoothScroll from './SmoothScroll';
 import { casesData } from '../data/casesData';
 import { useDitherTransition } from '../context/DitherTransitionContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -37,7 +39,8 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
   const websiteUrl = caseItem.websiteUrl || (caseItem as Record<string, any>).siteUrl || "";
 
   return (
-    <div className="min-h-screen w-full bg-[#000000] text-[#FFFDF3] font-sans selection:bg-white selection:text-black relative overflow-x-clip">
+    <SmoothScroll>
+      <div className="min-h-screen w-full bg-[#000000] text-[#FFFDF3] font-sans selection:bg-white selection:text-black relative overflow-x-clip">
       <Scene />
       <div className="dither-bg-overlay" />
       <div className="grain-overlay" />
@@ -179,9 +182,13 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
         {/* ── BLOQUE 3: GALERÍA DEL PROYECTO EN 2 COLUMNAS (Grid 2 Columnas) ── */}
         <section className="w-full px-6 md:px-12 lg:px-16 space-y-10 border-t border-white/15 pt-16">
           <div className="flex justify-between items-end">
-            <h2 className="text-3xl md:text-5xl font-black uppercase text-white font-sans">
-              <GlitchText text={t.caseGalleryTitle || "Galería del Proyecto"} />
-            </h2>
+            <GooeyLiquidText
+              text={t.caseGalleryTitle || "Galería del Proyecto"}
+              as="h2"
+              className="text-3xl md:text-5xl font-black uppercase text-white font-sans"
+              scrollStart="top 90%"
+              scrollEnd="center 60%"
+            />
             <span className="text-xs text-white/40 uppercase font-sans tracking-widest hidden sm:block font-normal">
               [ {galleryList.length} {t.caseGalleryTitle ? t.caseGalleryTitle.toUpperCase() : 'PIEZAS'} ]
             </span>
@@ -206,9 +213,15 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
               <a
                 href={`/cases/${caseItem.nextSlug}`}
                 onClick={(e) => navigateTo(`/cases/${caseItem.nextSlug}`, e)}
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5vw] font-normal uppercase text-white font-sans hover:text-white/70 transition-colors cursor-pointer leading-[0.95] block"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5vw] font-normal uppercase text-white font-sans hover:text-white/70 transition-colors cursor-pointer leading-[0.95] block group"
               >
-                {caseItem.nextTitle} ↗
+                <GooeyLiquidText
+                  text={`${caseItem.nextTitle} ↗`}
+                  as="span"
+                  className="inline-block"
+                  scrollStart="top 92%"
+                  scrollEnd="center 65%"
+                />
               </a>
             </div>
 
@@ -226,5 +239,6 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
 
       </main>
     </div>
+    </SmoothScroll>
   );
 }
