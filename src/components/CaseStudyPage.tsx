@@ -24,6 +24,10 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 150);
+    return () => clearTimeout(timer);
   }, [slug]);
 
   const navigateTo = (path: string, e?: React.MouseEvent) => {
