@@ -17,8 +17,8 @@ interface CaseStudyPageProps {
 export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
   const { t } = useLanguage();
   const { triggerTransition } = useDitherTransition();
-  // Buscar datos del caso o fallback seguro a jack-and-ai
-  const caseItem = casesData[slug] || casesData["jack-and-ai"];
+  // Buscar datos del caso o fallback seguro a kinetic-sculpture
+  const caseItem = casesData[slug] || casesData["kinetic-sculpture"];
 
   useEffect(() => {
     window.scrollTo(0, 0);

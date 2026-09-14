@@ -196,7 +196,7 @@ export const translations = {
     s04Subtitle: 'DESARROLLO WEB DE ALTO RENDIMIENTO & CÓDIGO CREATIVO',
     s05Subtitle: 'CRECIMIENTO DIGITAL & ACTIVOS DE CONVERSIÓN',
     p6Desc: 'Serie experimental de cartelería serigráfica y gráficos tipográficos de gran formato para festivales de arte contemporáneo.',
-    p7Desc: 'Catálogo de marcas vectoriales, monogramas geométricos y símbolos de identidad para startups de inteligencia artificial.',
+    p7Desc: 'Catálogo de marcas vectoriales, monogramas geométricos y símbolos de identidad para startups tecnológicas y marcas contemporáneas.',
     tag3DDesign: 'Diseño 3D',
   },
 
@@ -395,7 +395,7 @@ export const translations = {
     s04Subtitle: 'DESENVOLUPAMENT WEB D’ALT RENDIMENT & CODI CREATIU',
     s05Subtitle: 'CREIXEMENT DIGITAL & ACTIUS DE CONVERSIÓ',
     p6Desc: 'Sèrie experimental de cartelleria serigràfica i gràfics tipogràfics de gran format per a festivals d’art contemporani.',
-    p7Desc: 'Catàleg de marques vectorials, monogrames geomètrics i símbols d’identitat per a startups d’intel·ligència artificial.',
+    p7Desc: 'Catàleg de marques vectorials, monogrames geomètrics i símbols d’identitat per a startups tecnològiques i marques contemporànies.',
     tag3DDesign: 'Disseny 3D',
   },
 
@@ -594,7 +594,7 @@ export const translations = {
     s04Subtitle: 'HIGH-PERFORMANCE WEB DEVELOPMENT & CREATIVE CODE',
     s05Subtitle: 'DIGITAL GROWTH & CONVERSION ASSETS',
     p6Desc: 'Experimental series of silkscreen posters and large-scale typographic graphics for contemporary art festivals.',
-    p7Desc: 'Catalog of vector trademarks, geometric monograms, and identity symbols for AI startups.',
+    p7Desc: 'Catalog of vector trademarks, geometric monograms, and identity symbols for technology startups and contemporary brands.',
     tag3DDesign: '3D Design',
   }
 };

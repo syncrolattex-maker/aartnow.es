@@ -15,8 +15,8 @@ export default function ProjectList() {
       tags: [t.tag3DDesign || "Diseño 3D", "Cinema 4D / 3ds Max", "Corona & V-Ray"],
       categories: ['3D', 'BRANDING', 'CARTELES'],
       description: t.p1Desc,
-      caseUrl: "/cases/jack-and-ai",
-      siteUrl: "https://jackandai.com",
+      caseUrl: "/cases/kinetic-sculpture",
+      siteUrl: "https://aartnow.es",
       thumbnails: [
         "/projects/project1-1.jpg",
         "/projects/project1-2.jpg"
@@ -110,8 +110,8 @@ export default function ProjectList() {
       title: "Logofolio 2026",
       tags: ["Identity System", "Logos", "LOGO"],
       categories: ['LOGO', 'BRANDING'],
-      description: t.p7Desc || "Catálogo de marcas vectoriales, monogramas geométricos y símbolos de identidad para startups de inteligencia artificial.",
-      caseUrl: "/cases/jack-and-ai",
+      description: t.p7Desc || "Catálogo de marcas vectoriales, monogramas geométricos y símbolos de identidad para startups tecnológicas y marcas contemporáneas.",
+      caseUrl: "/cases/kinetic-sculpture",
       siteUrl: "#contact",
       thumbnails: [
         "https://images.unsplash.com/photo-1626785774573-4b799315345d?q=75&w=600&auto=format&fit=crop",

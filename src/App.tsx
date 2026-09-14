@@ -61,7 +61,7 @@ function AppContent() {
   const { triggerTransition } = useDitherTransition();
   const [loading, setLoading] = useState(true);
   const [currentRoute, setCurrentRoute] = useState<'home' | 'admin' | 'presupuesto' | 'case' | 'contact' | 'about'>('home');
-  const [caseSlug, setCaseSlug] = useState<string>('jack-and-ai');
+  const [caseSlug, setCaseSlug] = useState<string>('kinetic-sculpture');
 
   // Failsafe absoluto para que jamás se quede congelado en pantalla negra
   useEffect(() => {

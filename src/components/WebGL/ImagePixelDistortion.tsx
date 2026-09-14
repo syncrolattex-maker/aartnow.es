@@ -18,7 +18,7 @@ const fragmentShader = `
   uniform vec2 uMouse;
   varying vec2 vUv;
 
-  // Jack & AI Pixel Distortion + RGB Chromatic Shift GLSL Shader
+  // Interactive Pixel Distortion + RGB Chromatic Shift GLSL Shader
   void main() {
     vec2 uv = vUv;
 

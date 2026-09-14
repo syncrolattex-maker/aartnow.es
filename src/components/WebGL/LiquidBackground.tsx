@@ -72,7 +72,7 @@ const fragmentShader = `
     float distortionIntensity = uScrollVelocity * 0.8 + uGlitchBurst * 2.2;
     float pixelEffect = clamp(pixelBlock * distortionIntensity + uGlitchBurst * 0.7, 0.0, 1.0);
 
-    // Monochromatic & Jack & AI Red Signal Pixel Highlight Colors
+    // Monochromatic & Red Signal Pixel Highlight Colors
     vec3 baseBg = vec3(0.0, 0.0, 0.0);
     vec3 redSignal = vec3(1.0, 0.075, 0.0); // #FF1300
     vec3 pixelColor = mix(vec3(0.08, 0.08, 0.08), redSignal, clamp(uScrollVelocity * 0.5 + uGlitchBurst * 0.9, 0.0, 1.0));

@@ -18,8 +18,8 @@ export interface CaseStudy {
 }
 
 export const casesData: Record<string, CaseStudy> = {
-  "jack-and-ai": {
-    slug: "jack-and-ai",
+  "kinetic-sculpture": {
+    slug: "kinetic-sculpture",
     title: "3D Kinetic Sculpture",
     client: "Exploración Tipográfica 3D",
     year: "2026",
@@ -136,7 +136,7 @@ export const casesData: Record<string, CaseStudy> = {
       "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1400&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1400&auto=format&fit=crop"
     ],
-    nextSlug: "jack-and-ai",
-    nextTitle: "Jack & AI"
+    nextSlug: "kinetic-sculpture",
+    nextTitle: "3D Kinetic Sculpture"
   }
 };
