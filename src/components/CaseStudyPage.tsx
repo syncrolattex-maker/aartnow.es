@@ -6,7 +6,7 @@ import HalftoneCursorTrail from './HalftoneCursorTrail';
 import Scene from './WebGL/Scene';
 import GlitchText from './GlitchText';
 import PowerGlitchText from './PowerGlitchText';
-import GooeyLiquidText from './GooeyLiquidText';
+import RedactedTextReveal from './RedactedTextReveal';
 import SmoothScroll from './SmoothScroll';
 import { casesData } from '../data/casesData';
 import { useDitherTransition } from '../context/DitherTransitionContext';
@@ -83,23 +83,25 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
                 <span className="px-3.5 py-1.5 bg-white/10 text-white border border-white/20 text-xs font-normal uppercase tracking-widest inline-block">
                   {caseItem.category}
                 </span>
-                <GooeyLiquidText
+                <RedactedTextReveal
                   key={`${slug}-title`}
                   text={caseItem.title}
                   as="h1"
                   className="text-4xl sm:text-6xl md:text-7xl lg:text-[4.2vw] font-black uppercase text-white font-sans tracking-tight leading-[0.92] block"
                   autoPlayOnLoad={true}
-                  delay={0.1}
+                  delay={0.25}
+                  stagger={0.06}
                 />
               </div>
 
-              <GooeyLiquidText
+              <RedactedTextReveal
                 key={`${slug}-sub`}
                 text={caseItem.subtitle || caseItem.overview}
                 as="p"
                 className="text-sm md:text-base text-white/80 leading-relaxed font-light block"
                 autoPlayOnLoad={true}
-                delay={0.3}
+                delay={0.45}
+                stagger={0.03}
               />
 
               {websiteUrl && (
@@ -158,18 +160,19 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <span className="w-2 h-2 bg-white inline-block"></span>
-                  <GooeyLiquidText
+                  <RedactedTextReveal
                     key={`${slug}-challenge-title`}
                     text="El Desafío"
                     as="h3"
                     className="text-xl md:text-2xl font-normal uppercase text-white font-sans tracking-wide inline-block"
                   />
                 </div>
-                <GooeyLiquidText
+                <RedactedTextReveal
                   key={`${slug}-challenge-desc`}
                   text={caseItem.challenge}
                   as="p"
                   className="text-sm md:text-base text-white/70 leading-relaxed max-w-xl font-light block"
+                  stagger={0.02}
                 />
               </div>
 
@@ -190,18 +193,19 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <span className="w-2 h-2 bg-white inline-block"></span>
-                  <GooeyLiquidText
+                  <RedactedTextReveal
                     key={`${slug}-solution-title`}
                     text="La Solución"
                     as="h3"
                     className="text-xl md:text-2xl font-normal uppercase text-white font-sans tracking-wide inline-block"
                   />
                 </div>
-                <GooeyLiquidText
+                <RedactedTextReveal
                   key={`${slug}-solution-desc`}
                   text={caseItem.solution}
                   as="p"
                   className="text-sm md:text-base text-white/70 leading-relaxed max-w-xl font-light block"
+                  stagger={0.02}
                 />
               </div>
             </div>
@@ -212,12 +216,11 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
         {/* ── BLOQUE 3: GALERÍA DEL PROYECTO EN 2 COLUMNAS (Grid 2 Columnas) ── */}
         <section className="w-full px-6 md:px-12 lg:px-16 space-y-10 border-t border-white/15 pt-16">
           <div className="flex justify-between items-end">
-            <GooeyLiquidText
+            <RedactedTextReveal
               text={t.caseGalleryTitle || "Galería del Proyecto"}
               as="h2"
               className="text-3xl md:text-5xl font-black uppercase text-white font-sans"
-              scrollStart="top 90%"
-              scrollEnd="center 60%"
+              stagger={0.06}
             />
             <span className="text-xs text-white/40 uppercase font-sans tracking-widest hidden sm:block font-normal">
               [ {galleryList.length} {t.caseGalleryTitle ? t.caseGalleryTitle.toUpperCase() : 'PIEZAS'} ]
@@ -245,12 +248,11 @@ export default function CaseStudyPage({ slug }: CaseStudyPageProps) {
                 onClick={(e) => navigateTo(`/cases/${caseItem.nextSlug}`, e)}
                 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5vw] font-normal uppercase text-white font-sans hover:text-white/70 transition-colors cursor-pointer leading-[0.95] block group"
               >
-                <GooeyLiquidText
+                <RedactedTextReveal
                   text={`${caseItem.nextTitle} ↗`}
                   as="span"
                   className="inline-block"
-                  scrollStart="top 92%"
-                  scrollEnd="center 65%"
+                  stagger={0.06}
                 />
               </a>
             </div>
