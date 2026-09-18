@@ -65,10 +65,6 @@ export default function Header() {
         setActiveSectionLabel('CASE STUDY');
         return;
       }
-      if (path.startsWith('/wiki') || path.startsWith('/brain')) {
-        setActiveSectionLabel('WIKI · BRAIN');
-        return;
-      }
       if (path.startsWith('/presupuesto') || path.startsWith('/estimador')) {
         setActiveSectionLabel('ESTIMADOR');
         return;
@@ -376,21 +372,6 @@ export default function Header() {
               >
                 <span className="text-base sm:text-lg font-normal tracking-tight font-sans text-white">
                   <GlitchText text={t.navAbout} />
-                </span>
-              </a>
-
-              {/* Nav Item: Wiki & Digital Garden */}
-              <a 
-                href="/wiki" 
-                onClick={(e) => handleNavClick('/wiki', e)} 
-                className="gsap-menu-item h-14 flex items-center justify-between px-6 border-b border-white/10 hover:bg-white/[0.04] transition-colors"
-              >
-                <span className="text-base sm:text-lg font-normal tracking-tight font-sans text-white flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <GlitchText text="Wiki & Brain" />
-                </span>
-                <span className="text-[10px] font-mono uppercase text-white/40 border border-white/15 px-2 py-0.5">
-                  LLM AI
                 </span>
               </a>
 
